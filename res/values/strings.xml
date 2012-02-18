@@ -2,4 +2,7 @@
 <resources>
     <string name="hello">Hello World, PdfViewerActivity!</string>
     <string name="app_name">PdfViewer</string>
+    <string name="initialPageText">Page 0</string>
+    <string name="next">Next</string>
+    <string name="prev">Prev</string>
 </resources>

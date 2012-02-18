@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -499,6 +500,9 @@ public abstract class PdfViewerActivity extends Activity {
 			LinearLayout.LayoutParams lpWrap1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);
 			LinearLayout.LayoutParams lpWrap10 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,10);
 
+			lpWrap1.gravity = Gravity.CENTER_HORIZONTAL;
+			lpWrap10.gravity = Gravity.CENTER_HORIZONTAL;
+			
             // vertical layout
 			LinearLayout vl=new LinearLayout(context);
 			vl.setLayoutParams(lpWrap10);
