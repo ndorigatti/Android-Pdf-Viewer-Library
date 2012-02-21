@@ -65,7 +65,21 @@ public class FlateDecode {
             // copy the data, since the array() method is not supported
             // on raf-based ByteBuffers
             data = new byte[bufSize];
-            buf.get(data);
+            
+            /* FYI:
+             * The code below is a necessary hack. Due to Android's use of the class MapperByteBufferAdapter, sometimes
+             * the position of the wrapped buffer would be at it's limit, while the members of the wrapped buffer would
+             * not match this but _would_ be at our desired value of zero. There doesn't appear to be any functions within
+             * this MappedByteBufferAdapter class to reset the position. To fix this, we initially call the basic get() 
+             * function that returns a byte. This function actually resets the wrapped buffer's position to the value
+             * of the adapter class. get(byte[]) for some reason does not do this! Just look at the Android source code
+             * for MappedByteBufferAdapter! After this, we call the standard get with an offset and continue as usual!
+             * This happens in 2 other places as well.
+             * //buf.get(data);
+             */
+            data[0] = buf.get();
+            buf.get(data, 1, data.length - 1);
+
             inf.setInput(data);
         }
 

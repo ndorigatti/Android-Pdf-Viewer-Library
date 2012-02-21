@@ -70,7 +70,14 @@ public class DCTDecode {
         
         // copy the data into a byte array required by createimage
         byte[] ary = new byte[buf.remaining()];
-        buf.get(ary);
+        
+        /*
+         * FYI
+         * This is the same hack as explained in FlateDecode
+         * //buf.get(ary);
+         */
+        ary[0] = buf.get();
+        buf.get(ary, 1, ary.length - 1);
 
         Bitmap img = BitmapFactory.decodeByteArray(ary, 0, ary.length);
 
