@@ -76,7 +76,7 @@ public abstract class PdfViewerActivity extends Activity {
 	public static final boolean DEFAULTSHOWIMAGES = true;
 	public static final boolean DEFAULTANTIALIAS = true;
 	public static final boolean DEFAULTUSEFONTSUBSTITUTION = false;
-	public static final boolean DEFAULTKEEPCACHES = false;
+	public static final boolean DEFAULTKEEPCACHES = true;
     
 	private final static int MENU_NEXT_PAGE = 1;
 	private final static int MENU_PREV_PAGE = 2;
