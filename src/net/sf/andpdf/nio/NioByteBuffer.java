@@ -22,11 +22,13 @@ public final class NioByteBuffer extends ByteBuffer {
      */
     private java.nio.ByteBuffer nioBuf;
 
-    public byte[] array() {
+    @Override
+	public byte[] array() {
         return nioBuf.array();
     }
 
-    public int arrayOffset() {
+    @Override
+	public int arrayOffset() {
         return nioBuf.arrayOffset();
     }
 
@@ -74,7 +76,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.compareTo(otherBuffer);
     }
 
-    public NioByteBuffer duplicate() {
+    @Override
+	public NioByteBuffer duplicate() {
         return new NioByteBuffer(nioBuf.duplicate());
     }
 
@@ -83,31 +86,38 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.equals(other);
     }
 
-    public void flip() {
+    @Override
+	public void flip() {
         nioBuf.flip();
     }
 
-    public byte get() {
+    @Override
+	public byte get() {
         return nioBuf.get();
     }
 
-    public void get(final byte[] dest, final int off, final int len) {
+    @Override
+	public void get(final byte[] dest, final int off, final int len) {
         nioBuf.get(dest, off, len);
     }
 
-    public void get(final byte[] dest) {
+    @Override
+	public void get(final byte[] dest) {
         nioBuf.get(dest);
     }
 
-    public byte get(final int index) {
+    @Override
+	public byte get(final int index) {
         return nioBuf.get(index);
     }
 
-    public char getChar() {
+    @Override
+	public char getChar() {
         return nioBuf.getChar();
     }
 
-    public char getChar(final int index) {
+    @Override
+	public char getChar(final int index) {
         return nioBuf.getChar(index);
     }
 
@@ -127,7 +137,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.getFloat(index);
     }
 
-    public int getInt() {
+    @Override
+	public int getInt() {
         return nioBuf.getInt();
     }
 
@@ -135,7 +146,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.getInt(index);
     }
 
-    public long getLong() {
+    @Override
+	public long getLong() {
         return nioBuf.getLong();
     }
 
@@ -143,7 +155,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.getLong(index);
     }
 
-    public short getShort() {
+    @Override
+	public short getShort() {
         return nioBuf.getShort();
     }
 
@@ -151,7 +164,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.getShort(index);
     }
 
-    public boolean hasArray() {
+    @Override
+	public boolean hasArray() {
         return nioBuf.hasArray();
     }
 
@@ -160,7 +174,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.hashCode();
     }
 
-    public boolean hasRemaining() {
+    @Override
+	public boolean hasRemaining() {
         return nioBuf.hasRemaining();
     }
 
@@ -172,15 +187,18 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.isReadOnly();
     }
 
-    public int limit() {
+    @Override
+	public int limit() {
         return nioBuf.limit();
     }
 
-    public void limit(final int newLimit) {
+    @Override
+	public void limit(final int newLimit) {
         nioBuf.limit(newLimit);
     }
 
-    public void mark() {
+    @Override
+	public void mark() {
         nioBuf.mark();
     }
 
@@ -192,15 +210,18 @@ public final class NioByteBuffer extends ByteBuffer {
         return nioBuf.order(byteOrder);
     }
 
-    public int position() {
+    @Override
+	public int position() {
         return nioBuf.position();
     }
 
-    public void position(final int newPosition) {
+    @Override
+	public void position(final int newPosition) {
         nioBuf.position(newPosition);
     }
 
-    public void put(final byte b) {
+    @Override
+	public void put(final byte b) {
         nioBuf.put(b);
     }
 
@@ -209,7 +230,8 @@ public final class NioByteBuffer extends ByteBuffer {
         return this;
     }
 
-    public void put(final byte[] src) {
+    @Override
+	public void put(final byte[] src) {
         nioBuf.put(src);
     }
 
@@ -218,15 +240,18 @@ public final class NioByteBuffer extends ByteBuffer {
         return this;
     }
 
-    public void put(final ByteBuffer src) {
+    @Override
+	public void put(final ByteBuffer src) {
         nioBuf.put(src.toNIO());
     }
 
-    public void put(final int index, final byte b) {
+    @Override
+	public void put(final int index, final byte b) {
         nioBuf.put(index, b);
     }
 
-    public void putChar(final char value) {
+    @Override
+	public void putChar(final char value) {
         nioBuf.putChar(value);
     }
 
@@ -255,11 +280,13 @@ public final class NioByteBuffer extends ByteBuffer {
         return this;
     }
 
-    public void putInt(final int index, final int value) {
+    @Override
+	public void putInt(final int index, final int value) {
         nioBuf.putInt(index, value);
     }
 
-    public void putInt(final int value) {
+    @Override
+	public void putInt(final int value) {
         nioBuf.putInt(value);
     }
 
@@ -267,7 +294,8 @@ public final class NioByteBuffer extends ByteBuffer {
         nioBuf.putLong(index, value);
     }
 
-    public void putLong(final long value) {
+    @Override
+	public void putLong(final long value) {
         nioBuf.putLong(value);
     }
 
@@ -275,23 +303,28 @@ public final class NioByteBuffer extends ByteBuffer {
         nioBuf.putShort(index, value);
     }
 
-    public void putShort(final short value) {
+    @Override
+	public void putShort(final short value) {
         nioBuf.putShort(value);
     }
 
-    public int remaining() {
+    @Override
+	public int remaining() {
         return nioBuf.remaining();
     }
 
-    public void reset() {
+    @Override
+	public void reset() {
         nioBuf.reset();
     }
 
-    public void rewind() {
+    @Override
+	public void rewind() {
         nioBuf.rewind();
     }
 
-    public NioByteBuffer slice() {
+    @Override
+	public NioByteBuffer slice() {
         return new NioByteBuffer(nioBuf.slice());
     }
 
@@ -304,7 +337,8 @@ public final class NioByteBuffer extends ByteBuffer {
         this.nioBuf = nioBuf;
     }
 
-    public java.nio.ByteBuffer toNIO() {
+    @Override
+	public java.nio.ByteBuffer toNIO() {
         return nioBuf;
     }
 

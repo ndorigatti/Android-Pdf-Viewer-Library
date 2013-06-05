@@ -41,7 +41,8 @@ public class PNGPredictor extends Predictor {
     /**
      * Undo data based on the png algorithm
      */
-    public ByteBuffer unpredict(ByteBuffer imageData)
+    @Override
+	public ByteBuffer unpredict(ByteBuffer imageData)
         throws IOException
     {
         List<byte[]> rows = new ArrayList<byte[]>();
@@ -55,7 +56,7 @@ public class PNGPredictor extends Predictor {
         
         while(imageData.remaining() >= rowSize + 1) {
             // the first byte determines the algorithm
-            int algorithm = (int) (imageData.get() & 0xff);
+            int algorithm = imageData.get() & 0xff;
             
             // read the rest of the line
             curLine = new byte[rowSize];

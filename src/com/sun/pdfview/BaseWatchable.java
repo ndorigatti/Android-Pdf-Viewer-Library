@@ -76,7 +76,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
         // do nothing
     }
 
-    public void run() {
+    @Override
+	public void run() {
         // System.out.println(Thread.currentThread().getName() + " starting");
 
         // call setup once we started
@@ -142,7 +143,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      *
      * @return one of the well-known statuses
      */
-    public int getStatus() {
+    @Override
+	public int getStatus() {
         return status;
     }
 
@@ -168,7 +170,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * Stop this watchable.  Stop will cause all processing to cease,
      * and the watchable to be destroyed.
      */
-    public void stop() {
+    @Override
+	public void stop() {
         setStatus(Watchable.STOPPED);
     }
 
@@ -178,7 +181,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * Note the watchable may be stopped if go() with a
      * different time is called during execution.
      */
-    public synchronized void go() {
+    @Override
+	public synchronized void go() {
         gate = null;
 
         execute(false);
@@ -203,7 +207,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      *
      * @param steps the number of steps to run for
      */
-    public synchronized void go(int steps) {
+    @Override
+	public synchronized void go(int steps) {
         gate = new Gate();
         gate.setStopIterations(steps);
 
@@ -216,7 +221,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      *
      * @param millis the number of milliseconds to run for
      */
-    public synchronized void go(long millis) {
+    @Override
+	public synchronized void go(long millis) {
         gate = new Gate();
         gate.setStopTime(millis);
 

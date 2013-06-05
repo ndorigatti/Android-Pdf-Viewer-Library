@@ -109,7 +109,7 @@ public abstract class CMap {
     public static CMap getMap (ByteBuffer data) {
         short format = data.getShort ();
         short lengthShort = data.getShort ();
-        int length = 0xFFFF & (int) lengthShort;
+        int length = 0xFFFF & lengthShort;
 //        System.out.println (
 //                "CMAP, length: " + length + ", short: " + lengthShort);
 

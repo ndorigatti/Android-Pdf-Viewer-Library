@@ -19,10 +19,7 @@
 package com.sun.pdfview;
 
 import java.io.*;
-import java.util.Map;
-import java.util.HashMap;
 import java.nio.CharBuffer;
-import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 
 /**

@@ -62,7 +62,8 @@ public class Type0Font extends PDFFont {
     /**
      * Get a character from the first font in the descendant fonts array
      */
-    protected PDFGlyph getGlyph(char src, String name) {
+    @Override
+	protected PDFGlyph getGlyph(char src, String name) {
         return (getDescendantFont(0).getGlyph(src, name));
     }
 }

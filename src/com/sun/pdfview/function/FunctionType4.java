@@ -80,7 +80,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(Math.abs(popDouble()));
                 }
             });
@@ -95,7 +96,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(popDouble() + popDouble());
                 }
             });
@@ -114,7 +116,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double den = popDouble();
                     double num = popDouble();
                     if (den == 0.0) {
@@ -135,7 +138,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(Math.ceil(popDouble()));
                 }
             });
@@ -160,8 +164,9 @@ public class FunctionType4 extends PDFFunction {
                  * errors: invalidaccess, rangecheck, stackunderflow,
                  *         syntaxError, typecheck,
                  */
-                void eval() {
-                    pushDouble((double) ((int) popDouble()));
+                @Override
+				void eval() {
+                    pushDouble(((int) popDouble()));
                 }
             });
             operationSet.add(new Operation("cvr") {
@@ -182,7 +187,8 @@ public class FunctionType4 extends PDFFunction {
                  * errors: invalidaccess, limitcheck, stackunderflow,
                  *         syntaxerror, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
 
                     // YOUR CODE IN THIS SPACE
                 }
@@ -199,7 +205,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num2 = popDouble();
                     double num1 = popDouble();
                     pushDouble(num1 / num2);
@@ -217,7 +224,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double exponent = popDouble();
                     double base = popDouble();
                     pushDouble(Math.pow(exponent, base));
@@ -234,7 +242,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(Math.floor(popDouble()));
                 }
             });
@@ -250,7 +259,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     long int2 = popLong();
                     long int1 = popLong();
                     pushLong(int1 / int2);
@@ -266,7 +276,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: rangecheck, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(Math.log(popDouble()));
                 }
             });
@@ -280,7 +291,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors:  rangecheck, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(Math.log10(popDouble()));
                 }
             });
@@ -297,7 +309,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     long int2 = popLong();
                     long int1 = popLong();
                     pushLong(int1 % int2);
@@ -315,7 +328,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(popDouble() * popDouble());
                 }
             });
@@ -331,7 +345,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(-popDouble());
                 }
             });
@@ -348,7 +363,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushLong(Math.round(popDouble()));
                 }
             });
@@ -362,7 +378,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double radians = Math.toRadians(popDouble());
                     pushDouble(Math.toDegrees(Math.sin(radians)));
                 }
@@ -377,7 +394,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: rangecheck, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushDouble(Math.sqrt(popDouble()));
                 }
             });
@@ -393,7 +411,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck, undefinedresult
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num2 = popDouble();
                     double num1 = popDouble();
                     pushDouble(num1 - num2);
@@ -410,9 +429,10 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num1 = popDouble();
-                    pushDouble(((double) ((long) num1) - num1));
+                    pushDouble((((long) num1) - num1));
                 }
             });
 
@@ -429,7 +449,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushLong(popLong() & popLong());
                 }
             });
@@ -448,7 +469,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     long shift = popLong();
                     long int1 = popLong();
                     pushLong(int1 << shift);
@@ -484,7 +506,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: invalidaccess, stackunderflow
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushBoolean(popObject().equals(popObject()));
                 }
             });
@@ -498,7 +521,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackoverflow
                  */
-                void eval() {   
+                @Override
+				void eval() {   
                     pushBoolean(false);
                 }
             });
@@ -519,7 +543,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: invalidaccess, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num2 = popDouble();
                     double num1 = popDouble();
                     pushBoolean(num1 >= num2);
@@ -541,7 +566,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: invalidaccess, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num2 = popDouble();
                     double num1 = popDouble();
                     pushBoolean(num1 > num2);
@@ -564,7 +590,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: invalidaccess, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num2 = popDouble();
                     double num1 = popDouble();
                     pushBoolean(num1 <= num2);
@@ -586,7 +613,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: invalidaccess, stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     double num2 = popDouble();
                     double num1 = popDouble();
                     pushBoolean(num1 < num2);
@@ -603,7 +631,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: invalidaccess, stackunderflow
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushBoolean(!popObject().equals(popObject()));
                 }
             });
@@ -618,7 +647,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushLong(~popLong());
                 }
             });
@@ -632,7 +662,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushLong(popLong() | popLong());
                 }
             });
@@ -646,7 +677,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackoverflow
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushBoolean(true);
                 }
             });
@@ -660,7 +692,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     pushLong(popLong() ^ popLong());
                 }
             });
@@ -680,7 +713,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     if (popBoolean()) {
                         stack.addFirst(popExpression());
                     } else {
@@ -704,7 +738,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     // execute expr1 if bool is true, expr2 if false
                     if (popBoolean()) {
 //                        expression.push(popExpression());
@@ -761,7 +796,8 @@ public class FunctionType4 extends PDFFunction {
                  * errors: invalidaccess, rangecheck, stackoverflow,
                  * stackunderflow, typecheck
                  */
-                void eval() {
+                @Override
+				void eval() {
                     long count = popLong();
 // ????
                     Object obj = stack.removeFirst();
@@ -780,7 +816,8 @@ public class FunctionType4 extends PDFFunction {
                  *
                  * errors: stackoverflow, stackunderflow
                  */
-                void eval() {
+                @Override
+				void eval() {
                     Object obj = popObject();
                     pushObject(obj);
                     pushObject(obj);
@@ -788,7 +825,8 @@ public class FunctionType4 extends PDFFunction {
             });
             operationSet.add(new Operation("exch") {
 
-                void eval() {   // <i>any1 any2</i> <b>exch</b> <i>any2 any1</i> - exchange top of stack
+                @Override
+				void eval() {   // <i>any1 any2</i> <b>exch</b> <i>any2 any1</i> - exchange top of stack
                     Object any1 = popObject();
                     Object any2 = popObject();
                     pushObject(any2);
@@ -797,7 +835,8 @@ public class FunctionType4 extends PDFFunction {
             });
             operationSet.add(new Operation("index") {
 
-                void eval() {   // <i>anyn ... any0 n</i> <b>index</b> <i>anyn ... any0 anyn</i>
+                @Override
+				void eval() {   // <i>anyn ... any0 n</i> <b>index</b> <i>anyn ... any0 anyn</i>
                     Object obj = stack.removeFirst();
                     stack.addFirst(obj);
                     stack.addFirst(obj);
@@ -805,13 +844,15 @@ public class FunctionType4 extends PDFFunction {
             });
             operationSet.add(new Operation("pop") {
 
-                void eval() {   // discard top element
+                @Override
+				void eval() {   // discard top element
                     stack.removeFirst();
                 }
             });
             operationSet.add(new Operation("roll") {
 
-                void eval() {
+                @Override
+				void eval() {
                     // <i>anyn-1 ... any0 n j</i> <b>roll</b> <i>any(j-1)mod n ... anyn-1 ... any</i>
                     // Roll n elements up j times
                     Object obj = stack.removeFirst();
@@ -823,7 +864,8 @@ public class FunctionType4 extends PDFFunction {
     }
 
     /** Read the function information from a PDF Object */
-    protected void parse(PDFObject obj) throws IOException {
+    @Override
+	protected void parse(PDFObject obj) throws IOException {
         // read the postscript from the stream
         readPS(obj.getStreamBuffer());
         throw new PDFParseException("Unsupported function type 4.");
@@ -839,7 +881,8 @@ public class FunctionType4 extends PDFFunction {
      * @param outputs an array of size <i>n</i> which will be filled
      *                with the output values, or null to return a new array
      */
-    protected void doFunction(float[] inputs, int inputOffset,
+    @Override
+	protected void doFunction(float[] inputs, int inputOffset,
             float[] outputs, int outputOffset) {
     }
 
@@ -894,7 +937,8 @@ public class FunctionType4 extends PDFFunction {
 
     class Expression extends LinkedList {
 
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if (obj instanceof Expression) {
                 // actually validate the list contents are the same expressions
                 return true;
@@ -929,7 +973,8 @@ public class FunctionType4 extends PDFFunction {
          * @param obj
          * @return
          */
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if (obj instanceof Operation) {
                 return ((Operation) obj).operatorName.equals(operatorName);
             } else if (obj instanceof String) {

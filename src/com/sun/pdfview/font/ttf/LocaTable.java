@@ -72,7 +72,8 @@ public class LocaTable extends TrueTypeTable {
     
    
     /** get the data in this map as a ByteBuffer */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         int size = getLength();
         
         ByteBuffer buf = ByteBuffer.allocate(size);
@@ -93,12 +94,13 @@ public class LocaTable extends TrueTypeTable {
     }
     
     /** Initialize this structure from a ByteBuffer */
-    public void setData(ByteBuffer data) {
+    @Override
+	public void setData(ByteBuffer data) {
         for (int i = 0; i < offsets.length; i++) {
             if (isLongFormat()) {
                 offsets[i] = data.getInt();
             } else {
-                offsets[i] = 2 * ( 0xFFFF & (int) data.getShort());
+                offsets[i] = 2 * ( 0xFFFF & data.getShort());
             }
         }
     }
@@ -106,7 +108,8 @@ public class LocaTable extends TrueTypeTable {
     /**
      * Get the length of this table
      */
-    public int getLength() {
+    @Override
+	public int getLength() {
         if (isLongFormat()) {
             return offsets.length * 4;
         } else {

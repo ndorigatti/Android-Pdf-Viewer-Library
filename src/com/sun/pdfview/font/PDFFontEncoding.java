@@ -131,7 +131,7 @@ public class PDFFontEncoding {
 
         // see if this character is in the differences list
         if (differences.containsKey(new Character(src))) {
-            charName = (String) differences.get(new Character(src));
+            charName = differences.get(new Character(src));
         } else if (baseEncoding != null) {
             // get the character name from the base encoding
             int charID = baseEncoding[src];

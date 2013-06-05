@@ -85,7 +85,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Get the length of this table
      */
-    public short getLength() {
+    @Override
+	public short getLength() {
         // start with the size of the fixed header
         short size = 16;
         
@@ -110,7 +111,8 @@ public class CMapFormat4 extends CMap {
     /** 
      * Cannot map from a byte
      */
-    public byte map(byte src) {
+    @Override
+	public byte map(byte src) {
         char c = map((char) src);
         if (c < Byte.MIN_VALUE || c > Byte.MAX_VALUE) {
             // out of range
@@ -123,7 +125,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Map from char
      */
-    public char map(char src) {
+    @Override
+	public char map(char src) {
         // find first segment with endcode > src
         for (Iterator i = segments.keySet().iterator(); i.hasNext();) {
             Segment s = (Segment) i.next();
@@ -155,7 +158,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Get the src code which maps to the given glyphID
      */
-    public char reverseMap(short glyphID) {
+    @Override
+	public char reverseMap(short glyphID) {
         // look at each segment
         for (Iterator i = segments.keySet().iterator(); i.hasNext();) {
             Segment s = (Segment) i.next();
@@ -192,7 +196,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Get the data in this map as a ByteBuffer
      */
-    public void setData(int length, ByteBuffer data) {
+    @Override
+	public void setData(int length, ByteBuffer data) {
         // read the table size values
         short segCount = (short) (data.getShort() / 2);
         short searchRange = data.getShort();
@@ -264,12 +269,13 @@ public class CMapFormat4 extends CMap {
     /** 
      * Get the data in the map as a byte buffer
      */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         ByteBuffer buf = ByteBuffer.allocate(getLength());
     
         // write the header
         buf.putShort(getFormat());
-        buf.putShort((short) getLength());
+        buf.putShort(getLength());
         buf.putShort(getLanguage());
         
         // write the various values
@@ -434,7 +440,8 @@ public class CMapFormat4 extends CMap {
         }
         
         /** Segments sort by increasing endCode */
-        public int compareTo(Object o) {
+        @Override
+		public int compareTo(Object o) {
             if (!(o instanceof Segment)) {
                 return -1;
             }

@@ -192,7 +192,7 @@ public class PDFRenderer extends BaseWatchable implements Runnable {
      * push() was called.
      */
     public void pop() {
-        state = (GraphicsState) stack.pop();
+        state = stack.pop();
 
         setTransform(state.xform);
         setClip(state.cliprgn);
@@ -600,7 +600,7 @@ public class PDFRenderer extends BaseWatchable implements Runnable {
         Canvas graphics = null;
 
         if (imageRef != null) {
-            BiCa bica = (BiCa) imageRef.get();
+            BiCa bica = imageRef.get();
             if (bica != null) {
                 graphics = bica.createCa();
             }
@@ -628,7 +628,8 @@ public class PDFRenderer extends BaseWatchable implements Runnable {
      *                 has gone away
      *         </ul>
      */
-    public int iterate() throws Exception {
+    @Override
+	public int iterate() throws Exception {
         // make sure we have a page to render
         if (page == null) {
             return Watchable.COMPLETED;

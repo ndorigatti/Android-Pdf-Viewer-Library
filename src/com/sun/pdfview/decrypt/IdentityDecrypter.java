@@ -35,7 +35,8 @@ public class IdentityDecrypter implements PDFDecrypter {
 
     private static IdentityDecrypter INSTANCE = new IdentityDecrypter();
 
-    public ByteBuffer decryptBuffer(String cryptFilterName,
+    @Override
+	public ByteBuffer decryptBuffer(String cryptFilterName,
             PDFObject streamObj, ByteBuffer streamBuf)
             throws PDFParseException {
 
@@ -46,7 +47,8 @@ public class IdentityDecrypter implements PDFDecrypter {
         return streamBuf;
     }
 
-    public String decryptString(int objNum, int objGen, String inputBasicString) {
+    @Override
+	public String decryptString(int objNum, int objGen, String inputBasicString) {
         return inputBasicString;
     }
 
@@ -54,11 +56,13 @@ public class IdentityDecrypter implements PDFDecrypter {
         return INSTANCE;
     }
 
-    public boolean isEncryptionPresent() {
+    @Override
+	public boolean isEncryptionPresent() {
         return false;
     }
 
-    public boolean isOwnerAuthorised() {
+    @Override
+	public boolean isOwnerAuthorised() {
         return false;
     }
 }

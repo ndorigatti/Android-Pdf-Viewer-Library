@@ -91,7 +91,8 @@ public class TTFFont extends OutlineFont {
     /**
      * Get the outline of a character given the character code
      */
-    protected synchronized Path getOutline(char src, float width) {
+    @Override
+	protected synchronized Path getOutline(char src, float width) {
         // find the cmaps
         CmapTable cmap = (CmapTable) font.getTable("cmap");
 
@@ -147,7 +148,8 @@ public class TTFFont extends OutlineFont {
     /**
      * Get the outline of a character given the character name
      */
-    protected synchronized Path getOutline(String name, float width) {
+    @Override
+	protected synchronized Path getOutline(String name, float width) {
         int idx;
         PostTable post = (PostTable) font.getTable("post");
         if (post != null) {
@@ -185,7 +187,7 @@ public class TTFFont extends OutlineFont {
 
         // calculate the advance
         HmtxTable hmtx = (HmtxTable) font.getTable("hmtx");
-        float advance = (float) hmtx.getAdvance(glyphId) / (float) unitsPerEm;
+        float advance = hmtx.getAdvance(glyphId) / unitsPerEm;
 
         // scale the glyph to match the desired advance
         float widthfactor = width / advance;

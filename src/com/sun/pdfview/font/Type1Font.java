@@ -508,20 +508,20 @@ public class Type1Font extends OutlineFont {
         int loc = 0;
         float x1, x2, x3, y1, y2, y3;
         while (loc < cs.length) {
-            int v = ((int) cs[loc++]) & 0xff;
+            int v = (cs[loc++]) & 0xff;
             if (v == 255) {
-                stack[sloc++] = ((((int) cs[loc]) & 0xff) << 24) +
-                        ((((int) cs[loc + 1]) & 0xff) << 16) +
-                        ((((int) cs[loc + 2]) & 0xff) << 8) +
-                        ((((int) cs[loc + 3]) & 0xff));
+                stack[sloc++] = (((cs[loc]) & 0xff) << 24) +
+                        (((cs[loc + 1]) & 0xff) << 16) +
+                        (((cs[loc + 2]) & 0xff) << 8) +
+                        (((cs[loc + 3]) & 0xff));
                 loc += 4;
 //		System.out.println("Pushed long "+stack[sloc-1]);
             } else if (v >= 251) {
-                stack[sloc++] = -((v - 251) << 8) - (((int) cs[loc]) & 0xff) - 108;
+                stack[sloc++] = -((v - 251) << 8) - ((cs[loc]) & 0xff) - 108;
                 loc++;
 //		System.out.println("Pushed lo "+stack[sloc-1]);
             } else if (v >= 247) {
-                stack[sloc++] = ((v - 247) << 8) + (((int) cs[loc]) & 0xff) + 108;
+                stack[sloc++] = ((v - 247) << 8) + ((cs[loc]) & 0xff) + 108;
                 loc++;
 //		System.out.println("Pushed hi "+stack[sloc-1]);
             } else if (v >= 32) {
@@ -597,7 +597,7 @@ public class Type1Font extends OutlineFont {
                     case 11:  // return
                         return;
                     case 12:  // ext...
-                        v = ((int) cs[loc++]) & 0xff;
+                        v = (cs[loc++]) & 0xff;
                         if (v == 6) {  // s x y b a seac
                         	char a = (char) pop();
                             char b = (char) pop();
@@ -762,7 +762,7 @@ public class Type1Font extends OutlineFont {
 
         Path pathBorig = getOutline(b, getWidth(b, null));
         // don't manipulate the original glyph
-        Path pathB = (Path) new Path(pathBorig);
+        Path pathB = new Path(pathBorig);
 
         Matrix xformB = new Matrix();
         if (at.invert(xformB)) {
@@ -833,7 +833,8 @@ public class Type1Font extends OutlineFont {
      * @param name the name of the desired glyph
      * @return the glyph outline, or null if unavailable
      */
-    protected Path getOutline(String name, float width) {
+    @Override
+	protected Path getOutline(String name, float width) {
         // make sure we have a valid name
         if (name == null || !name2outline.containsKey(name)) {
             name = ".notdef";
@@ -880,7 +881,8 @@ public class Type1Font extends OutlineFont {
      * @param src the character code of the desired glyph
      * @return the glyph outline
      */
-    protected Path getOutline(char src, float width) {
+    @Override
+	protected Path getOutline(char src, float width) {
         return getOutline(chr2name[src & 0xff], width);
     }
 }

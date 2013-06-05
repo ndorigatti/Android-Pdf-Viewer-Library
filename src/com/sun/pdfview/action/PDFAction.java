@@ -59,8 +59,10 @@ public class PDFAction {
         // create the action based on the type
         PDFAction action = null;
         String type = typeObj.getStringValue();
+
         if (type.equals("GoTo")) {
             action = new GoToAction(obj, root);
+          
         } else {
             /** [JK FIXME: Implement other action types! ] */
             throw new PDFParseException("Unknown Action type: " + type);

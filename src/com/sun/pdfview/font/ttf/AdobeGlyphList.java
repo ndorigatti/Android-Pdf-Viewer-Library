@@ -76,7 +76,8 @@ public class AdobeGlyphList {
         unicodeToGlyph = new HashMap<Integer, String>(4500);
         glyphLoaderThread = new Thread(new Runnable() {
 
-            public void run() {
+            @Override
+			public void run() {
                 int[] codes;
                 StringTokenizer codeTokens;
                 String glyphName;

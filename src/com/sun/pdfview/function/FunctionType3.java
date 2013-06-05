@@ -21,8 +21,6 @@
 package com.sun.pdfview.function;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParseException;
 
@@ -110,7 +108,8 @@ public class FunctionType3 extends PDFFunction {
      * and the <b>Bounds</b> array to the domain of the corresponding function.
      * </li></p>
      */
-    protected void parse(PDFObject obj) throws IOException {
+    @Override
+	protected void parse(PDFObject obj) throws IOException {
         // read the Functions array (required)
         PDFObject functionsObj = obj.getDictRef("Functions");
         if (functionsObj == null) {
@@ -156,7 +155,8 @@ public class FunctionType3 extends PDFFunction {
      * @param outputs an array of size <i>n</i> which will be filled
      *                with the output values, or null to return a new array
      */
-    protected void doFunction(float[] inputs, int inputOffset,
+    @Override
+	protected void doFunction(float[] inputs, int inputOffset,
             float[] outputs, int outputOffset) {
         // calculate the encoded values for each input
         float[] encoded = new float[getNumInputs()];

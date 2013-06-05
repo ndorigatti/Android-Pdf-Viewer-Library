@@ -21,9 +21,6 @@
 
 package com.sun.pdfview.decode;
 
-import java.io.IOException;
-import java.nio.IntBuffer;
-
 import net.sf.andpdf.nio.ByteBuffer;
 
 import android.graphics.Bitmap;
@@ -33,7 +30,6 @@ import android.util.Log;
 
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParseException;
-import com.sun.pdfview.colorspace.PDFColorSpace;
 
 /**
  * decode a DCT encoded array into a byte array.  This class uses Java's

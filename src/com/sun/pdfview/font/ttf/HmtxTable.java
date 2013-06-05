@@ -68,7 +68,8 @@ public class HmtxTable extends TrueTypeTable {
     }
     
     /** get the data in this map as a ByteBuffer */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         int size = getLength();
         
         ByteBuffer buf = ByteBuffer.allocate(size);
@@ -89,7 +90,8 @@ public class HmtxTable extends TrueTypeTable {
     }
     
     /** Initialize this structure from a ByteBuffer */
-    public void setData(ByteBuffer data) {
+    @Override
+	public void setData(ByteBuffer data) {
         // some PDF writers subset the font but don't update the number of glyphs in the maxp table,
         // this would appear to break the TTF spec.
         // A better solution might be to try and override the numGlyphs in the maxp table based
@@ -117,7 +119,8 @@ public class HmtxTable extends TrueTypeTable {
     /**
      * Get the length of this table
      */
-    public int getLength() {
+    @Override
+	public int getLength() {
         return (advanceWidths.length * 2) + (leftSideBearings.length * 2);
     }
 }

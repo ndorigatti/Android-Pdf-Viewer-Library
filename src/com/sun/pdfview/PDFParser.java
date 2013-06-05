@@ -516,7 +516,8 @@ public class PDFParser extends BaseWatchable {
      *                 no longer available
      *         </ul> 
      */
-    public int iterate() throws Exception {
+    @Override
+	public int iterate() throws Exception {
         // make sure the page is still available, and create the reference
         // to it for use within this iteration
         cmds = (PDFPage) pageRef.get();
@@ -995,7 +996,7 @@ public class PDFParser extends BaseWatchable {
         // pop graphics state ('Q')
         cmds.addPop();
         // pop the parser state
-        state = (ParserState) parserStates.pop();
+        state = parserStates.pop();
     }
 
     /**
@@ -1138,7 +1139,7 @@ public class PDFParser extends BaseWatchable {
             } else {
                 float elts[] = new float[6];
                 for (int i = 0; i < elts.length; i++) {
-                    elts[i] = ((PDFObject) matrix.getAt(i)).getFloatValue();
+                    elts[i] = matrix.getAt(i).getFloatValue();
                 }
                 at = new Matrix();
                 Utils.setMatValues(at, elts);
@@ -1285,13 +1286,13 @@ public class PDFParser extends BaseWatchable {
         }
 
 
-        PDFObject imObj = (PDFObject) hm.get("ImageMask");
+        PDFObject imObj = hm.get("ImageMask");
         if (imObj != null && imObj.getBooleanValue()) {
             // [PATCHED by michal.busta@gmail.com] - default value according to PDF spec. is [0, 1]
             // there is no need to swap array - PDF image should handle this values
             Double[] decode = {new Double(0), new Double(1)};
 
-            PDFObject decodeObj = (PDFObject) hm.get("Decode");
+            PDFObject decodeObj = hm.get("Decode");
             if (decodeObj != null) {
                 decode[0] = new Double(decodeObj.getAt(0).getDoubleValue());
                 decode[1] = new Double(decodeObj.getAt(1).getDoubleValue());

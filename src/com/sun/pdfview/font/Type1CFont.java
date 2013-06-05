@@ -99,7 +99,7 @@ public class Type1CFont extends OutlineFont {
         char[] parts = new char[17];
         int partsloc = 0;
         for (int i = 0; i < data.length; i++) {
-            int d = ((int) data[i]) & 0xff;
+            int d = (data[i]) & 0xff;
             if (d == 0) {
                 parts[partsloc++] = '.';
             } else if (d < 32 || d >= 127) {
@@ -130,23 +130,23 @@ public class Type1CFont extends OutlineFont {
      * @param charstring ????
      */
     private int readNext (boolean charstring) {
-        num = (int) (data[pos++]) & 0xff;
+        num = (data[pos++]) & 0xff;
         if (num == 30 && !charstring) { // goofy floatingpoint rep
             readFNum ();
             return type = FLT;
         } else if (num == 28) {
-            num = (((int) data[pos]) << 8) + (((int) data[pos + 1]) & 0xff);
+            num = ((data[pos]) << 8) + ((data[pos + 1]) & 0xff);
             pos += 2;
             return type = NUM;
         } else if (num == 29 && !charstring) {
-            num = (((int) data[pos] & 0xff) << 24) |
-                    (((int) data[pos + 1] & 0xff) << 16) |
-                    (((int) data[pos + 2] & 0xff) << 8) |
-                    (((int) data[pos + 3] & 0xff));
+            num = ((data[pos] & 0xff) << 24) |
+                    ((data[pos + 1] & 0xff) << 16) |
+                    ((data[pos + 2] & 0xff) << 8) |
+                    ((data[pos + 3] & 0xff));
             pos += 4;
             return type = NUM;
         } else if (num == 12) {  // two-byte command
-            num = 1000 + ((int) (data[pos++]) & 0xff);
+            num = 1000 + ((data[pos++]) & 0xff);
             return type = CMD;
         } else if (num < 32) {
             return type = CMD;
@@ -154,19 +154,19 @@ public class Type1CFont extends OutlineFont {
             num -= 139;
             return type = NUM;
         } else if (num < 251) {
-            num = (num - 247) * 256 + (((int) data[pos++]) & 0xff) + 108;
+            num = (num - 247) * 256 + ((data[pos++]) & 0xff) + 108;
             return type = NUM;
         } else if (num < 255) {
-            num = -(num - 251) * 256 - (((int) data[pos++]) & 0xff) - 108;
+            num = -(num - 251) * 256 - ((data[pos++]) & 0xff) - 108;
             return type = NUM;
         } else if (!charstring) { // dict shouldn't have a 255 code
             printData ();
             throw new RuntimeException ("Got a 255 code while reading dict");
         } else { // num was 255
-            fnum = ((((int) data[pos] & 0xff) << 24) |
-                    (((int) data[pos + 1] & 0xff) << 16) |
-                    (((int) data[pos + 2] & 0xff) << 8) |
-                    (((int) data[pos + 3] & 0xff))) / 65536f;
+            fnum = (((data[pos] & 0xff) << 24) |
+                    ((data[pos + 1] & 0xff) << 16) |
+                    ((data[pos + 2] & 0xff) << 8) |
+                    ((data[pos + 3] & 0xff))) / 65536f;
             pos += 4;
             return type = FLT;
         }
@@ -222,7 +222,7 @@ public class Type1CFont extends OutlineFont {
     private int readInt (int len) {
         int n = 0;
         for (int i = 0; i < len; i++) {
-            n = (n << 8) | (((int) data[pos++]) & 0xff);
+            n = (n << 8) | ((data[pos++]) & 0xff);
         }
         return n;
     }
@@ -232,7 +232,7 @@ public class Type1CFont extends OutlineFont {
      * @return the byte
      */
     private int readByte () {
-        return ((int) data[pos++]) & 0xff;
+        return (data[pos++]) & 0xff;
     }
 
     // DICT structure:
@@ -312,7 +312,8 @@ public class Type1CFont extends OutlineFont {
             return start + len;
         }
 
-        public String toString () {
+        @Override
+		public String toString () {
             return "Range: start: " + start + ", len: " + len;
         }
     }
@@ -386,13 +387,13 @@ public class Type1CFont extends OutlineFont {
                 charstringtype = (int) stack[0];
             } else if (cmd == 1007) { // fontmatrix
                 if (stackptr == 4) {
-                    at = Utils.createMatrix((float) stack[0], (float) stack[1],
-                            (float) stack[2], (float) stack[3],
+                    at = Utils.createMatrix(stack[0], stack[1],
+                            stack[2], stack[3],
                             0, 0);
                 } else {
-                    at = Utils.createMatrix((float) stack[0], (float) stack[1],
-                            (float) stack[2], (float) stack[3],
-                            (float) stack[4], (float) stack[5]);
+                    at = Utils.createMatrix(stack[0], stack[1],
+                            stack[2], stack[3],
+                            stack[4], stack[5]);
                 }
             } else if (cmd == 15) { // charset
                 charsetbase = (int) stack[0];
@@ -1152,7 +1153,8 @@ public class Type1CFont extends OutlineFont {
      * @param name the name of the desired glyph
      * @return the glyph outline, or null if unavailable
      */
-    protected Path getOutline (String name, float width) {
+    @Override
+	protected Path getOutline (String name, float width) {
         // first find the index of this name
         int index = getNameIndex (name);
 
@@ -1175,9 +1177,10 @@ public class Type1CFont extends OutlineFont {
      * @param src the character code of the desired glyph
      * @return the glyph outline
      */
-    protected Path getOutline (char src, float width) {
+    @Override
+	protected Path getOutline (char src, float width) {
         // ignore high bits
-        int index = (int) (src & 0xff);
+        int index = src & 0xff;
 
         // if we use a standard encoding, the mapping is from glyph to SID
         // therefore we must find the glyph index in the name table

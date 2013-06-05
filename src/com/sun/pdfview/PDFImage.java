@@ -20,7 +20,6 @@
  */
 package com.sun.pdfview;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import com.sun.pdfview.colorspace.PDFColorSpace;
 import com.sun.pdfview.function.FunctionType0;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -274,7 +272,7 @@ public class PDFImage {
 				int n=0;
 				for (int h = 0; h<maxH; h++) {
 					for (int w = 0; w<getWidth(); w++) {
-						line[w] = ((0xff&(int)imgBytes[n])<<8|(0xff&(int)imgBytes[n+1]))<<8|(0xff&(int)imgBytes[n+2])|0xFF000000;
+						line[w] = ((0xff&imgBytes[n])<<8|(0xff&imgBytes[n+1]))<<8|(0xff&imgBytes[n+2])|0xFF000000;
 	//            			line[w] = Color.rgb(0xff&(int)imgBytes[n], 0xff&(int)imgBytes[n+1],0xff&(int)imgBytes[n+2]);
 						n+=3;
 					}
@@ -291,7 +289,7 @@ public class PDFImage {
 			int n=0;
 			for (int h = 0; h<maxH; h++) {
 				for (int w = 0; w<getWidth(); w++) {
-					int gray = 0xff&(int)imgBytes[n];
+					int gray = 0xff&imgBytes[n];
 					line[w] = (gray<<8|gray)<<8|gray|0xFF000000;
 					n+=1;
 				}

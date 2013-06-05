@@ -269,14 +269,14 @@ public class PDFPage {
      * get the width of this page, after rotation
      */
     public float getWidth() {
-        return (float) bbox.width();
+        return bbox.width();
     }
 
     /**
      * get the height of this page, after rotation
      */
     public float getHeight() {
-        return (float) bbox.height();
+        return bbox.height();
     }
 
     /**
@@ -650,7 +650,8 @@ class PDFImageCmd extends PDFCmd {
         this.image = image;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         return state.drawImage(image);
     }
 }
@@ -666,7 +667,8 @@ class PDFFillPaintCmd extends PDFCmd {
         this.p = p;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         state.setFillPaint(p);
         return null;
     }
@@ -683,7 +685,8 @@ class PDFStrokePaintCmd extends PDFCmd {
         this.p = p;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         state.setStrokePaint(p);
         return null;
     }
@@ -700,7 +703,8 @@ class PDFFillAlphaCmd extends PDFCmd {
         this.a = a;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         // TODO [FHe]: fill alpha
 //        state.setFillAlpha(a);
         return null;
@@ -718,7 +722,8 @@ class PDFStrokeAlphaCmd extends PDFCmd {
         this.a = a;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         // TODO [FHe]: stroke alpha
 //        state.setStrokeAlpha(a);
         return null;
@@ -730,7 +735,8 @@ class PDFStrokeAlphaCmd extends PDFCmd {
  */
 class PDFPushCmd extends PDFCmd {
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         state.push();
         return null;
     }
@@ -741,7 +747,8 @@ class PDFPushCmd extends PDFCmd {
  */
 class PDFPopCmd extends PDFCmd {
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         state.pop();
         return null;
     }
@@ -761,7 +768,8 @@ class PDFXformCmd extends PDFCmd {
         this.mat = mat;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         state.transform(mat);
         return null;
     }
@@ -837,7 +845,8 @@ class PDFChangeStrokeCmd extends PDFCmd {
         this.phase = phase;
     }
 
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         state.setStrokeParts(w, cap, join, limit, ary, phase);
         return null;
     }

@@ -321,7 +321,7 @@ public class PDFTextFormat implements Cloneable {
         Utils.setMatValues(scale, fsize, 0, 0, fsize * th, 0, tr);
         final Matrix at = new Matrix();
 
-        final List<PDFGlyph> l = (List<PDFGlyph>) font.getGlyphs(text);
+        final List<PDFGlyph> l = font.getGlyphs(text);
 
         for (final PDFGlyph glyph : l) {
             at.set(cur);

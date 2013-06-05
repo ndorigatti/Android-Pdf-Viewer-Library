@@ -29,9 +29,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.andpdf.nio.ByteBuffer;
-
 import android.graphics.RectF;
-
 import com.sun.pdfview.action.GoToAction;
 import com.sun.pdfview.action.PDFAction;
 import com.sun.pdfview.decrypt.EncryptionUnsupportedByPlatformException;
@@ -828,7 +826,7 @@ public class PDFFile {
         }
         PDFObject[] objlist = new PDFObject[ary.size()];
         for (int i = 0; i < objlist.length; i++) {
-            objlist[i] = (PDFObject) ary.get(i);
+            objlist[i] = ary.get(i);
         }
         return new PDFObject(this, PDFObject.ARRAY, objlist);
     }
@@ -1460,6 +1458,7 @@ public class PDFFile {
                                     PDFDestination.getDestination(destObj, getRoot());
 
                             action = new GoToAction(dest);
+                            
                         } catch (IOException ioe) {
                             // oh well
                         }

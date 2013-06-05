@@ -1685,7 +1685,8 @@ public class FullScrollView extends FrameLayout {
      *
      * <p>This version also clamps the scrolling to the bounds of our child.
      */
-    public void scrollTo(int x, int y) {
+    @Override
+	public void scrollTo(int x, int y) {
         // we rely on the fact the View.scrollBy calls scrollTo.
         if (getChildCount() > 0) {
             View child = getChildAt(0);

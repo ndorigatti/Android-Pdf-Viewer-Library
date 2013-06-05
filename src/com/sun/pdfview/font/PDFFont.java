@@ -303,7 +303,7 @@ public abstract class PDFFont {
         }
 
         // try the cache
-        PDFGlyph glyph = (PDFGlyph) charCache.get(new Character(src));
+        PDFGlyph glyph = charCache.get(new Character(src));
 
         // if it's not there, add it to the cache
         if (glyph == null) {

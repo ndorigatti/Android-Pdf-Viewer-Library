@@ -80,7 +80,8 @@ public class HheaTable extends TrueTypeTable {
     /**
      * Parse the data before it is set
      */
-    public void setData(ByteBuffer data) {
+    @Override
+	public void setData(ByteBuffer data) {
         if (data.remaining() != 36) {
             throw new IllegalArgumentException("Bad Head table size");
         }
@@ -109,7 +110,8 @@ public class HheaTable extends TrueTypeTable {
     /**
      * Get the data we have stored
      */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         ByteBuffer buf = ByteBuffer.allocate(getLength());
         
         buf.putInt(getVersion());
@@ -142,7 +144,8 @@ public class HheaTable extends TrueTypeTable {
     /**
      * Get the length of this table
      */
-    public int getLength() {
+    @Override
+	public int getLength() {
         return 36;
     }
     
@@ -165,7 +168,8 @@ public class HheaTable extends TrueTypeTable {
     /**
      * Create a pretty string
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer buf = new StringBuffer();
         String indent = "    ";
         

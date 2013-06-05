@@ -204,7 +204,8 @@ public class StandardDecrypter implements PDFDecrypter {
 
     }
 
-    public ByteBuffer decryptBuffer(
+    @Override
+	public ByteBuffer decryptBuffer(
             String cryptFilterName, PDFObject streamObj, ByteBuffer streamBuf)
             throws PDFParseException {
 
@@ -229,7 +230,8 @@ public class StandardDecrypter implements PDFDecrypter {
         return decryptBuffer(streamBuf, decryptionKeyBytes);
     }
 
-    public String decryptString(int objNum, int objGen, String inputBasicString)
+    @Override
+	public String decryptString(int objNum, int objGen, String inputBasicString)
             throws PDFParseException {
         final byte[] crypted = PDFStringUtil.asBytes(inputBasicString);
         final byte[] decryptionKey = getObjectSaltedDecryptionKey(objNum, objGen);
@@ -237,11 +239,13 @@ public class StandardDecrypter implements PDFDecrypter {
         return PDFStringUtil.asBasicString(decrypted.array(), decrypted.arrayOffset(), decrypted.limit());
     }
 
-    public boolean isOwnerAuthorised() {
+    @Override
+	public boolean isOwnerAuthorised() {
         return ownerAuthorised;
     }
 
-    public boolean isEncryptionPresent() {
+    @Override
+	public boolean isEncryptionPresent() {
         return true;
     }
 

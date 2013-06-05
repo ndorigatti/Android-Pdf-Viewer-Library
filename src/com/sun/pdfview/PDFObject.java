@@ -27,7 +27,6 @@ import net.sf.andpdf.refs.SoftReference;
 import java.util.*;
 
 import net.sf.andpdf.nio.ByteBuffer;
-
 import com.sun.pdfview.decode.PDFDecoder;
 import com.sun.pdfview.decrypt.PDFDecrypter;
 import com.sun.pdfview.decrypt.IdentityDecrypter;
@@ -403,9 +402,11 @@ public class PDFObject {
      * char will be between 0 and 255.
      */
     public String getStringValue() throws IOException {
-        if (type == INDIRECT) {
+        if (type == INDIRECT) 
+        {
             return dereference().getStringValue();
-        } else if (type == STRING || type == NAME || type == KEYWORD) {
+        } else if (type == STRING || type == NAME || type == KEYWORD) 
+        {
             return (String) value;
         }
 

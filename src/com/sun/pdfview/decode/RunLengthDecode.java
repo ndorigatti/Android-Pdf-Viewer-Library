@@ -67,7 +67,7 @@ public class RunLengthDecode {
                 }
             } else {
                 byte dupByte = buf.get();
-                for (int i = 0; i < 257 - (int) (dupAmount & 0xFF); i++) {
+                for (int i = 0; i < 257 - (dupAmount & 0xFF); i++) {
                     baos.write(dupByte);
                 }
             }

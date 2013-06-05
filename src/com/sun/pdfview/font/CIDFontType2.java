@@ -260,7 +260,7 @@ public class CIDFontType2 extends TTFFont {
      */
     @Override
     protected synchronized Path getOutline(char src, float width) {
-        int glyphId = (int) (src & 0xffff);
+        int glyphId = src & 0xffff;
 
         // check if there is a cidToGidMap
         if (cidToGidMap != null) {

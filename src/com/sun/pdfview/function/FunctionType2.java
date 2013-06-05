@@ -49,7 +49,8 @@ public class FunctionType2 extends PDFFunction {
     /**
      * Read the zeros, ones and exponent
      */
-    protected void parse(PDFObject obj) throws IOException 
+    @Override
+	protected void parse(PDFObject obj) throws IOException 
     {
         // read the exponent (required)
         PDFObject nObj = obj.getDictRef("N");
@@ -86,7 +87,8 @@ public class FunctionType2 extends PDFFunction {
      * the function value is:
      * C0(j) + x^N * (C1(j) - C0(j))
      */
-    protected void doFunction(float[] inputs, int inputOffset, 
+    @Override
+	protected void doFunction(float[] inputs, int inputOffset, 
                               float[] outputs, int outputOffset)
     {
         // read the input value

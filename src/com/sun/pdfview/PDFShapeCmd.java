@@ -70,7 +70,8 @@ public class PDFShapeCmd extends PDFCmd {
     /**
      * perform the stroke and record the dirty region
      */
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         RectF rect = null;
 
         if ((style & FILL) != 0) {

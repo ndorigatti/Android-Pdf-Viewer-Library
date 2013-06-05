@@ -150,7 +150,8 @@ public class Type3Font extends PDFFont {
      * @param name the name of this glyph or null if unknown
      * @return a glyph for this character
      */
-    protected PDFGlyph getGlyph(char src, String name) {
+    @Override
+	protected PDFGlyph getGlyph(char src, String name) {
         if (name == null) {
             throw new IllegalArgumentException("Glyph name required for Type3 font!" +
                     "Source character: " + (int) src);
