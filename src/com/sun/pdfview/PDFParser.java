@@ -32,7 +32,6 @@ import java.util.Stack;
 
 import net.sf.andpdf.nio.ByteBuffer;
 import net.sf.andpdf.utils.Utils;
-
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -90,7 +89,7 @@ public class PDFParser extends BaseWatchable {
     HashMap<String, PDFObject> resources;
 //    public static int debuglevel = 4000;
 // TODO [FHe]: changed for debugging
-    public static int debuglevel = -1;
+    static int debuglevel = -1;
 
     public static void debug(String msg, int level) {
         if (level > debuglevel) {
@@ -921,7 +920,7 @@ public class PDFParser extends BaseWatchable {
                     case 'D' + ('P' << 8): {
                         // mark point with dictionary (role, ref)
                         // ref is either inline dict or name in "Properties" rsrc
-                        Object ref = stack.pop();
+                        stack.pop();
                         popString();
                         break;
                     }
@@ -932,7 +931,7 @@ public class PDFParser extends BaseWatchable {
                     case 'B' + ('D' << 8) + ('C' << 16): {
                         // begin marked content with dict (role, ref)
                         // ref is either inline dict or name in "Properties" rsrc
-                        Object ref = stack.pop();
+                        stack.pop();
                         popString();
                         break;
                     }
@@ -1562,14 +1561,14 @@ public class PDFParser extends BaseWatchable {
         if (stk.size() == 0) {
             return "[]";
         }
-        String result = "";
+        StringBuilder result = new StringBuilder();
         String delimiter = "[";
         for (Object obj : stk) {
-            result += delimiter + dumpObj(obj);
+            result.append( delimiter).append( dumpObj(obj));
             delimiter = ",";
         }
-        result += "]";
-        return result;
+        result.append( "]");
+        return result.toString();
     }
 
     private String dumpObj(Object obj) {
@@ -1589,13 +1588,13 @@ public class PDFParser extends BaseWatchable {
         if (objs.length == 0) {
             return "[]";
         }
-        String result = "";
+        StringBuilder result=new StringBuilder();
         String delimiter = "[";
         for (Object obj : objs) {
-            result += delimiter + dumpObj(obj);
+            result .append( delimiter).append( dumpObj(obj));
             delimiter = ",";
         }
-        result += "]";
-        return result;
+        result .append( "]");
+        return result.toString();
     }
 }

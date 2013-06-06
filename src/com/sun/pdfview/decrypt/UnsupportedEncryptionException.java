@@ -29,7 +29,9 @@ package com.sun.pdfview.decrypt;
  */
 public abstract class UnsupportedEncryptionException extends Exception {
 
-    protected UnsupportedEncryptionException(String message) {
+	private static final long serialVersionUID = 1L;
+
+	protected UnsupportedEncryptionException(String message) {
         super(message);
     }
 

@@ -383,7 +383,11 @@ public class NameTable extends TrueTypeTable {
             this.nameID = nameID;
         }
         
-        
+        @Override
+        public int hashCode ()
+        {
+        	return platformID+platformSpecificID+languageID+nameID;
+        }
         /**
          * Compare two records
          */

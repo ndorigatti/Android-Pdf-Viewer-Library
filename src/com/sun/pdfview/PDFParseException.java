@@ -28,7 +28,9 @@ import java.io.IOException;
  */
 public class PDFParseException extends IOException {
 
-    public PDFParseException(String msg) {
+	private static final long serialVersionUID = 1L;
+
+	public PDFParseException(String msg) {
         super(msg);
     }
 

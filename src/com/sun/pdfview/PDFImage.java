@@ -51,10 +51,10 @@ public class PDFImage {
         if (obj == null) {
             return;
         }
-        HashMap dict = obj.getDictionary();
+        HashMap<String, PDFObject>  dict = obj.getDictionary();
         p("   dict = " + dict);
-        for (Object key : dict.keySet()) {
-            p("key = " + key + " value = " + dict.get(key));
+        for (Map.Entry<String, PDFObject> entry:dict.entrySet()) {
+            p("key = " + entry.getKey() + " value = " + entry.getValue());
         }
     }
 
@@ -63,7 +63,7 @@ public class PDFImage {
     }
     /** color key mask. Array of start/end pairs of ranges of color components to
      *  mask out. If a component falls within any of the ranges it is clear. */
-    private int[] colorKeyMask = null;
+   //private int[] colorKeyMask = null;
     /** the width of this image in pixels */
     private int width;
     /** the height of this image in pixels */
@@ -471,12 +471,12 @@ public class PDFImage {
      */
     private void setColorKeyMask(PDFObject maskArrayObject) throws IOException {
         PDFObject[] maskObjects = maskArrayObject.getArray();
-        colorKeyMask = null;
+        //colorKeyMask = null;
         int[] masks = new int[maskObjects.length];
         for (int i = 0; i < masks.length; i++) {
             masks[i] = maskObjects[i].getIntValue();
         }
-        colorKeyMask = masks;
+        //colorKeyMask = masks;
     }
 
     /**

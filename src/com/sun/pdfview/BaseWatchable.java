@@ -35,7 +35,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
     /** when to stop */
     private Gate gate;
     /** suppress local stack trace on setError. */
-    private static boolean SuppressSetErrorStackTrace = false;
+    private static boolean suppressSetErrorStackTrace = false;
     /** the thread we are running in */
     private Thread thread;
 
@@ -293,7 +293,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * @return  boolean
      */
     public static boolean isSuppressSetErrorStackTrace () {
-        return SuppressSetErrorStackTrace;
+        return suppressSetErrorStackTrace;
     }
 
     /**
@@ -302,14 +302,14 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * @param suppressTrace
      */
     public static void setSuppressSetErrorStackTrace(boolean suppressTrace) {
-        SuppressSetErrorStackTrace = suppressTrace;
+        suppressSetErrorStackTrace = suppressTrace;
     }
 
     /**
      * Set an error on this watchable
      */
     protected void setError(Exception error) {
-        if (!SuppressSetErrorStackTrace) {
+        if (!suppressSetErrorStackTrace) {
             error.printStackTrace();
         }
 

@@ -59,7 +59,8 @@ public class RunLengthDecode {
         byte[] buffer = new byte[128];
         while ((dupAmount = buf.get()) != -1 &&
                 dupAmount != RUN_LENGTH_EOD) {
-            if (dupAmount <= 127) {
+            if (dupAmount <= 127) 
+            {
                 int amountToCopy = dupAmount + 1;
                 while (amountToCopy > 0) {
                     buf.get(buffer, 0, amountToCopy);

@@ -64,7 +64,6 @@ public class TTFFont extends OutlineFont {
             throws IOException {
         super(baseFont, fontObj, descriptor);
 
-        String fontName = descriptor.getFontName();
         PDFObject ttfObj = descriptor.getFontFile2();
 
         // try {

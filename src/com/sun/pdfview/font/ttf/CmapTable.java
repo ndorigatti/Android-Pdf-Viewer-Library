@@ -242,7 +242,11 @@ public class CmapTable extends TrueTypeTable {
             this.platformID = platformID;
             this.platformSpecificID = platformSpecificID;
         }
-            
+        @Override
+        public int hashCode ()
+        {
+        	return platformID+platformSpecificID;
+        }
         /**
          * Compare two subtables
          */

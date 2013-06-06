@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 
 import net.sf.andpdf.nio.ByteBuffer;
 import android.graphics.RectF;
+
 import com.sun.pdfview.action.GoToAction;
 import com.sun.pdfview.action.PDFAction;
 import com.sun.pdfview.decrypt.EncryptionUnsupportedByPlatformException;
@@ -263,7 +264,7 @@ public class PDFFile {
 		    PDFXref compRef = new PDFXref(compId, 0);
 		    PDFObject compObj = dereference(compRef, decrypter);
 		    int first = compObj.getDictionary().get("First").getIntValue();
-		    int length = compObj.getDictionary().get("Length").getIntValue();
+		    //int length = compObj.getDictionary().get("Length").getIntValue();
 		    int n = compObj.getDictionary().get("N").getIntValue();
 		    if (idx >= n)
 		        return PDFObject.nullObj;
@@ -273,8 +274,8 @@ public class PDFFile {
 			buf = strm;
 		    // skip other nums
 		    for (int i=0; i<idx; i++) {
-		    	PDFObject skip1num= readObject(-1, -1, true, IdentityDecrypter.getInstance());
-		    	PDFObject skip2num= readObject(-1, -1, true, IdentityDecrypter.getInstance());
+		    	readObject(-1, -1, true, IdentityDecrypter.getInstance());
+		    	readObject(-1, -1, true, IdentityDecrypter.getInstance());
 		    }
 			PDFObject objNumPO= readObject(-1, -1, true, IdentityDecrypter.getInstance());
 			PDFObject offsetPO= readObject(-1, -1, true, IdentityDecrypter.getInstance());
@@ -499,7 +500,7 @@ public class PDFFile {
             majorVersion = Integer.parseInt(tokens.nextToken());
             minorVersion = Integer.parseInt(tokens.nextToken());
             this.versionString = versionString;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             // ignore
         }
     }
@@ -934,9 +935,6 @@ public class PDFFile {
             // skip until we see \n
             readLine();
             ByteBuffer data = readStream(obj);
-            if (data == null) {
-                data = ByteBuffer.allocate(0);
-            }
             obj.setStream(data);
 	    endkey= readObject(objNum, objGen, decrypter);
         }
@@ -1154,12 +1152,10 @@ public class PDFFile {
         // check what permissions are relevant
         if (encrypt != null) {
             PDFObject permissions = encrypt.getDictRef("P");
-            if (permissions!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
-                int perms= permissions != null ? permissions.getIntValue() : 0;
-                if (permissions!=null) {
+            if (permissions!=null&&newDefaultDecrypter!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
+                int perms=permissions.getIntValue();
                     printable = (perms & 4) != 0;
                     saveable = (perms & 16) != 0;
-                }
             }
             // Install the new default decrypter only after the trailer has
             // been read, as nothing we're reading passing through is encrypted
@@ -1205,7 +1201,7 @@ public class PDFFile {
 //			System.out.println("Size = " + size);
 
 			byte[] strmbuf = xrefObj.getStream();
-			int strmEntries = strmbuf.length / entrySize;
+			//int strmEntries = strmbuf.length / entrySize;
 			int strmPos = 0;
 //			System.out.println("strmEntries = " + strmEntries);
 			
@@ -1327,12 +1323,10 @@ public class PDFFile {
         // check what permissions are relevant
         if (encrypt != null) {
             PDFObject permissions = encrypt.getDictRef("P");
-            if (permissions!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
-                int perms= permissions != null ? permissions.getIntValue() : 0;
-                if (permissions!=null) {
+            if (permissions!=null&&newDefaultDecrypter!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
+                int perms= permissions.getIntValue();
                     printable = (perms & 4) != 0;
                     saveable = (perms & 16) != 0;
-                }
             }
             // Install the new default decrypter only after the trailer has
             // been read, as nothing we're reading passing through is encrypted
@@ -1343,7 +1337,7 @@ public class PDFFile {
         root.dereference();
     }
 
-    private int readNum(byte[] sbuf, int pos, int numBytes) {
+    private static int readNum(byte[] sbuf, int pos, int numBytes) {
     	int result = 0;
     	for (int i=0; i<numBytes; i++)
     		result = (result << 8) + (sbuf[pos+i]&0xff);
@@ -1426,15 +1420,16 @@ public class PDFFile {
      * of DefaultMutableTreeNode.  If there is no outline tree, this method
      * returns null.
      */
-    public OutlineNode getOutline() throws IOException {
+    @SuppressWarnings ( "null" )//bogus
+	public OutlineNode getOutline() throws IOException {
         // find the outlines entry in the root object
         PDFObject oroot = root.getDictRef("Outlines");
-        OutlineNode work = null;
+        OutlineNode work;
         OutlineNode outline = null;
         if (oroot != null) {
             // find the first child of the outline root
             PDFObject scan = oroot.getDictRef("First");
-            outline = work = new OutlineNode("<top>");
+            outline = work= new OutlineNode("<top>");
 
             // scan each sibling in turn
             while (scan != null) {
@@ -1552,7 +1547,7 @@ public class PDFFile {
      * @param wait if true, do not exit until the page is complete.
      */
     public PDFPage getPage(int pagenum, boolean wait) {
-        Integer key = new Integer(pagenum);
+        Integer key = Integer.valueOf(pagenum);
         HashMap<String,PDFObject> resources = null;
         PDFObject pageObj = null;
         boolean needread = false;
@@ -1595,7 +1590,7 @@ public class PDFFile {
      * Stop the rendering of a particular image on this page
      */
     public void stop(int pageNum) {
-        PDFParser parser = cache.getPageParser(new Integer(pageNum));
+        PDFParser parser = cache.getPageParser(Integer.valueOf(pageNum));
         if (parser != null) {
             // stop it
             parser.stop();
@@ -1609,7 +1604,7 @@ public class PDFFile {
      * @return a concatenation of any content streams for the requested
      * page.
      */
-    private byte[] getContents(PDFObject pageObj) throws IOException {
+    private static byte[] getContents(PDFObject pageObj) throws IOException {
         // concatenate all the streams
         PDFObject contentsObj = pageObj.getDictRef("Contents");
         if (contentsObj == null) {

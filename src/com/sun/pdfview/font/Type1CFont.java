@@ -36,13 +36,13 @@ import com.sun.pdfview.PDFObject;
  */
 public class Type1CFont extends OutlineFont {
 
-    String chr2name[] = new String[256];
+    //String chr2name[] = new String[256];
 
     byte[] data;
 
     int pos;
 
-    byte[] subrs;
+    //byte[] subrs;
 
     float[] stack = new float[100];
 
@@ -54,7 +54,7 @@ public class Type1CFont extends OutlineFont {
 
     int encoding[] = new int[256];
 
-    String fontname;
+   // String fontname;
 
     Matrix at = Utils.createMatrix(0.001f, 0, 0, 0.001f, 0, 0);
 
@@ -350,7 +350,7 @@ public class Type1CFont extends OutlineFont {
     // Private           18      - (size, offset)
     // glyph at position i in CharStrings has name charset[i]
     // and code encoding[i]
-    int charstringtype = 2;
+    //int charstringtype = 2;
 
     float temps[] = new float[32];
 
@@ -384,7 +384,7 @@ public class Type1CFont extends OutlineFont {
         while (pos < r.getEnd ()) {
             int cmd = readCommand (false);
             if (cmd == 1006) { // charstringtype, default=2
-                charstringtype = (int) stack[0];
+                //charstringtype = (int) stack[0];
             } else if (cmd == 1007) { // fontmatrix
                 if (stackptr == 4) {
                     at = Utils.createMatrix(stack[0], stack[1],
@@ -543,10 +543,10 @@ public class Type1CFont extends OutlineFont {
      * @param encdif a dictionary describing the encoding.
      */
     private void parse () throws IOException {
-        int majorVersion = readByte ();
-        int minorVersion = readByte ();
+        readByte ();
+        readByte ();
         int hdrsz = readByte ();
-        int offsize = readByte ();
+        readByte ();
         // jump over rest of header: base of font names index
         int fnames = hdrsz;
         // offset in the file of the array of font dicts
@@ -565,7 +565,7 @@ public class Type1CFont extends OutlineFont {
             throw new RuntimeException ("More than one font in this file!");
         }
         Range r = getIndexEntry (fnames, 0);
-        fontname = new String (data, r.getStart (), r.getLen ());
+        //fontname = new String (data, r.getStart (), r.getLen ());
         // read first dict
         //	System.out.println("TOPDICT[0]:");
         readDict (getIndexEntry (topdicts, 0));

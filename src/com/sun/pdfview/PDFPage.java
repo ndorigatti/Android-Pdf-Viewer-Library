@@ -20,27 +20,26 @@
  */
 package com.sun.pdfview;
 
-import net.sf.andpdf.refs.WeakReference;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.andpdf.refs.WeakReference;
 import net.sf.andpdf.utils.Utils;
-
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Paint.Cap;
+import android.graphics.Paint.Join;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.Bitmap.Config;
-import android.graphics.Paint.Cap;
-import android.graphics.Paint.Join;
 
 /**
  * A PDFPage encapsulates the parsed commands required to render a
@@ -70,9 +69,6 @@ public class PDFPage {
     private RectF bbox;
     /** the rotation of this page, in degrees */
     private int rotation;
-    /** a map from image info (width, height, clip) to a soft reference to the
-    rendered image */
-    private Cache cache;
     /** a map from image info to weak references to parsers that are active */
     private final Map<ImageInfo, WeakReference> renderers = Collections.synchronizedMap(new HashMap<ImageInfo, WeakReference>());
     // TODO [FHe]: just a quick hack
@@ -100,8 +96,6 @@ public class PDFPage {
     public PDFPage(int pageNumber, RectF bbox, int rotation,
             Cache cache) {
         this.pageNumber = pageNumber;
-        this.cache = cache;
-
         if (bbox == null) {
             bbox = new RectF(0, 0, 1, 1);
         }
@@ -205,13 +199,6 @@ public class PDFPage {
         PDFRenderer renderer = null;
         ImageInfo info = new ImageInfo(width, height, clip, Color.WHITE);
 
-//        if (cache != null) {
-//            image = cache.getImage(this, info);
-//            renderer = cache.getImageRenderer(this, info);
-//        }
-//
-        // not in the cache, so create it
-        if (image == null) {
             if (drawbg) {
                 info.bgColor = Color.WHITE;
             }
@@ -219,26 +206,10 @@ public class PDFPage {
             image = Bitmap.createBitmap(width, height, Config.RGB_565);
             renderer = new PDFRenderer(this, info, image);
 
-//            if (cache != null) {
-//                cache.addImage(this, info, image, renderer);
-//            }
-
             renderers.put(info, new WeakReference<PDFRenderer>(renderer));
-        }
 
-        // the renderer may be null if we are getting this image from the
-        // cache and rendering has completed.
-        if (renderer != null) {
-//            if (observer != null) {
-//                renderer.addObserver(observer);
-//            }
-
-            if (!renderer.isFinished()) {
+            if (!renderer.isFinished()) 
                 renderer.go(wait);
-            }
-        }
-
-        // return the image
         return image;
     }
 
@@ -697,10 +668,10 @@ class PDFStrokePaintCmd extends PDFCmd {
  */
 class PDFFillAlphaCmd extends PDFCmd {
 
-    float a;
+    //float a;
 
     public PDFFillAlphaCmd(float a) {
-        this.a = a;
+        //this.a = a;
     }
 
     @Override
@@ -716,10 +687,10 @@ class PDFFillAlphaCmd extends PDFCmd {
  */
 class PDFStrokeAlphaCmd extends PDFCmd {
 
-    float a;
+    //float a;
 
     public PDFStrokeAlphaCmd(float a) {
-        this.a = a;
+       // this.a = a;
     }
 
     @Override
@@ -853,7 +824,7 @@ class PDFChangeStrokeCmd extends PDFCmd {
 
     public String toString(PDFRenderer state) {
         return "STROKE: w=" + w + " cap=" + cap + " join=" + join + " limit=" + limit +
-                " ary=" + ary + " phase=" + phase;
+                " ary=" + Arrays.toString( ary) + " phase=" + phase;
     }
 }
 

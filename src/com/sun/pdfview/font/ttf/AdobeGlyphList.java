@@ -62,21 +62,11 @@ public class AdobeGlyphList {
 
 
     static {
-        new AdobeGlyphList();
-    }
-
-    /** 
-     * <p>private constructor to restrict creation to a singleton.</p>
-     * 
-     * <p>We initialize by creating the storage and parsing the glyphlist
-     * into the tables.</p>
-     */
-    private AdobeGlyphList() {
         glyphToUnicodes = new HashMap<String, int[]>(4500);
         unicodeToGlyph = new HashMap<Integer, String>(4500);
         glyphLoaderThread = new Thread(new Runnable() {
 
-            @Override
+			@Override
 			public void run() {
                 int[] codes;
                 StringTokenizer codeTokens;
@@ -88,7 +78,8 @@ public class AdobeGlyphList {
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(istr));
                 String line = "";
-                while (line != null) {
+                while (line != null) 
+                {
                     try {
                         unicodes.clear();
                         line = reader.readLine();
@@ -107,7 +98,7 @@ public class AdobeGlyphList {
                             codes = new int[unicodes.size()];
                             for (int i = 0; i < unicodes.size(); i++) {
                                 codes[i] = Integer.parseInt(unicodes.get(i), 16);
-                                unicodeToGlyph.put(new Integer(codes[i]), glyphName);
+                                unicodeToGlyph.put(Integer.valueOf(codes[i]), glyphName);
                             }
                             glyphToUnicodes.put(glyphName, codes);
                         }
@@ -121,6 +112,16 @@ public class AdobeGlyphList {
         glyphLoaderThread.setDaemon(true);
         glyphLoaderThread.setPriority(Thread.MIN_PRIORITY);
         glyphLoaderThread.start();
+    }
+
+    /** 
+     * <p>private constructor to restrict creation to a singleton.</p>
+     * 
+     * <p>We initialize by creating the storage and parsing the glyphlist
+     * into the tables.</p>
+     */
+    private AdobeGlyphList() {
+
     }
 
     /**
@@ -155,7 +156,7 @@ public class AdobeGlyphList {
         if (unicodes == null) {
             return null;
         } else {
-            return new Integer(unicodes[0]);
+            return Integer.valueOf(unicodes[0]);
         }
     }
 
@@ -176,6 +177,6 @@ public class AdobeGlyphList {
                 }
             }
         }
-        return unicodeToGlyph.get(new Integer(unicode));
+        return unicodeToGlyph.get(Integer.valueOf(unicode));
     }
 }

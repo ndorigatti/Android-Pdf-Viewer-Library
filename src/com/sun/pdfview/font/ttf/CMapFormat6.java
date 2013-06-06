@@ -63,7 +63,7 @@ public class CMapFormat6 extends CMap {
     @Override
 	public byte map(byte src) {
         char c = map((char) src);
-        if (c < Byte.MIN_VALUE || c > Byte.MAX_VALUE) {
+        if ( c > Byte.MAX_VALUE) {
             // out of range
             return 0;
         }

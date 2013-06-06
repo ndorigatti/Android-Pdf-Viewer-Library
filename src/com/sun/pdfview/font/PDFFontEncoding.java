@@ -130,8 +130,8 @@ public class PDFFontEncoding {
         src &= 0xff;
 
         // see if this character is in the differences list
-        if (differences.containsKey(new Character(src))) {
-            charName = differences.get(new Character(src));
+        if (differences.containsKey(Character.valueOf(src))) {
+            charName = differences.get(Character.valueOf(src));
         } else if (baseEncoding != null) {
             // get the character name from the base encoding
             int charID = baseEncoding[src];
@@ -177,7 +177,7 @@ public class PDFFontEncoding {
                 if (diffArray[i].getType() == PDFObject.NUMBER) {
                     curPosition = diffArray[i].getIntValue();
                 } else if (diffArray[i].getType() == PDFObject.NAME) {
-                    Character key = new Character((char) curPosition);
+                    Character key = Character.valueOf((char) curPosition);
                     differences.put(key, diffArray[i].getStringValue());
                     curPosition++;
                 } else {

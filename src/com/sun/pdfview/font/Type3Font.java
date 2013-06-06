@@ -86,7 +86,7 @@ public class Type3Font extends PDFFont {
         at = Utils.createMatrix(matrixAry);
 
         // get the scale from the matrix
-        float scale = matrixAry[0] + matrixAry[2];
+        //float scale = matrixAry[0] + matrixAry[2];
 
         // put all the resources in a Hash
         PDFObject rsrcObj = fontObj.getDictRef("Resources");

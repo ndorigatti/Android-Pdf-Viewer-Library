@@ -1,6 +1,8 @@
 package net.sf.andpdf.crypto;
 
 import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 
@@ -38,22 +40,59 @@ public class CryptoCipher extends Cipher {
 
 	@Override
 	public void init(int mode, Key key) {
-		init(mode, key);
+		try
+		{
+			cipher.init(mode, key);
+		}
+		catch ( InvalidKeyException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void init(int mode, SecretKey key) {
-		init(mode, key);
+		try
+		{
+			cipher.init(mode, key);
+		}
+		catch ( InvalidKeyException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void init(int mode, SecretKeySpec keySpec) {
-		init(mode, keySpec);
+		try
+		{
+			cipher.init(mode, keySpec);
+		}
+		catch ( InvalidKeyException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void init(int mode, SecretKeySpec keySpec, IvParameterSpec Iv) {
-		init(mode, keySpec, Iv);
+		try
+		{
+			cipher.init(mode, keySpec, Iv);
+		}
+		catch ( InvalidKeyException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch ( InvalidAlgorithmParameterException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

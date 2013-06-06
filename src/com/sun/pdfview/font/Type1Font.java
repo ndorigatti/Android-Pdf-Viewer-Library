@@ -176,7 +176,6 @@ public class Type1Font extends OutlineFont {
         // end at "def"
         PSParser psp = new PSParser(d, i);
         String type = psp.readThing();     // read the key (i is the start of the key)
-        double val;
         type = psp.readThing();
         if (type.equals("StandardEncoding")) {
             byte[] stdenc[] = new byte[FontSupport.standardEncoding.length][];
@@ -700,7 +699,7 @@ public class Type1Font extends OutlineFont {
                         y2 = pop();
                         x2 = pop();
                         y1 = pop();
-                        x1 = y3 = 0;
+                        //x1 = y3 = 0;
                         gp.cubicTo(pt.x, pt.y + y1,
                                 pt.x + x2, pt.y + y1 + y2,
                                 pt.x + x2 + x3, pt.y + y1 + y2);
@@ -713,7 +712,7 @@ public class Type1Font extends OutlineFont {
                         y2 = pop();
                         x2 = pop();
                         x1 = pop();
-                        y1 = x3 = 0;
+                        //y1 = x3 = 0;
                         gp.cubicTo(pt.x + x1, pt.y,
                                 pt.x + x1 + x2, pt.y + y2,
                                 pt.x + x1 + x2, pt.y + y2 + y3);

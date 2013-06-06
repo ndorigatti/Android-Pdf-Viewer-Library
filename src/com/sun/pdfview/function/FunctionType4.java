@@ -42,7 +42,7 @@ public class FunctionType4 extends PDFFunction {
      * in Appendix B - Operators.*/
     private static HashSet<Operation> operationSet = null;
     /** the list of tokens and sub-expressions. */
-    private LinkedList tokens = new LinkedList();
+    //private LinkedList tokens = new LinkedList();
     /** the stack of operations. The stack contents should all be Comparable. */
     private LinkedList<Object> stack = new LinkedList<Object>();
 
@@ -798,7 +798,7 @@ public class FunctionType4 extends PDFFunction {
                  */
                 @Override
 				void eval() {
-                    long count = popLong();
+                    popLong();
 // ????
                     Object obj = stack.removeFirst();
                     stack.addFirst(obj);
@@ -937,7 +937,9 @@ public class FunctionType4 extends PDFFunction {
 
     class Expression extends LinkedList {
 
-        @Override
+		private static final long serialVersionUID = 1L;
+
+		@Override
 		public boolean equals(Object obj) {
             if (obj instanceof Expression) {
                 // actually validate the list contents are the same expressions
@@ -981,6 +983,11 @@ public class FunctionType4 extends PDFFunction {
                 return operatorName.equals(obj);
             }
             return false;
+        }
+        @Override
+        public int hashCode ()
+        {
+        	return operatorName.hashCode();
         }
     }
 }

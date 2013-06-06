@@ -72,7 +72,7 @@ public class CIDFontType2 extends TTFFont {
         parseWidths(fontObj);
 
         // read the CIDSystemInfo dictionary (required)
-        PDFObject systemInfoObj = fontObj.getDictRef("CIDSystemInfo");
+        fontObj.getDictRef("CIDSystemInfo");
         // read the cid to gid map (optional)
         PDFObject mapObj = fontObj.getDictRef("CIDToGIDMap");
 
@@ -123,11 +123,11 @@ public class CIDFontType2 extends TTFFont {
                         // add all the entries in the array to the width array
                         PDFObject[] entries = widthArray[i].getArray();
                         for (int c = 0; c < entries.length; c++) {
-                            Character key = new Character((char) (c + first));
+                            Character key = Character.valueOf((char) (c + first));
 
                             // value is width / default width
                             float value = entries[c].getIntValue();
-                            widths.put(key, new Float(value));
+                            widths.put(key, Float.valueOf(value));
                         }
                         // all done
                         entryIdx = -1;
@@ -140,7 +140,7 @@ public class CIDFontType2 extends TTFFont {
 
                     // set the range
                     for (int c = first; c <= last; c++) {
-                        widths.put(new Character((char) c), new Float(value));
+                        widths.put(Character.valueOf((char) c), Float.valueOf(value));
                     }
 
                     // all done
@@ -186,11 +186,11 @@ public class CIDFontType2 extends TTFFont {
                         // add all the entries in the array to the width array
                         PDFObject[] entries = widthArray[i].getArray();
                         for (int c = 0; c < entries.length; c++) {
-                            Character key = new Character((char) (c + first));
+                            Character key = Character.valueOf((char) (c + first));
 
                             // value is width / default width
                             float value = entries[c].getIntValue();
-                            widthsVertical.put(key, new Float(value));
+                            widthsVertical.put(key, Float.valueOf(value));
                         }
                         // all done
                         entryIdx = -1;
@@ -203,7 +203,7 @@ public class CIDFontType2 extends TTFFont {
 
                     // set the range
                     for (int c = first; c <= last; c++) {
-                        widthsVertical.put(new Character((char) c), new Float(value));
+                        widthsVertical.put(Character.valueOf((char) c), Float.valueOf(value));
                     }
 
                     // all done
@@ -227,7 +227,7 @@ public class CIDFontType2 extends TTFFont {
         if (widths == null) {
             return 1f;
         }
-        Float w = widths.get(new Character(code));
+        Float w = widths.get(Character.valueOf(code));
         if (w == null) {
             return 1f;
         }
@@ -245,7 +245,7 @@ public class CIDFontType2 extends TTFFont {
         if (widthsVertical == null) {
             return 1f;
         }
-        Float w = widthsVertical.get(new Character(code));
+        Float w = widthsVertical.get(Character.valueOf(code));
         if (w == null) {
             return 1f;
         }

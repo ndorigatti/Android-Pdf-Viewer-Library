@@ -134,7 +134,7 @@ public class FunctionType3 extends PDFFunction {
 
         // read the encode array (required)
         PDFObject encodeObj = obj.getDictRef("Encode");
-        if (encodeObj != null) {
+        if (encodeObj == null) {
             throw new PDFParseException("Encode required for function type 3!");
         }
         PDFObject[] encodeAry = encodeObj.getArray();
@@ -158,40 +158,6 @@ public class FunctionType3 extends PDFFunction {
     @Override
 	protected void doFunction(float[] inputs, int inputOffset,
             float[] outputs, int outputOffset) {
-        // calculate the encoded values for each input
-        float[] encoded = new float[getNumInputs()];
-//        for (int i = 0; i < getNumInputs(); i++) {
-//            // encode -- interpolate(x<i>, domain<2i>, domain<2i + 1>,
-//            //                       encode<2i>, encode<2i + 1>)
-//            encoded[i] = interpolate(inputs[i + inputOffset],
-//                                     getDomain(2 * i),
-//                                     getDomain((2 * i) + 1),
-//                                     getEncode(2 * i),
-//                                     getEncode((2 * i) + 1));
-//
-//            // clip to size of sample table -- min(max(e<i>, 0), size<i> - 1)
-//            encoded[i] = Math.max(encoded[i], 0);
-//            encoded[i] = Math.min(encoded[i], size[i] - 1);
-//        }
-
-        // do some magic
-        for (int i = 0; i < getNumOutputs(); i++) {
-//            if (getOrder() == 1) {
-//                outputs[i + outputOffset] = multilinearInterpolate(encoded, i);
-//            } else {
-//                outputs[i + outputOffset] = multicubicInterpolate(encoded, i);
-//            }
-        }
-
-    // now adjust the output to be within range
-//        for (int i = 0; i < outputs.length; i++) {
-//            // decode -- interpolate(r<i>, 0, 2^bps - 1,
-//            //                       decode<2i>, decode<2i + 1>)
-//            outputs[i + outputOffset] = interpolate(outputs[i + outputOffset],
-//                                     0,
-//                                     (float) Math.pow(2, getBitsPerSample()) - 1,
-//                                     getDecode(2 * i),
-//                                     getDecode((2 * i) + 1));
-//        }
+    	//no op
     }
 }

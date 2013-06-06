@@ -71,7 +71,7 @@ public class CMapFormat4 extends CMap {
         Segment s = new Segment(startCode, endCode, false);
         // make sure we remove any old entries
         segments.remove(s);
-        segments.put(s, new Integer(idDelta));
+        segments.put(s, Integer.valueOf(idDelta));
     }
     
     /**
@@ -114,7 +114,7 @@ public class CMapFormat4 extends CMap {
     @Override
 	public byte map(byte src) {
         char c = map((char) src);
-        if (c < Byte.MIN_VALUE || c > Byte.MAX_VALUE) {
+        if ( c > Byte.MAX_VALUE) {
             // out of range
             return 0;
         }
@@ -200,9 +200,9 @@ public class CMapFormat4 extends CMap {
 	public void setData(int length, ByteBuffer data) {
         // read the table size values
         short segCount = (short) (data.getShort() / 2);
-        short searchRange = data.getShort();
-        short entrySelector = data.getShort();
-        short rangeShift = data.getShort();
+        data.getShort();
+        data.getShort();
+        data.getShort();
     
         // create arrays to store segment info
         short[] endCodes = new short[segCount];
@@ -210,9 +210,6 @@ public class CMapFormat4 extends CMap {
         short[] idDeltas = new short[segCount];
         short[] idRangeOffsets = new short[segCount];
           
-        // the start of the glyph array
-        int glyphArrayPos = 16 + (8 * segCount);
-        
         // read the endCodes
         for (int i = 0; i < segCount; i++) {
            endCodes[i] = data.getShort();
@@ -433,7 +430,11 @@ public class CMapFormat4 extends CMap {
             
             this.hasMap = hasMap;
         }
-        
+        @Override
+        public int hashCode ()
+        {
+        	return endCode+startCode+Boolean.valueOf( hasMap ).hashCode();
+        }
         /** Equals based on compareTo (only compares endCode) */
         @Override public boolean equals(Object o) {
             return (compareTo(o) == 0);

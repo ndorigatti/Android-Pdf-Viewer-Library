@@ -231,7 +231,7 @@ public class Cache {
     Record addImageRecord(PDFPage page, ImageInfo info,
             Bitmap image, PDFRenderer renderer) {
         // first, find or create the relevant page record
-        Integer pageNumber = new Integer(page.getPageNumber());
+        Integer pageNumber = Integer.valueOf(page.getPageNumber());
         PageRecord pageRec = getPageRecord(pageNumber);
         if (pageRec == null) {
             pageRec = addPageRecord(pageNumber, page, null);
@@ -255,7 +255,7 @@ public class Cache {
      */
     Record getImageRecord(PDFPage page, ImageInfo info) {
         // first find the relevant page record
-        Integer pageNumber = new Integer(page.getPageNumber());
+        Integer pageNumber = Integer.valueOf(page.getPageNumber());
 
         // System.out.println("Request for image on page " + pageNumber);
 
@@ -279,7 +279,7 @@ public class Cache {
      */
     Record removeImageRecord(PDFPage page, ImageInfo info) {
         // first find the relevant page record
-        Integer pageNumber = new Integer(page.getPageNumber());
+        Integer pageNumber = Integer.valueOf(page.getPageNumber());
         PageRecord pageRec = getPageRecord(pageNumber);
         if (pageRec != null) {
             SoftReference ref = pageRec.images.remove(info);

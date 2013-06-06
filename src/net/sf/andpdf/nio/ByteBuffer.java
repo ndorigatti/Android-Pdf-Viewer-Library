@@ -73,7 +73,7 @@ public abstract class ByteBuffer {
 	public abstract boolean hasRemaining();
 
 	
-	public static boolean sUseNIO = true;
+	public static final boolean sUseNIO = true;
 	public static ByteBuffer NEW(MappedByteBuffer map) {
 		return new NioByteBuffer(map);
 	}

@@ -62,9 +62,9 @@ public class TrueTypeFont {
     public static TrueTypeFont parseFont(ByteBuffer inBuf) {
         int type = inBuf.getInt();
         short numTables = inBuf.getShort();
-        short searchRange = inBuf.getShort();
-        short entrySelector = inBuf.getShort();
-        short rangeShift = inBuf.getShort();
+        inBuf.getShort();
+        inBuf.getShort();
+        inBuf.getShort();
 
         TrueTypeFont font = new TrueTypeFont(type);
         parseDirectories(inBuf, numTables, font);

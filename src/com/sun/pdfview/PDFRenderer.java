@@ -54,7 +54,7 @@ import android.util.Log;
  * @author Ferenc Hechler (ferenc@hechler.de)
  * @author Joerg Jahnke (joergjahnke@users.sourceforge.net)
  */
-public class PDFRenderer extends BaseWatchable implements Runnable {
+public class PDFRenderer extends BaseWatchable  {
 
     private static final String TAG = "APV.PDFRenderer";
     private int cmdCnt;
@@ -91,7 +91,7 @@ public class PDFRenderer extends BaseWatchable implements Runnable {
     public static final float NOWIDTH = -1000;
     public static final float NOLIMIT = -1000;
     public static final Cap NOCAP = null;
-    public static final float[] NODASH = null;
+    static final float[] NODASH = null;
     public static final Join NOJOIN = null;
 
     /**
@@ -340,7 +340,7 @@ public class PDFRenderer extends BaseWatchable implements Runnable {
 		return bounds;
 	}
 	
-    private void showTrans(Matrix m, RectF src) {
+    private static void showTrans(Matrix m, RectF src) {
     	RectF dst = new RectF();
     	m.mapRect(dst, src);
     	Log.i(TAG, "M="+m);
@@ -722,7 +722,7 @@ public class PDFRenderer extends BaseWatchable implements Runnable {
     /**
      * Append a rectangle to the total dirty region of this shape
      */
-    private RectF addDirtyRegion(RectF region, RectF glob) {
+    private static RectF addDirtyRegion(RectF region, RectF glob) {
         if (region == null) {
             return glob;
         } else if (glob == null) {

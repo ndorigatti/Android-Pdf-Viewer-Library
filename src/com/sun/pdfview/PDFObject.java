@@ -451,7 +451,7 @@ public class PDFObject {
         if (type == INDIRECT) {
             return dereference().getBooleanValue();
         } else if (type == BOOLEAN) {
-            return value == Boolean.TRUE;
+            return Boolean.TRUE.equals( value );
         }
 
         // wrong type
@@ -687,11 +687,10 @@ public class PDFObject {
             }
 
             if (obj == null || obj.value == null) {
-                if (owner == null) {
+                if (owner == null) 
                     System.out.println("Bad seed (owner==null)!  Object=" + this);
-                }
-
-                obj = owner.dereference((PDFXref)value, getDecrypter());
+                else
+                	obj = owner.dereference((PDFXref)value, getDecrypter());
 
                 cache = new SoftReference<PDFObject>(obj);
             }
@@ -765,5 +764,16 @@ public class PDFObject {
         }
 
         return false;
+    }
+    @Override
+    public int hashCode ()
+    {
+    	int hash=super.hashCode();
+    	if (type == INDIRECT) 
+    	{
+    		PDFXref lXref = (PDFXref) value;
+    		hash+=lXref.getID()+lXref.getGeneration()+(lXref.getCompressed()?1231 : 1237);
+    	}	
+    	return hash;
     }
 }
