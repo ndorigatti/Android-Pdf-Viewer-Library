@@ -195,7 +195,6 @@ public class PDFPage {
     public Bitmap getImage(int width, int height, RectF clip,
             boolean drawbg, boolean wait) {
         // see if we already have this image
-        Bitmap image = null;
         PDFRenderer renderer = null;
         ImageInfo info = new ImageInfo(width, height, clip, Color.WHITE);
 
@@ -203,7 +202,7 @@ public class PDFPage {
                 info.bgColor = Color.WHITE;
             }
 
-            image = Bitmap.createBitmap(width, height, Config.RGB_565);
+            Bitmap image = Bitmap.createBitmap(width, height, Config.RGB_565);
             renderer = new PDFRenderer(this, info, image);
 
             renderers.put(info, new WeakReference<PDFRenderer>(renderer));

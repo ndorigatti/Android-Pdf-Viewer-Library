@@ -893,7 +893,7 @@ public class PDFFile {
         if (neg) {
             value = -value;
         }
-        return new PDFObject(this, PDFObject.NUMBER, new Double(value));
+        return new PDFObject(this, PDFObject.NUMBER, Double.valueOf(value));
     }
 
     /**
@@ -1550,7 +1550,6 @@ public class PDFFile {
         Integer key = Integer.valueOf(pagenum);
         HashMap<String,PDFObject> resources = null;
         PDFObject pageObj = null;
-        boolean needread = false;
 
         PDFPage page = cache.getPage(key);
         PDFParser parser = cache.getPageParser(key);

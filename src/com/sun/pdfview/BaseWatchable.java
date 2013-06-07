@@ -81,14 +81,14 @@ public abstract class BaseWatchable implements Watchable, Runnable {
         // System.out.println(Thread.currentThread().getName() + " starting");
 
         // call setup once we started
-        if (getStatus() == Watchable.NOT_STARTED) {
+        if (status == Watchable.NOT_STARTED) {
             setup();
         }
 
         setStatus(Watchable.PAUSED);
 
         synchronized (parserLock) {
-            while (!isFinished() && getStatus() != Watchable.STOPPED) {
+            while (!isFinished() && status != Watchable.STOPPED) {
                 if (isExecutable()) {
                     // set the status to running
                     setStatus(Watchable.RUNNING);
@@ -96,14 +96,14 @@ public abstract class BaseWatchable implements Watchable, Runnable {
                     try {
                         // keep going until the status is no longer running,
                         // our gate tells us to stop, or no-one is watching
-                        while ((getStatus() == Watchable.RUNNING) &&
+                        while ((status == Watchable.RUNNING) &&
                                 (gate == null || !gate.iterate())) {
                             // update the status based on this iteration
                             setStatus(iterate());
                         }
 
                         // make sure we are paused
-                        if (getStatus() == Watchable.RUNNING) {
+                        if (status == Watchable.RUNNING) {
                             setStatus(Watchable.PAUSED);
                         }
                     } catch (Exception ex) {
@@ -128,8 +128,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
         // System.out.println(Thread.currentThread().getName() + " exiting: status = " + getStatusString());
 
         // call cleanup when we are done
-        if (getStatus() == Watchable.COMPLETED ||
-                getStatus() == Watchable.ERROR) {
+        if (status == Watchable.COMPLETED ||
+                status == Watchable.ERROR) {
 
             cleanup();
         }
@@ -153,7 +153,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * when its status is either COMPLETED, STOPPED or ERROR
      */
     public boolean isFinished() {
-        int s = getStatus();
+        int s = status;
         return (s == Watchable.COMPLETED ||
                 s == Watchable.ERROR);
     }
@@ -234,7 +234,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      */
     public void waitForFinish() {
         synchronized (statusLock) {
-            while (!isFinished() && getStatus() != Watchable.STOPPED) {
+            while (!isFinished() && status != Watchable.STOPPED) {
                 try {
                     statusLock.wait();
                 } catch (InterruptedException ex) {
@@ -317,7 +317,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
     }
 
     private String getStatusString() {
-        switch (getStatus()) {
+        switch (status) {
             case Watchable.NOT_STARTED:
                 return "Not started";
             case Watchable.RUNNING:

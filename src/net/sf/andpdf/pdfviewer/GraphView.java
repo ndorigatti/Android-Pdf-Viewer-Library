@@ -1,11 +1,8 @@
 package net.sf.andpdf.pdfviewer;
 
 import uk.co.senab.photoview.PhotoView;
-import uk.co.senab.photoview.PhotoViewAttacher.OnMatrixChangedListener;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -14,62 +11,38 @@ import android.util.Log;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
-class GraphView extends PhotoView implements OnMatrixChangedListener
+public class GraphView extends PhotoView
 {
 	private PDFFile pdfFile;
-	public static final float STARTZOOM = 2.0f;
-	private float mZoom = STARTZOOM;
-
 	private static final Handler uiHandler = new Handler();
-
 	private PDFPage mPdfPage;
-
 	private volatile Thread backgroundThread;
+	private final int mPage;
 
-	private int mPage = 1;
-	private Bitmap mBi;
-	private float mOldScale;
-
-	public GraphView ( Context context, PDFFile pdfFile )
+	public GraphView ( PdfViewerActivity act, int page )
 	{
-		super( context );
-		this.pdfFile = pdfFile;
+		super( act );
+		pdfFile=act.mPdfFile;
 		setMinScale( 1.0f );
-		setMaxScale( 2.0f );
-		mOldScale = getScale();
-		setOnMatrixChangeListener( this );
-
-		updateImage();
+		setMaxScale( 6.0f );
+		setScaleType( ScaleType.FIT_XY );
+		setAdjustViewBounds( true );
 		setBackgroundColor( Color.LTGRAY );
+		mPage=page+act.startPage;
 	}
 
-	public synchronized void startRenderThread ( final int page, final float zoom )
+	private synchronized void startRenderThread (final int viewWith, final int viewHeight)
 	{
 		if ( backgroundThread != null )
 			return;
-		if ( mPdfPage != null )
-		{
-			int newWidth = ( int ) ( mPdfPage.getWidth() * zoom );
-			int newHeight = ( int ) ( mPdfPage.getHeight() * zoom );
-			if ( newWidth > 2048 || newHeight > 2048 )
-				return;
-		}
-		Log.i( PdfViewerActivity.TAG,  "reading page " + page + ", zoom:" + zoom );
+		Log.i( PdfViewerActivity.TAG,  "reading page " + mPage );
 		
 		backgroundThread = new Thread() 
 		{
 			@Override
 			public void run ()
 			{
-				try
-				{
-					showPage( page, zoom );
-				}
-				catch ( Exception e )
-				{
-					//FIXME
-					e.printStackTrace();
-				}
+				showPage(viewWith ,viewHeight);
 				backgroundThread = null;
 			}
 		};
@@ -80,11 +53,11 @@ class GraphView extends PhotoView implements OnMatrixChangedListener
 	protected void onDetachedFromWindow ()
 	{
 		super.onDetachedFromWindow();
-		if ( mBi != null )
-		{
-			mBi.recycle();
-			mBi = null;
-		}
+		recycleOldBitmap();
+	}
+	
+	private void recycleOldBitmap()
+	{
 		Drawable drw=getDrawable();
 		if (drw!=null)
 		{
@@ -93,56 +66,50 @@ class GraphView extends PhotoView implements OnMatrixChangedListener
 				bmp.recycle();
 		}	
 	}
-
-	private void updateImage ()
+	
+	private void updateImage (final Bitmap bitmap)
 	{
 		uiHandler.post( new Runnable()
 		{
 			@Override
 			public void run ()
 			{
-				setImageBitmap( mBi );
+				recycleOldBitmap();
+				setImageBitmap( bitmap );
 			}
 		} );
 	}
-
-	private void setPageBitmap ( Bitmap bi )
-	{
-		if ( bi != null )
-			mBi = bi;
-	}
-
+	
 	@Override
-	public void onMatrixChanged ( RectF arg0 )
+	protected void onSizeChanged ( int w, int h, int oldw, int oldh )
 	{
-		float scale = getScale();
-		if ( Math.abs( scale - mOldScale ) < 0.1f )
-			return;
-		mZoom = STARTZOOM * scale;
-		if ( mZoom < STARTZOOM )
-			mZoom = STARTZOOM;
-		else
-			startRenderThread( mPage, mZoom );
+		super.onSizeChanged( w, h, oldw, oldh );
+		startRenderThread(w,h);
 	}
-
-	private void showPage ( int page, float zoom ) throws Exception
+	
+	private void showPage (int w, int h)
 	{
-		// long startTime = System.currentTimeMillis();
-		// long middleTime = startTime;
 		try
 		{
-			updateImage();
-
 			// Only load the page if it's a different page (i.e. not just changing the zoom level)
-			if ( mPdfPage == null || mPdfPage.getPageNumber() != page )
+			if ( mPdfPage == null || mPdfPage.getPageNumber() != mPage )
 			{
-				mPdfPage = pdfFile.getPage( page, true );
+				mPdfPage = pdfFile.getPage( mPage, true );
 			}
-			float width = mPdfPage.getWidth();
-			float height = mPdfPage.getHeight();
-			Bitmap bi = mPdfPage.getImage( ( int ) ( width * zoom ), ( int ) ( height * zoom ), null, true, true );
-			setPageBitmap( bi );
-			updateImage();
+			float fwidth = mPdfPage.getWidth();
+			float fheight = mPdfPage.getHeight();
+			float zoom=h/fheight;
+			int oHeight=( int ) ( fheight * zoom );
+			int oWidth=( int ) ( fwidth * zoom );
+			int maxDim=Math.max( oHeight, oWidth );
+			if (maxDim>2048)
+			{
+				zoom*=(2048f/maxDim);
+				oHeight=( int ) ( fheight * zoom );
+				oWidth=( int ) ( fwidth * zoom );				
+			}	
+			Bitmap bitmap= mPdfPage.getImage( oWidth, oHeight, null, true, true );
+			updateImage(bitmap);
 			//TODO optimize
 		}
 		catch ( Throwable e )
