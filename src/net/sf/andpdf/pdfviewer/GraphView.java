@@ -18,6 +18,7 @@ public final class GraphView extends PhotoView
 	private PDFPage mPdfPage;
 	private volatile Thread backgroundThread;
 	private final int mPage;
+	private float scale;
 
 	public GraphView ( PdfViewerActivity act, int page )
 	{
@@ -76,6 +77,7 @@ public final class GraphView extends PhotoView
 			{
 				recycleOldBitmap();
 				setImageBitmap( bitmap );
+				zoomTo(scale, 0.0f, 0.0f);
 			}
 		} );
 	}
@@ -85,6 +87,12 @@ public final class GraphView extends PhotoView
 	{
 		super.onSizeChanged( w, h, oldw, oldh );
 		startRenderThread(w,h);
+	}
+	
+	public void setScale(float scale)
+	{
+		zoomTo(scale, 0.0f, 0.0f);
+		this.scale=scale;
 	}
 	
 	private void showPage (int w, int h)
