@@ -140,6 +140,7 @@ public class PDFRenderer extends BaseWatchable
 	/**
 	 * Set up the graphics transform to match the clip region to the image size.
 	 */
+	@SuppressWarnings ( "deprecation" ) //wontfix
 	private void setupRendering ( Canvas g )
 	{
 		// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -279,6 +280,7 @@ public class PDFRenderer extends BaseWatchable
 		Paint paint = state.fillPaint.getPaint();
 		g.save();
 		Matrix m;
+		@SuppressWarnings ( "deprecation" ) //wontfix
 		Matrix mOrig = g.getMatrix();
 
 		// Log.i(TAG, "orig");
@@ -347,15 +349,6 @@ public class PDFRenderer extends BaseWatchable
 		return bounds;
 	}
 
-	private static void showTrans ( Matrix m, RectF src )
-	{
-		RectF dst = new RectF();
-		m.mapRect( dst, src );
-		Log.i( TAG, "M=" + m );
-		Log.i( TAG, "src=" + src );
-		Log.i( TAG, "dst=" + dst );
-	}
-
 	/**
 	 * draw native text
 	 * 
@@ -383,17 +376,14 @@ public class PDFRenderer extends BaseWatchable
 
 		Bitmap bi = image.getImage();
 		if ( image.isImageMask() )
-		{
 			bi = getMaskedImage( bi );
-		}
-
-		/*
-		 * javax.swing.JFrame frame = new javax.swing.JFrame("Original Image"); frame.getContentPane().add(new javax.swing.JLabel(new javax.swing.ImageIcon(bi))); frame.pack(); frame.show();
-		 */
+		if (bi==null)
+			return new RectF();
 
 		g.drawBitmap( bi, mat, null );
 
 		// get the total transform that was executed
+		@SuppressWarnings ( "deprecation" ) //wontfix
 		Matrix matB = new Matrix( g.getMatrix() );
 		matB.preConcat( mat );
 
@@ -654,7 +644,7 @@ public class PDFRenderer extends BaseWatchable
 
 			if ( image == null )
 			{
-				System.out.println( "Image went away.  Stopping" );
+				//System.out.println( "Image went away.  Stopping" );
 				return Watchable.STOPPED;
 			}
 			g = image.createCa();
@@ -697,7 +687,8 @@ public class PDFRenderer extends BaseWatchable
 		catch ( Exception e )
 		{
 			// TODO [FHe] remove if all commands are supported, now catch image not yet supp. excp.
-			Log.e( TAG, e.getMessage(), e );
+			if (!PDFParser.RELEASE)
+				Log.e( TAG, e.getMessage(), e );
 			// throw new PDFParseException(e.getMessage());
 		}
 

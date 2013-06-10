@@ -180,7 +180,7 @@ public class PDFPassword {
         return possibilties;
     }
 
-    private boolean isAlphaNum7BitString(String string) {
+    private static boolean isAlphaNum7BitString(String string) {
         for (int i = 0; i < string.length(); ++i) {
             final char c = string.charAt(i);
             if (c >= 127 || !Character.isLetterOrDigit(c)) {

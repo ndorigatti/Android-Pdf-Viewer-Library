@@ -115,10 +115,10 @@ public class CmapTable extends TrueTypeTable {
                     addCMap(platformID, platformSpecificID, cMap);
                 }
             } catch (Exception ex) {
-                System.out.println("Error reading map.  PlatformID=" +
-                                    platformID + ", PlatformSpecificID=" + 
-                                    platformSpecificID);
-                System.out.println("Reason: " + ex);
+//                System.out.println("Error reading map.  PlatformID=" +
+//                                    platformID + ", PlatformSpecificID=" + 
+//                                    platformSpecificID);
+//                System.out.println("Reason: " + ex);
             }
         }
     }

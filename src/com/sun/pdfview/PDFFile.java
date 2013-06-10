@@ -168,14 +168,10 @@ public class PDFFile {
     /**
      * return the number of pages in this PDFFile.  The pages will be
      * numbered from 1 to getNumPages(), inclusive.
+     * @throws IOException 
      */
-    public int getNumPages() {
-        try {
+    public int getNumPages() throws IOException {
             return root.getDictRef("Pages").getDictRef("Count").getIntValue();
-        } catch (Exception ioe) {
-        	ioe.printStackTrace();
-            return 0;
-        }
     }
 
     /**
@@ -941,7 +937,7 @@ public class PDFFile {
         // at this point, obj is the object, keyword should be "endobj"
         String endcheck = endkey.getStringValue();
         if (endcheck == null || !endcheck.equals("endobj")) {
-            System.out.println("WARNING: object at " + debugpos + " didn't end with 'endobj'");
+            //System.out.println("WARNING: object at " + debugpos + " didn't end with 'endobj'");
         //throw new PDFParseException("Object musst end with 'endobj'");
         }
         obj.setObjectId(objNum, objGen);
@@ -977,8 +973,8 @@ public class PDFFile {
         int ending = buf.position();
 
         if (!nextItemIs("endstream")) {
-            System.out.println("read " + length + " chars from " + start + " to " +
-                    ending);
+//            System.out.println("read " + length + " chars from " + start + " to " +
+//                    ending);
             throw new PDFParseException("Stream ended inappropriately");
         }
 
@@ -1122,7 +1118,7 @@ public class PDFFile {
 
             PDFObject xrefstmPos = trailerdict.getDictRef("XRefStm");
             if (xrefstmPos != null) {
-            	System.out.println("XRefStm:" + xrefstmPos.getIntValue());
+            	//System.out.println("XRefStm:" + xrefstmPos.getIntValue());
                 int pos14 = buf.position(); 
                 buf.position(xrefstmPos.getIntValue());
             	readTrailer15(password);
@@ -1194,7 +1190,7 @@ public class PDFFile {
 			int l1 = wNums[0].getIntValue();
 			int l2 = wNums[1].getIntValue();
 			int l3 = wNums[2].getIntValue();
-			int entrySize = l1+l2+l3;
+			//int entrySize = l1+l2+l3;
 //			System.out.println("["+l1+","+l2+","+l3+"]");
 	
 			int size = xrefObj.getDictionary().get("Size").getIntValue();
@@ -1572,8 +1568,6 @@ public class PDFFile {
 
                 cache.addPage(key, page, parser);
             } catch (IOException ioe) {
-                System.out.println("GetPage inner loop:");
-                ioe.printStackTrace();
                 return null;
             }
         }

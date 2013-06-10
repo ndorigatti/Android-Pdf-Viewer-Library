@@ -80,7 +80,6 @@ public class DCTDecode {
         if (img == null)
         	throw new PDFParseException("could not decode image of compressed size "+ary.length);
     	Config conf = img.getConfig();
-    	Log.e("ANDPDF.dctdecode", "decoded image type"+conf);
     	int size = 4*img.getWidth()*img.getHeight();
     	if (conf == Config.RGB_565) 
     		size = 2*img.getWidth()*img.getHeight();

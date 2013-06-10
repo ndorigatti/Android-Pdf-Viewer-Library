@@ -137,8 +137,8 @@ public class PostTable extends TrueTypeTable {
                 break;
             default:
                 nameMap = new PostMap();
-                System.out.println("Unknown post map type: " + 
-                                   Integer.toHexString(format));
+                //System.out.println("Unknown post map type: " + 
+                //                   Integer.toHexString(format));
                 break;
         }
         

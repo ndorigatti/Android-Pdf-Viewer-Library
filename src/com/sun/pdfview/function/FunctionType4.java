@@ -883,7 +883,7 @@ public class FunctionType4 extends PDFFunction {
      */
     @Override
 	protected void doFunction(float[] inputs, int inputOffset,
-            float[] outputs, int outputOffset) {
+            float[] outputs, int outputOffset) {//no-op
     }
 
     private boolean popBoolean() {
@@ -935,7 +935,7 @@ public class FunctionType4 extends PDFFunction {
     private void readPS(ByteBuffer buf) {
     }
 
-    class Expression extends LinkedList {
+    class Expression extends LinkedList<Operation> {
 
 		private static final long serialVersionUID = 1L;
 

@@ -23,11 +23,12 @@ package com.sun.pdfview.font;
 import java.io.IOException;
 
 import net.sf.andpdf.utils.Utils;
-
 import android.graphics.Matrix;
 import android.graphics.Path;
 
 import com.sun.pdfview.PDFObject;
+import com.sun.pdfview.PDFParser;
+import com.sun.pdfview.PDFRenderer;
 
 
 /**
@@ -446,7 +447,7 @@ public class Type1CFont extends OutlineFont {
             System.arraycopy (FontSupport.standardEncoding, 0, encoding, 0,
                     FontSupport.standardEncoding.length);
         } else if (base == 1) {  // this is the expert encoding
-            System.out.println ("**** EXPERT ENCODING!");
+           // System.out.println ("**** EXPERT ENCODING!");
             // TODO: copy ExpertEncoding
         } else {
             pos = base;
@@ -468,7 +469,7 @@ public class Type1CFont extends OutlineFont {
                     }
                 }
             } else {
-                System.out.println ("Bad encoding type: " + encodingtype);
+              //  System.out.println ("Bad encoding type: " + encodingtype);
             }
             // TODO: now check for supplemental encoding data
         }
@@ -560,11 +561,13 @@ public class Type1CFont extends OutlineFont {
         readNames (theNames);
         // does this file have more than one font?
         pos = topdicts;
-        if (readInt (2) != 1) {
-            printData ();
+        if (readInt (2) != 1) 
+        {
+        	if (!PDFParser.RELEASE)
+        		printData ();
             throw new RuntimeException ("More than one font in this file!");
         }
-        Range r = getIndexEntry (fnames, 0);
+       // Range r = getIndexEntry (fnames, 0);
         //fontname = new String (data, r.getStart (), r.getLen ());
         // read first dict
         //	System.out.println("TOPDICT[0]:");
@@ -603,7 +606,7 @@ public class Type1CFont extends OutlineFont {
      * convert a string to one in which any non-printable bytes are
      * replaced by "<###>" where ## is the value of the byte.
      */
-    private String safe (String src) {
+    private static String safe (String src) {
         StringBuffer sb = new StringBuffer ();
         for (int i = 0; i < src.length (); i++) {
             char c = src.charAt (i);
@@ -728,7 +731,7 @@ public class Type1CFont extends OutlineFont {
     void parseGlyph (Range r, Path gp, FlPoint pt) {
         pos = r.getStart ();
         int i;
-        float x1, y1, x2, y2, x3, y3, ybase;
+        float x1, y1, x2, y2, /*x3, y3,*/ ybase;
         int hold;
         int stemhints = 0;
         while (pos < r.getEnd ()) {
@@ -1141,7 +1144,7 @@ public class Type1CFont extends OutlineFont {
                     stackptr = 0;
                     break;
                 default:
-                    System.out.println ("ERROR! TYPE1C CHARSTRING CMD IS " + cmd);
+                    //System.out.println ("ERROR! TYPE1C CHARSTRING CMD IS " + cmd);
                     break;
             }
         }

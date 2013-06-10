@@ -414,7 +414,7 @@ public class FunctionType0 extends PDFFunction {
      * @param od the output dimension
      */
     private float multicubicInterpolate(float[] encoded, int od) {
-        System.out.println("Cubic interpolation not supported!");
+        //System.out.println("Cubic interpolation not supported!");
         return multilinearInterpolate(encoded, od);
     }
     

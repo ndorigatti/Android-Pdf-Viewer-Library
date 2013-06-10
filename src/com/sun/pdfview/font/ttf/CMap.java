@@ -93,7 +93,7 @@ public abstract class CMap {
 //                outMap = new CMapFormat_12(language);
 //                break;
             default:
-                System.out.println ("Unsupport CMap format: " + format);
+                //System.out.println ("Unsupport CMap format: " + format);
                 return null;
         }
 

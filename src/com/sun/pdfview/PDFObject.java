@@ -688,7 +688,9 @@ public class PDFObject {
 
             if (obj == null || obj.value == null) {
                 if (owner == null) 
-                    System.out.println("Bad seed (owner==null)!  Object=" + this);
+                    {
+                	//System.out.println("Bad seed (owner==null)!  Object=" + this);
+                    }
                 else
                 	obj = owner.dereference((PDFXref)value, getDecrypter());
 
@@ -714,7 +716,7 @@ public class PDFObject {
                 obj = (PDFObject) cache.get();
             }
 
-            if (obj == null || obj.value == null) {
+/*            if (obj == null || obj.value == null) {
                 if (owner == null) {
                     System.out.println("Bad seed (owner==null)!  Object=" + this);
                 }
@@ -722,7 +724,7 @@ public class PDFObject {
 //                obj = owner.dereference((PDFXref)value, getDecrypter());
 //
 //                cache = new SoftReference<PDFObject>(obj);
-            }
+            }*/
 
             return obj;
         } else {

@@ -42,11 +42,8 @@ import android.util.Log;
  */
 public class PDFImage {
 
-    private static final String TAG = "AWTPDF.pdfimage";
-
-    public static boolean sShowImages;
-
-	public static void dump(PDFObject obj) throws IOException {
+    public static void dump(PDFObject obj) throws IOException 
+	{
         p("dumping PDF object: " + obj);
         if (obj == null) {
             return;
@@ -59,7 +56,8 @@ public class PDFImage {
     }
 
     public static void p(String string) {
-        System.out.println(string);
+    	if (!PDFParser.RELEASE)
+    		System.out.println(string);
     }
     /** color key mask. Array of start/end pairs of ranges of color components to
      *  mask out. If a component falls within any of the ranges it is clear. */
@@ -126,8 +124,8 @@ public class PDFImage {
             // create the indexed color space for the mask
             // [PATCHED by michal.busta@gmail.com] - default value od Decode according to PDF spec. is [0, 1]
         	// so the color arry should be:  
-            int[] colors = {Color.BLACK, Color.WHITE};
-            
+           // int[] colors = {Color.BLACK, Color.WHITE};
+/*            
             PDFObject imageMaskDecode = obj.getDictRef("Decode");
             if (imageMaskDecode != null) {
                 PDFObject[] array = imageMaskDecode.getArray();
@@ -135,7 +133,7 @@ public class PDFImage {
                 if (decode0 == 1.0f) {
                     colors = new int[]{Color.WHITE, Color.BLACK};
                 }
-            }
+            }*/
             // TODO [FHe]: support for indexed colorspace
             image.setColorSpace(PDFColorSpace.getColorSpace(PDFColorSpace.COLORSPACE_GRAY));
 //          image.setColorSpace(new IndexedColor(colors));
@@ -188,17 +186,15 @@ public class PDFImage {
                     } catch (IOException ex) {
                         p("ERROR: there was a problem parsing the mask for this object");
                         dump(obj);
-                        ex.printStackTrace(System.out);
                     }
                 } else if (sMaskObj.getType() == PDFObject.ARRAY) {
                     // retrieve the range of the ColorKeyMask
                     // colors outside this range will not be painted.
                     try {
-                        image.setColorKeyMask(sMaskObj);
+                        PDFImage.setColorKeyMask(sMaskObj);
                     } catch (IOException ex) {
                         p("ERROR: there was a problem parsing the color mask for this object");
                         dump(obj);
-                        ex.printStackTrace(System.out);
                     }
                 }
             }
@@ -217,49 +213,27 @@ public class PDFImage {
             Bitmap bi = (Bitmap) imageObj.getCache();
 
             if (bi == null) {
-            	if (!sShowImages)
-            		throw new UnsupportedOperationException("do not show images");
             	byte[] imgBytes = imageObj.getStream();
                 bi = parseData(imgBytes);
             	// TODO [FHe]: is the cache useful on Android?
                 imageObj.setCache(bi);
             }
-//            if(bi != null)
-//            	ImageIO.write(bi, "png", new File("/tmp/test/" + System.identityHashCode(this) + ".png"));
             return bi;
         } catch (IOException ioe) {
-            System.out.println("Error reading image");
-            ioe.printStackTrace();
             return null;
-        } catch (OutOfMemoryError e) {
-            // fix for too large images
-            Log.e(TAG, "image too large (OutOfMemoryError)");
-            int size = 15;
-            int max = size-1;
-            int half = size/2-1;
-            Bitmap bi = Bitmap.createBitmap(size, size, Config.RGB_565);
-            Canvas c = new Canvas(bi);
-            c.drawColor(Color.RED);
-            Paint p = new Paint();
-            p.setColor(Color.WHITE);
-            c.drawLine(0, 0, max, max, p);
-            c.drawLine(0, max, max, 0, p);
-            c.drawLine(half, 0, half, max, p);
-            c.drawLine(0, half, max, half, p);
-            return bi;
-		}
+        } 
     }
 
 	private Bitmap parseData(byte[] imgBytes) {
 		Bitmap bi;
 		long startTime = System.currentTimeMillis();
 		// parse the stream data into an actual image
-		Log.i(TAG, "Creating Image width="+getWidth() + ", Height="+getHeight()+", bpc="+getBitsPerComponent()+",cs="+colorSpace);
+		//Log.i(TAG, "Creating Image width="+getWidth() + ", Height="+getHeight()+", bpc="+getBitsPerComponent()+",cs="+colorSpace);
 		if (colorSpace == null) {
 			throw new UnsupportedOperationException("image without colorspace");
 		} else if (colorSpace.getType() == PDFColorSpace.COLORSPACE_RGB) {
-			int maxH = getHeight();
-			int maxW = getWidth();
+			int maxH = height;
+			int maxW =width;
 			if (imgBytes.length == 2*maxW*maxH) {
 				// decoded JPEG as RGB565
 				bi = Bitmap.createBitmap(maxW, maxH, Config.RGB_565);
@@ -267,11 +241,11 @@ public class PDFImage {
 			}
 			else {
 				// create RGB image
-				bi = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+				bi = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 				int[] line = new int[maxW]; 
 				int n=0;
 				for (int h = 0; h<maxH; h++) {
-					for (int w = 0; w<getWidth(); w++) {
+					for (int w = 0; w<height; w++) {
 						line[w] = ((0xff&imgBytes[n])<<8|(0xff&imgBytes[n+1]))<<8|(0xff&imgBytes[n+2])|0xFF000000;
 	//            			line[w] = Color.rgb(0xff&(int)imgBytes[n], 0xff&(int)imgBytes[n+1],0xff&(int)imgBytes[n+2]);
 						n+=3;
@@ -282,9 +256,9 @@ public class PDFImage {
 		}
 		else if (colorSpace.getType() == PDFColorSpace.COLORSPACE_GRAY) {
 			// create gray image
-			bi = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
-			int maxH = getHeight();
-			int maxW = getWidth();
+			bi = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+			int maxH = height;
+			int maxW =width;
 			int[] line = new int[maxW]; 
 			int n=0;
 			for (int h = 0; h<maxH; h++) {
@@ -317,7 +291,6 @@ public class PDFImage {
 			throw new UnsupportedOperationException("image with unsupported colorspace "+colorSpace);
 		}
 		long stopTime = System.currentTimeMillis();
-		Log.i(TAG, "millis for converting image="+(stopTime-startTime));
 		return bi;
 	}
 
@@ -469,7 +442,7 @@ public class PDFImage {
      * 
      * @param maskArrayObject
      */
-    private void setColorKeyMask(PDFObject maskArrayObject) throws IOException {
+    private static void setColorKeyMask(PDFObject maskArrayObject) throws IOException {
         PDFObject[] maskObjects = maskArrayObject.getArray();
         //colorKeyMask = null;
         int[] masks = new int[maskObjects.length];

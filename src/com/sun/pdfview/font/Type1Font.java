@@ -108,7 +108,7 @@ public class Type1Font extends OutlineFont {
         password = 4330;
         int matrixloc = findSlashName(font, "FontMatrix");
         if (matrixloc < 0) {
-            System.out.println("No FontMatrix!");
+            //System.out.println("No FontMatrix!");
             at = Utils.createMatrix(0.001f, 0, 0, 0.001f, 0, 0);
         } else {
             PSParser psp2 = new PSParser(font, matrixloc + 11);
@@ -225,7 +225,7 @@ public class Type1Font extends OutlineFont {
      * @return the decrypted bytes.  The length of this array will be
      * (start-end-skip) bytes long
      */
-    private byte[] decrypt(byte[] d, int start, int end, int key, int skip) {
+    private static byte[] decrypt(byte[] d, int start, int end, int key, int skip) {
         if (end - start - skip < 0) {
             skip = 0;
         }
@@ -252,7 +252,7 @@ public class Type1Font extends OutlineFont {
      * @param start where in the array to start decrypting
      * @param end where in the array to stop decrypting
      */
-    private byte[] readASCII(byte[] data, int start, int end) {
+    private static byte[] readASCII(byte[] data, int start, int end) {
         // each byte of output is derived from one character (two bytes) of
         // input
         byte[] o = new byte[(end - start) / 2];
@@ -292,7 +292,7 @@ public class Type1Font extends OutlineFont {
      * 'A' - 'F' or 'a' - 'f'), then the data is binary.  Otherwise it is
      * ASCII
      */
-    private boolean isASCII(byte[] data, int start) {
+    private static boolean isASCII(byte[] data, int start) {
         // look at the first 4 bytes
         for (int i = start; i < start + 4; i++) {
             // get the byte as a character
@@ -426,7 +426,7 @@ public class Type1Font extends OutlineFont {
      * @param name the name to look for, without the initial /
      * @return the index of the first occurance of /name in the array.
      */
-    private int findSlashName(byte[] d, String name) {
+    private static int findSlashName(byte[] d, String name) {
         int i;
         for (i = 0; i < d.length; i++) {
             if (d[i] == '/') {
@@ -581,11 +581,11 @@ public class Type1Font extends OutlineFont {
                     case 10:  // n callsubr
                         int n = (int) pop();
                         if (subrs[n] == null) {
-                            System.out.println("No subroutine #" + n);
+                            //System.out.println("No subroutine #" + n);
                         } else {
                             callcount++;
                             if (callcount > 10) {
-                                System.out.println("Call stack too large");
+                               // System.out.println("Call stack too large");
                             //			    throw new RuntimeException("Call stack too large");
                             } else {
                                 parse(subrs[n], gp, pt, wid);

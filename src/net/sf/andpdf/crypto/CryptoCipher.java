@@ -46,8 +46,7 @@ public class CryptoCipher extends Cipher {
 		}
 		catch ( InvalidKeyException e )
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// no-op
 		}
 	}
 
@@ -59,8 +58,7 @@ public class CryptoCipher extends Cipher {
 		}
 		catch ( InvalidKeyException e )
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// no-op
 		}
 	}
 
@@ -72,8 +70,7 @@ public class CryptoCipher extends Cipher {
 		}
 		catch ( InvalidKeyException e )
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// no-op
 		}
 	}
 
@@ -85,13 +82,11 @@ public class CryptoCipher extends Cipher {
 		}
 		catch ( InvalidKeyException e )
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// no-op
 		}
 		catch ( InvalidAlgorithmParameterException e )
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// no-op
 		}
 	}
 

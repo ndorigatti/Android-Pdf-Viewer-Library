@@ -34,9 +34,7 @@ import android.graphics.RectF;
  */
 public class PDFNativeTextCmd extends PDFCmd {
 
-	private static final String TAG = "ANDPDF.natTXT";
-	
-    /** stroke the outline of the path with the stroke paint */
+	/** stroke the outline of the path with the stroke paint */
     public static final int STROKE = 1;
     /** fill the path with the fill paint */
     public static final int FILL = 2;

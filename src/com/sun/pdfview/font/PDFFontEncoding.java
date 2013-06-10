@@ -75,7 +75,7 @@ public class PDFFontEncoding {
                 type = TYPE_ENCODING;
 
                 differences = new HashMap<Character,String>();
-                baseEncoding = this.getBaseEncoding(encoding.getStringValue());
+                baseEncoding = PDFFontEncoding.getBaseEncoding(encoding.getStringValue());
             }
         } else {
             // loook at the "Type" entry of the encoding to determine the type
@@ -188,7 +188,7 @@ public class PDFFontEncoding {
     }
 
     /** Get the base encoding for a given name */
-    private int[] getBaseEncoding(String encodingName) {
+    private static int[] getBaseEncoding(String encodingName) {
         if (encodingName.equals("MacRomanEncoding")) {
             return FontSupport.macRomanEncoding;
         } else if (encodingName.equals("MacExpertEncoding")) {

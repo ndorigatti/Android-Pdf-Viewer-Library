@@ -55,7 +55,7 @@ public class PDFParser extends BaseWatchable {
 
     /** emit a file of DCT stream data. */
     public final static String DEBUG_DCTDECODE_DATA = "debugdctdecode";
-    static final boolean RELEASE = true;
+    public static final boolean RELEASE = true;
     static final int PDF_CMDS_RANGE1_MIN = 1;
     static final int PDF_CMDS_RANGE1_MAX = Integer.MAX_VALUE;
     static final int PDF_CMDS_RANGE2_MIN = 0;
@@ -91,8 +91,9 @@ public class PDFParser extends BaseWatchable {
 // TODO [FHe]: changed for debugging
     static int debuglevel = -1;
 
-    public static void debug(String msg, int level) {
-        if (level > debuglevel) {
+    @SuppressWarnings ( "unused" )
+	public static void debug(String msg, int level) {
+        if (!RELEASE&&level > debuglevel) {
             System.out.println(escape(msg));
         }
     }
@@ -303,7 +304,7 @@ public class PDFParser extends BaseWatchable {
                             tok.type = Tok.CMD;
                             tok.name = readName();
                         } else {
-                            System.out.println("Encountered character: " + c + " (" + (char) c + ")");
+                           // System.out.println("Encountered character: " + c + " (" + (char) c + ")");
                             tok.type = Tok.UNK;
                         }
                 }
@@ -521,7 +522,7 @@ public class PDFParser extends BaseWatchable {
         // to it for use within this iteration
         cmds = (PDFPage) pageRef.get();
         if (cmds == null) {
-            System.out.println("Page gone.  Stopping");
+            //System.out.println("Page gone.  Stopping");
             return Watchable.STOPPED;
         }
 
@@ -967,8 +968,11 @@ public class PDFParser extends BaseWatchable {
                             throw new PDFParseException("Unknown command: " + cmd);
                         }
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "cmd='" + cmd + ":" + e.getMessage(), e);
+            } 
+            catch (PDFParseException e) 
+            {
+            	if (!RELEASE)
+            		Log.e(TAG, "cmd='" + cmd + ":" + e.getMessage(), e);
             }
             if (stack.size() != 0) {
                 if (!RELEASE) {
@@ -1042,27 +1046,6 @@ public class PDFParser extends BaseWatchable {
 
     public String dumpStream() {
         return escape(new String(stream).replace('\r', '\n'));
-    }
-
-    /**
-     * take a byte array and write a temporary file with it's data.
-     * This is intended to capture data for analysis, like after decoders.
-     *
-     * @param ary
-     * @param name
-     */
-    public static void emitDataFile(byte[] ary, String name) {
-        FileOutputStream ostr;
-
-        try {
-            File file = File.createTempFile("DateFile", name);
-            ostr = new FileOutputStream(file);
-            System.out.println("Write: " + file.getPath());
-            ostr.write(ary);
-            ostr.close();
-        } catch (IOException ex) {
-            // ignore
-        }
     }
 
     /////////////////////////////////////////////////////////////////

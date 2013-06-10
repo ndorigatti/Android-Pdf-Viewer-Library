@@ -11,7 +11,7 @@ import android.util.Log;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
-public class GraphView extends PhotoView
+public final class GraphView extends PhotoView
 {
 	private PDFFile pdfFile;
 	private static final Handler uiHandler = new Handler();
@@ -35,7 +35,7 @@ public class GraphView extends PhotoView
 	{
 		if ( backgroundThread != null )
 			return;
-		Log.i( PdfViewerActivity.TAG,  "reading page " + mPage );
+		//Log.i( PdfViewerActivity.TAG,  "reading page " + mPage );
 		
 		backgroundThread = new Thread() 
 		{
@@ -110,11 +110,15 @@ public class GraphView extends PhotoView
 			}	
 			Bitmap bitmap= mPdfPage.getImage( oWidth, oHeight, null, true, true );
 			updateImage(bitmap);
-			//TODO optimize
 		}
 		catch ( Throwable e )
-		{
+		{//FIXME handle in act
 			Log.e( PdfViewerActivity.TAG, e.getMessage(), e );
 		}
+	}
+	@Override
+	public void onScale ()
+	{
+		((PdfViewerActivity)getContext()).onScalechanged(getScale());
 	}
 }

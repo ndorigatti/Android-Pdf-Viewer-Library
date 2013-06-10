@@ -328,7 +328,7 @@ public class TTFFont extends OutlineFont {
     }
 
     /** add a point on the curve */
-    private void addOnCurvePoint(PointRec rec, RenderState rs) {
+    private static void addOnCurvePoint(PointRec rec, RenderState rs) {
         // if the point is on the curve, either move to it,
         // or draw a line from the previous point
         if (rs.firstOn == null) {

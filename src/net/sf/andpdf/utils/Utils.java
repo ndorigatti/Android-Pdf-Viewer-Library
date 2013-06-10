@@ -1,5 +1,8 @@
 package net.sf.andpdf.utils;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import android.graphics.Matrix;
 
 public class Utils {
@@ -36,4 +39,16 @@ public class Utils {
 		return createMatrix(m6[0], m6[1], m6[2], m6[3], m6[4], m6[5]);
 	}
 	
+	public static void closeSilently ( Closeable closeable )
+	{
+		if ( closeable != null )
+			try
+			{
+				closeable.close();
+			}
+			catch ( IOException e )
+			{
+				// igonred
+			}
+	}
 }

@@ -181,8 +181,7 @@ public class Type3Font extends PDFFont {
             return new PDFGlyph(src, name, page, advance);
         } catch (IOException ioe) {
             // help!
-            System.out.println("IOException in Type3 font: " + ioe);
-            ioe.printStackTrace();
+            //System.out.println("IOException in Type3 font: " + ioe);
             return null;
         }
     }

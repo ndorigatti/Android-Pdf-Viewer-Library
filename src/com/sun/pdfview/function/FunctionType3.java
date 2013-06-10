@@ -76,7 +76,7 @@ public class FunctionType3 extends PDFFunction {
      * input values (from 0 to size[m - 1] * size[m - 2] * ... * size[0]), 
      * and the second is the output dimension within the sample (from 0 to n)
      */
-    private int[][] samples;
+   // private int[][] samples;
 
     /** Creates a new instance of FunctionType3 */
     protected FunctionType3() {

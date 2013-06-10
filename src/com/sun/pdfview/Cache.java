@@ -34,11 +34,11 @@ import android.graphics.Bitmap;
 public class Cache {
 
     /** the pages in the cache, mapped by page number */
-    private Map<Integer,SoftReference> pages;
+    private Map<Integer,SoftReference<Record>> pages;
 
     /** Creates a new instance of a Cache */
     public Cache() {
-        pages = Collections.synchronizedMap(new HashMap<Integer,SoftReference>());
+        pages = Collections.synchronizedMap(new HashMap<Integer,SoftReference<Record>>());
     }
 
     /**
@@ -199,9 +199,9 @@ public class Cache {
      */
     PageRecord getPageRecord(Integer pageNumber) {
         // System.out.println("Request for page " + pageNumber);
-        SoftReference ref = pages.get(pageNumber);
+        SoftReference<Record> ref = pages.get(pageNumber);
         if (ref != null) {
-            String val = (ref.get() == null) ? " not in " : " in ";
+          //  String val = (ref.get() == null) ? " not in " : " in ";
             // System.out.println("Page " + pageNumber + val + "cache");
             return (PageRecord) ref.get();
         }
@@ -215,7 +215,7 @@ public class Cache {
      * Remove a page's record from the cache
      */
     PageRecord removePageRecord(Integer pageNumber) {
-        SoftReference ref = pages.remove(pageNumber);
+        SoftReference<Record> ref = pages.remove(pageNumber);
         if (ref != null) {
             return (PageRecord) ref.get();
         }
@@ -261,9 +261,9 @@ public class Cache {
 
         PageRecord pageRec = getPageRecord(pageNumber);
         if (pageRec != null) {
-            SoftReference ref = pageRec.images.get(info);
+            SoftReference<Record> ref = pageRec.images.get(info);
             if (ref != null) {
-                String val = (ref.get() == null) ? " not in " : " in ";
+               // String val = (ref.get() == null) ? " not in " : " in ";
                 // System.out.println("Image on page " + pageNumber + val + " cache");
                 return (Record) ref.get();
             }

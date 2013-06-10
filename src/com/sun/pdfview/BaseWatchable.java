@@ -35,7 +35,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
     /** when to stop */
     private Gate gate;
     /** suppress local stack trace on setError. */
-    private static boolean suppressSetErrorStackTrace = false;
+    private static boolean suppressSetErrorStackTrace = true;
     /** the thread we are running in */
     private Thread thread;
 

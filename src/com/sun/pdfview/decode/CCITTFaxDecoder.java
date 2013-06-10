@@ -1521,7 +1521,7 @@ public class CCITTFaxDecoder {
 		this.fillBits = fillBits;
 	}
 
-	private void setToBlack(byte[] buffer, int lineOffset, int bitOffset,
+	private static void setToBlack(byte[] buffer, int lineOffset, int bitOffset,
 			int numBits) {
 		int bitNum = (8 * lineOffset) + bitOffset;
 		int lastBit = bitNum + numBits;
