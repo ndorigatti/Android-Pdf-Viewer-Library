@@ -29,11 +29,7 @@ import com.sun.pdfview.colorspace.PDFColorSpace;
 import com.sun.pdfview.function.FunctionType0;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Bitmap.Config;
-import android.util.Log;
 
 
 

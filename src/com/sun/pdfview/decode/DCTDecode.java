@@ -26,8 +26,6 @@ import net.sf.andpdf.nio.ByteBuffer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.Config;
-import android.util.Log;
-
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParseException;
 

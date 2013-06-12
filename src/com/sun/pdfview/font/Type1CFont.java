@@ -28,7 +28,6 @@ import android.graphics.Path;
 
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParser;
-import com.sun.pdfview.PDFRenderer;
 
 
 /**

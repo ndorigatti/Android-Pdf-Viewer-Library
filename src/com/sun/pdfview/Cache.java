@@ -265,7 +265,7 @@ public class Cache {
             if (ref != null) {
                // String val = (ref.get() == null) ? " not in " : " in ";
                 // System.out.println("Image on page " + pageNumber + val + " cache");
-                return (Record) ref.get();
+                return ref.get();
             }
         }
 
