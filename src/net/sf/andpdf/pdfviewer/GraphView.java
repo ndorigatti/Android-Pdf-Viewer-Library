@@ -1,6 +1,7 @@
 package net.sf.andpdf.pdfviewer;
 
 import uk.co.senab.photoview.PhotoView;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -15,23 +16,22 @@ public final class GraphView extends PhotoView
 	private volatile Thread backgroundThread;
 	private final int mPage;
 	private float scale;
-	private ScaleSetter setter;
+	private PdfViewer viewer;
+	private OnScaleChangedListener listener; 
 
-	public GraphView ( PdfViewerActivity act, int page, ScaleSetter setter )
+	public GraphView ( Context ctx, int page, PdfViewer viewer )
 	{
-		super( act );
+		super( ctx );
 		setMinScale( 1.0f );
 		setMaxScale( 1.8f );
-		mPage = page + act.startPage;
-		this.setter=setter;
+		mPage = page + viewer.startPage;
+		this.viewer = viewer;
 	}
 
-	
 	private synchronized void startRenderThread ( final int viewWith, final int viewHeight )
 	{
 		if ( backgroundThread != null )
 			return;
-		// Log.i( PdfViewerActivity.TAG, "reading page " + mPage );
 
 		backgroundThread = new Thread()
 		{
@@ -50,6 +50,7 @@ public final class GraphView extends PhotoView
 	{
 		super.onDetachedFromWindow();
 		recycleOldBitmap();
+		listener=null;
 	}
 
 	private void recycleOldBitmap ()
@@ -97,12 +98,12 @@ public final class GraphView extends PhotoView
 	{
 		// Only load the page if it's a different page (i.e. not just changing the zoom level)
 		if ( mPdfPage == null || mPdfPage.getPageNumber() != mPage )
-			mPdfPage = ( ( PdfViewerActivity ) getContext() ).mPdfFile.getPage( mPage, true );
+			mPdfPage = viewer.mPdfFile.getPage( mPage, true );
 		float fwidth = mPdfPage.getWidth();
 		float fheight = mPdfPage.getHeight();
 		float zoom = h / fheight;
-		int oHeight = ( int ) ( fheight * zoom *1.5f);
-		int oWidth = ( int ) ( fwidth * zoom *1.5f);
+		int oHeight = ( int ) ( fheight * zoom * 1.5f );
+		int oWidth = ( int ) ( fwidth * zoom * 1.5f );
 		int maxDim = Math.max( oHeight, oWidth );
 		if ( maxDim > 2048 )
 		{
@@ -116,9 +117,13 @@ public final class GraphView extends PhotoView
 
 	@Override
 	public void onScale ()
-	{		
-		scale=getScale();
-		setter.setScale( scale );		
-		( ( PdfViewerActivity ) getContext() ).onScalechanged( scale );
+	{
+		scale = getScale();
+		if (listener!=null)
+			listener.onScalechanged( scale );
+	}
+	public void setOnScaleChangedListener(OnScaleChangedListener listener)
+	{
+		this.listener=listener;
 	}
 }
