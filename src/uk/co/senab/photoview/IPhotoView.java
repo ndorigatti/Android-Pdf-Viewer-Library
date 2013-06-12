@@ -139,6 +139,6 @@ public interface IPhotoView {
      * @param focalX - X Focus Point
      * @param focalY - Y Focus Point
      */
-    void zoomTo(float scale, float focalX, float focalY);
+    void zoomTo(float scale, float focalX, float focalY, boolean notify);
  
 }

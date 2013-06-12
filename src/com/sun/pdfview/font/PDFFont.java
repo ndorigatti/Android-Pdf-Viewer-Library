@@ -35,7 +35,7 @@ import com.sun.pdfview.PDFParseException;
  */
 public abstract class PDFFont {
 
-	public static boolean sUseFontSubstitution = false;
+	public static final boolean sUseFontSubstitution = false;
 	
     /** the font SubType of this font */
     private String subtype;

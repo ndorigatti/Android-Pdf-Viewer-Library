@@ -2,48 +2,43 @@ package net.sf.andpdf.pdfviewer;
 
 import uk.co.senab.photoview.PhotoView;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.util.Log;
 
-import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
 public final class GraphView extends PhotoView
 {
-	private PDFFile pdfFile;
 	private static final Handler uiHandler = new Handler();
 	private PDFPage mPdfPage;
 	private volatile Thread backgroundThread;
 	private final int mPage;
 	private float scale;
+	private ScaleSetter setter;
 
-	public GraphView ( PdfViewerActivity act, int page )
+	public GraphView ( PdfViewerActivity act, int page, ScaleSetter setter )
 	{
 		super( act );
-		pdfFile=act.mPdfFile;
 		setMinScale( 1.0f );
-		setMaxScale( 6.0f );
-		setScaleType( ScaleType.FIT_XY );
-		setAdjustViewBounds( true );
-		setBackgroundColor( Color.LTGRAY );
-		mPage=page+act.startPage;
+		setMaxScale( 1.8f );
+		mPage = page + act.startPage;
+		this.setter=setter;
 	}
 
-	private synchronized void startRenderThread (final int viewWith, final int viewHeight)
+	
+	private synchronized void startRenderThread ( final int viewWith, final int viewHeight )
 	{
 		if ( backgroundThread != null )
 			return;
-		//Log.i( PdfViewerActivity.TAG,  "reading page " + mPage );
-		
-		backgroundThread = new Thread() 
+		// Log.i( PdfViewerActivity.TAG, "reading page " + mPage );
+
+		backgroundThread = new Thread()
 		{
 			@Override
 			public void run ()
 			{
-				showPage(viewWith ,viewHeight);
+				showPage( viewWith, viewHeight );
 				backgroundThread = null;
 			}
 		};
@@ -56,77 +51,74 @@ public final class GraphView extends PhotoView
 		super.onDetachedFromWindow();
 		recycleOldBitmap();
 	}
-	
-	private void recycleOldBitmap()
+
+	private void recycleOldBitmap ()
 	{
-		Drawable drw=getDrawable();
-		if (drw!=null)
+		Drawable drw = getDrawable();
+		if ( drw instanceof BitmapDrawable )
 		{
-			Bitmap bmp=( ( BitmapDrawable ) drw ).getBitmap();
-			if (bmp!=null)
+			Bitmap bmp = ( ( BitmapDrawable ) drw ).getBitmap();
+			if ( bmp != null )
 				bmp.recycle();
-		}	
+		}
 	}
-	
-	private void updateImage (final Bitmap bitmap)
+
+	private void updateImage ( final Bitmap bitmap )
 	{
 		uiHandler.post( new Runnable()
 		{
 			@Override
 			public void run ()
 			{
+				setZoomable( true );
+				setScaleType( ScaleType.FIT_CENTER );
+				setAdjustViewBounds( true );
 				recycleOldBitmap();
 				setImageBitmap( bitmap );
-				zoomTo(scale, 0.0f, 0.0f);
+				zoomTo( scale, 0.0f, 0.0f, false );
 			}
 		} );
 	}
-	
+
 	@Override
 	protected void onSizeChanged ( int w, int h, int oldw, int oldh )
 	{
 		super.onSizeChanged( w, h, oldw, oldh );
-		startRenderThread(w,h);
+		startRenderThread( w, h );
 	}
-	
-	public void setScale(float scale)
+
+	public void setScale ( float scale )
 	{
-		zoomTo(scale, 0.0f, 0.0f);
-		this.scale=scale;
+		zoomTo( scale, 0.0f, 0.0f, false );
+		this.scale = scale;
 	}
-	
-	private void showPage (int w, int h)
+
+	private void showPage ( int w, int h )
 	{
-		try
+		// Only load the page if it's a different page (i.e. not just changing the zoom level)
+		if ( mPdfPage == null || mPdfPage.getPageNumber() != mPage )
+			mPdfPage = ( ( PdfViewerActivity ) getContext() ).mPdfFile.getPage( mPage, true );
+		float fwidth = mPdfPage.getWidth();
+		float fheight = mPdfPage.getHeight();
+		float zoom = h / fheight;
+		int oHeight = ( int ) ( fheight * zoom *1.5f);
+		int oWidth = ( int ) ( fwidth * zoom *1.5f);
+		int maxDim = Math.max( oHeight, oWidth );
+		if ( maxDim > 2048 )
 		{
-			// Only load the page if it's a different page (i.e. not just changing the zoom level)
-			if ( mPdfPage == null || mPdfPage.getPageNumber() != mPage )
-			{
-				mPdfPage = pdfFile.getPage( mPage, true );
-			}
-			float fwidth = mPdfPage.getWidth();
-			float fheight = mPdfPage.getHeight();
-			float zoom=h/fheight;
-			int oHeight=( int ) ( fheight * zoom );
-			int oWidth=( int ) ( fwidth * zoom );
-			int maxDim=Math.max( oHeight, oWidth );
-			if (maxDim>2048)
-			{
-				zoom*=(2048f/maxDim);
-				oHeight=( int ) ( fheight * zoom );
-				oWidth=( int ) ( fwidth * zoom );				
-			}	
-			Bitmap bitmap= mPdfPage.getImage( oWidth, oHeight, null, true, true );
-			updateImage(bitmap);
+			zoom *= ( 2048f / maxDim );
+			oHeight = ( int ) ( fheight * zoom );
+			oWidth = ( int ) ( fwidth * zoom );
 		}
-		catch ( Throwable e )
-		{//FIXME handle in act
-			Log.e( PdfViewerActivity.TAG, e.getMessage(), e );
-		}
+		Bitmap bitmap = mPdfPage.getImage( oWidth, oHeight, null, true, true );
+		updateImage( bitmap );
 	}
+
 	@Override
 	public void onScale ()
-	{
-		((PdfViewerActivity)getContext()).onScalechanged(getScale());
+	{		
+		scale=getScale();
+		setter.setScale( scale );		
+		( ( PdfViewerActivity ) getContext() ).onScalechanged( scale );
 	}
 }

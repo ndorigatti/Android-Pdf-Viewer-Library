@@ -25,7 +25,7 @@ import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-public class PhotoView extends ImageView implements IPhotoView {
+public abstract class PhotoView extends ImageView implements IPhotoView {
 
 	private final PhotoViewAttacher mAttacher;
 
@@ -165,8 +165,8 @@ public class PhotoView extends ImageView implements IPhotoView {
 	}
 
 	@Override
-	public void zoomTo(float scale, float focalX, float focalY) {
-		mAttacher.zoomTo(scale, focalX, focalY);
+	public void zoomTo(float scale, float focalX, float focalY, boolean notify) {
+		mAttacher.zoomTo(scale, focalX, focalY, notify);
 	}
 
 	@Override
@@ -175,9 +175,6 @@ public class PhotoView extends ImageView implements IPhotoView {
 		super.onDetachedFromWindow();
 	}
 
-	public void onScale ()
-	{
-		// TODO Auto-generated method stub
-	}
+	public abstract void onScale ();
 
 }

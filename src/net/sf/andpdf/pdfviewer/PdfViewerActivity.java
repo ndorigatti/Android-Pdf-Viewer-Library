@@ -1,14 +1,20 @@
 package net.sf.andpdf.pdfviewer;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.andpdf.nio.ByteBuffer;
 import net.sf.andpdf.utils.Utils;
+import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Pair;
 import androswing.tree.DefaultMutableTreeNode;
@@ -33,14 +39,6 @@ public abstract class PdfViewerActivity extends FragmentActivity implements Runn
 	int startPage = 0;
 	private int numPages;
 
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate ( Bundle savedInstanceState )
-	{
-		super.onCreate( savedInstanceState );
-		PDFPaint.s_doAntiAlias = true;
-		PDFFont.sUseFontSubstitution = false;
-	}
 
 	private void parseOutline ( List< DefaultMutableTreeNode > list, List< Pair< String, Integer >> toc ) throws IOException
 	{
@@ -66,30 +64,50 @@ public abstract class PdfViewerActivity extends FragmentActivity implements Runn
 	@Override
 	public final void run ()
 	{
-		parsePDF( getPDFfileName() );
+		parsePDF( );
 	}
 	protected final void loadPDFAsync()
 	{
 		new Thread(this).start();
 	}
-	
-	protected abstract String getPDFfileName();
-	
-	@SuppressWarnings ( "resource" ) //bogus
-	private void parsePDF ( String filename )
+	public static void copyFdToFile(FileDescriptor src, File dst) throws IOException {
+	    FileChannel inChannel = new FileInputStream(src).getChannel();
+	    FileChannel outChannel = new FileOutputStream(dst).getChannel();
+	    try {
+	        inChannel.transferTo(0, inChannel.size(), outChannel);
+	    } finally {
+	        if (inChannel != null)
+	            inChannel.close();
+	        if (outChannel != null)
+	            outChannel.close();
+	    }
+	}
+	private void parsePDF (  )
 	{
-		RandomAccessFile raf = null;
-		FileChannel channel = null;
+	//	FileChannel outChannel = null, inChannel=null, 
+				FileChannel	pdfChannel=null;
 		final ArrayList< Pair< String, Integer >> toc = new ArrayList< Pair< String, Integer > >();
 		try
 		{
-			// first open the file for random access
-			raf = new RandomAccessFile( filename, "r" );
-			// extract a file channel
-			channel = raf.getChannel();
-
-			// now memory-map a byte-buffer
-			ByteBuffer bb = ByteBuffer.NEW( channel.map( FileChannel.MapMode.READ_ONLY, 0, channel.size() ) );
+//			inChannel = getAssets().openFd( "default.mp3" ).createInputStream().getChannel();
+//			outChannel=openFileOutput( "default.mp3",Context.MODE_PRIVATE ).getChannel();
+//			inChannel.transferTo( 0, inChannel.size(), outChannel );
+//			outChannel.close();
+//		    AssetFileDescriptor afd = getAssets().openFd( "default.mp3");
+//
+//		    // Create new file to copy into.
+//		    File file = new File(Environment.getDownloadCacheDirectory(),"default.mp3");
+//		    file.delete();
+//
+//		    copyFdToFile(afd.getFileDescriptor(), file);			
+			pdfChannel=new FileInputStream( new File(Environment.getExternalStorageDirectory(),"default.pdf") ).getChannel();
+//			// now memory-map a byte-buffer
+			ByteBuffer bb = ByteBuffer.NEW( pdfChannel.map( FileChannel.MapMode.READ_ONLY, 0, pdfChannel.size() ) );
+//			InputStream is = getAssets().open( "book.mp3" );
+//			byte[] array=new byte[is.available()];
+//			while ()
+//			
+//			java.nio.ByteBuffer buf=java.nio.ByteBuffer.wrap( array );
 			// create a PDFFile from the data
 			mPdfFile = new PDFFile( bb );
 			numPages=mPdfFile.getNumPages();
@@ -106,11 +124,13 @@ public abstract class PdfViewerActivity extends FragmentActivity implements Runn
 		catch ( IOException e )
 		{
 			onIOException(e);
+			e.printStackTrace();
 		}
 		finally
 		{
-			Utils.closeSilently( channel );
-			Utils.closeSilently( raf );
+//			Utils.closeSilently( outChannel );
+//			Utils.closeSilently( inChannel );
+			Utils.closeSilently( pdfChannel );
 			if (numPages<1)
 				mPdfFile=null;
 		}

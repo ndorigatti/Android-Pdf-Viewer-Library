@@ -248,11 +248,11 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener, Vers
 			float y = ev.getY();
 
 			if (scale < mMidScale) {
-				zoomTo(mMidScale, x, y);
+				zoomTo(mMidScale, x, y, true);
 			} else if (scale >= mMidScale && scale < mMaxScale) {
-				zoomTo(mMaxScale, x, y);
+				zoomTo(mMaxScale, x, y, true);
 			} else {
-				zoomTo(mMinScale, x, y);
+				zoomTo(mMinScale, x, y, true);
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			// Can sometimes happen when getX() and getY() is called
@@ -409,7 +409,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener, Vers
 					if (getScale() < mMinScale) {
 						RectF rect = getDisplayRect();
 						if (null != rect) {
-							v.post(new AnimatedZoomRunnable(getScale(), mMinScale, rect.centerX(), rect.centerY()));
+							v.post(new AnimatedZoomRunnable(getScale(), mMinScale, rect.centerX(), rect.centerY(),true));
 							handled = true;
 						}
 					}
@@ -507,11 +507,11 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener, Vers
 	}
 
 	@Override
-	public final void zoomTo(float scale, float focalX, float focalY) {
+	public final void zoomTo(float scale, float focalX, float focalY, boolean notify) {
 		ImageView imageView = getImageView();
 
 		if (null != imageView) {
-			imageView.post(new AnimatedZoomRunnable(getScale(), scale, focalX, focalY));
+			imageView.post(new AnimatedZoomRunnable(getScale(), scale, focalX, focalY, notify));
 		}
 	}
 
@@ -803,12 +803,14 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener, Vers
 		private final float mFocalX, mFocalY;
 		private final float mTargetZoom;
 		private final float mDeltaScale;
+		private final boolean mNotify;
 
 		public AnimatedZoomRunnable(final float currentZoom, final float targetZoom, final float focalX,
-				final float focalY) {
+				final float focalY, boolean notify) {
 			mTargetZoom = targetZoom;
 			mFocalX = focalX;
 			mFocalY = focalY;
+			mNotify=notify;
 
 			if (currentZoom < targetZoom) {
 				mDeltaScale = ANIMATION_SCALE_PER_ITERATION_IN;
@@ -840,6 +842,12 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener, Vers
 					mSuppMatrix.postScale(delta, delta, mFocalX, mFocalY);
 					checkAndDisplayMatrix();
 				}
+				if (mNotify)
+				{	
+					PhotoView photoView = mPhotoView.get();
+					if (photoView!=null)
+						photoView.onScale();
+				}				
 			}
 		}
 	}

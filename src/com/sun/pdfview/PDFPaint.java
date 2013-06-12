@@ -38,7 +38,7 @@ import android.graphics.Paint.Style;
 public class PDFPaint {
 
     private Paint mainPaint;
-    public static boolean s_doAntiAlias = false;
+    public static final boolean s_doAntiAlias = true;
 
     /**
      * create a new PDFPaint based on a solid color
