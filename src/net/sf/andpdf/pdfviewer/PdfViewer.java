@@ -1,17 +1,16 @@
 package net.sf.andpdf.pdfviewer;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.andpdf.nio.ByteBuffer;
 import net.sf.andpdf.utils.Utils;
-import android.os.Environment;
+import android.content.Context;
 import android.util.Pair;
 import androswing.tree.DefaultMutableTreeNode;
 
@@ -31,8 +30,15 @@ public abstract class PdfViewer
 	protected static final String TAG = "PDFVIEWER";
 	PDFFile mPdfFile;
 	int startPage = 0;
-	private int numPages;
-
+	private int numPages, pdfResId;
+	private Context ctx;
+	
+	public PdfViewer (Context ctx, int pdfResId)
+	{
+		this.ctx=ctx;
+		this.pdfResId=pdfResId;
+	}
+	
 	private void parseOutline ( List< DefaultMutableTreeNode > list, List< Pair< String, Integer >> toc ) throws IOException
 	{
 		for ( DefaultMutableTreeNode child : list )
@@ -69,49 +75,29 @@ public abstract class PdfViewer
 		new Thread( parser ).start();
 	}
 
-	public static void copyFdToFile ( FileDescriptor src, File dst ) throws IOException
-	{
-		FileChannel inChannel = new FileInputStream( src ).getChannel();
-		FileChannel outChannel = new FileOutputStream( dst ).getChannel();
-		try
-		{
-			inChannel.transferTo( 0, inChannel.size(), outChannel );
-		}
-		finally
-		{
-			if ( inChannel != null )
-				inChannel.close();
-			if ( outChannel != null )
-				outChannel.close();
-		}
-	}
-
 	private void parsePDF ()
 	{
-		// FileChannel outChannel = null, inChannel=null,
 		FileChannel pdfChannel = null;
+		InputStream is=null;
+		@SuppressWarnings ( "resource" )//bogus
+		RandomAccessFile raf=null;
 		final ArrayList< Pair< String, Integer >> toc = new ArrayList< Pair< String, Integer > >();
 		try
 		{
-			// inChannel = getAssets().openFd( "default.mp3" ).createInputStream().getChannel();
-			// outChannel=openFileOutput( "default.mp3",Context.MODE_PRIVATE ).getChannel();
-			// inChannel.transferTo( 0, inChannel.size(), outChannel );
-			// outChannel.close();
-			// AssetFileDescriptor afd = getAssets().openFd( "default.mp3");
-			//
-			// // Create new file to copy into.
-			// File file = new File(Environment.getDownloadCacheDirectory(),"default.mp3");
-			// file.delete();
-			//
-			// copyFdToFile(afd.getFileDescriptor(), file);
-			pdfChannel = new FileInputStream( new File( Environment.getExternalStorageDirectory(), "default.pdf" ) ).getChannel();
+			File dest=new File(ctx.getCacheDir(),String.valueOf( pdfResId ));
+			raf=new RandomAccessFile( dest, "rw" );
+			//if (!dest.exists())
+			{	
+				is = ctx.getResources().openRawResource( pdfResId );
+				byte [] buf=new byte[4096];
+				int bytes;
+				while ((bytes=is.read( buf ))>0)
+					raf.write( buf, 0, bytes );
+			}
+			pdfChannel = raf.getChannel();
+			
 			// // now memory-map a byte-buffer
 			ByteBuffer bb = ByteBuffer.NEW( pdfChannel.map( FileChannel.MapMode.READ_ONLY, 0, pdfChannel.size() ) );
-			// InputStream is = getAssets().open( "book.mp3" );
-			// byte[] array=new byte[is.available()];
-			// while ()
-			//
-			// java.nio.ByteBuffer buf=java.nio.ByteBuffer.wrap( array );
 			// create a PDFFile from the data
 			mPdfFile = new PDFFile( bb );
 			numPages = mPdfFile.getNumPages();
@@ -132,8 +118,8 @@ public abstract class PdfViewer
 		}
 		finally
 		{
-			// Utils.closeSilently( outChannel );
-			// Utils.closeSilently( inChannel );
+			Utils.closeSilently( is );
+			Utils.closeSilently( raf );
 			Utils.closeSilently( pdfChannel );
 			if ( numPages < 1 )
 				mPdfFile = null;

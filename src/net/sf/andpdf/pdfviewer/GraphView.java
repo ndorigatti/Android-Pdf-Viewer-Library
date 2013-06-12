@@ -66,6 +66,7 @@ public final class GraphView extends PhotoView
 
 	private void updateImage ( final Bitmap bitmap )
 	{
+		getAnimation().cancel();
 		uiHandler.post( new Runnable()
 		{
 			@Override
@@ -73,7 +74,6 @@ public final class GraphView extends PhotoView
 			{
 				setZoomable( true );
 				setScaleType( ScaleType.FIT_CENTER );
-				setAdjustViewBounds( true );
 				recycleOldBitmap();
 				setImageBitmap( bitmap );
 				zoomTo( scale, 0.0f, 0.0f, false );
