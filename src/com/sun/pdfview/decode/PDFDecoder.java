@@ -23,6 +23,7 @@ package com.sun.pdfview.decode;
 import java.io.IOException;
 
 import net.sf.andpdf.nio.ByteBuffer;
+import android.util.Log;
 
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParseException;
@@ -110,6 +111,7 @@ public class PDFDecoder {
                             cfName = nameObj.getStringValue();
                         }
                     }
+                    Log.e( "tag", "img" );
                     streamBuf = dict.getDecrypter().decryptBuffer(cfName, null, streamBuf);
                 } else {
                     throw new PDFParseException("Unknown coding method:" + ary[i].getStringValue());

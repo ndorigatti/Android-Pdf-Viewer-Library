@@ -222,7 +222,7 @@ public class PDFImage {
 
 	private Bitmap parseData(byte[] imgBytes) {
 		Bitmap bi;
-		long startTime = System.currentTimeMillis();
+		//long startTime = System.currentTimeMillis();
 		// parse the stream data into an actual image
 		//Log.i(TAG, "Creating Image width="+getWidth() + ", Height="+getHeight()+", bpc="+getBitsPerComponent()+",cs="+colorSpace);
 		if (colorSpace == null) {
@@ -286,7 +286,7 @@ public class PDFImage {
 		else {
 			throw new UnsupportedOperationException("image with unsupported colorspace "+colorSpace);
 		}
-		long stopTime = System.currentTimeMillis();
+		//long stopTime = System.currentTimeMillis();
 		return bi;
 	}
 

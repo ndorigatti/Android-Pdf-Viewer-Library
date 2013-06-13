@@ -101,11 +101,13 @@ public abstract class PdfViewer
 			// create a PDFFile from the data
 			mPdfFile = new PDFFile( bb );
 			numPages = mPdfFile.getNumPages();
-			OutlineNode page = mPdfFile.getOutline();
-
-			parseOutline( page.children, toc );
-			if ( !toc.isEmpty() )
-				startPage = toc.get( 0 ).second;
+			if (shouldParseOutline())
+			{	
+				OutlineNode page = mPdfFile.getOutline();
+				parseOutline( page.children, toc );
+				if ( !toc.isEmpty() )
+					startPage = toc.get( 0 ).second;
+			}
 		}
 		catch ( PDFParseException e )
 		{
@@ -135,6 +137,6 @@ public abstract class PdfViewer
 	{
 		return mPdfFile;
 	}
-
+	protected abstract boolean shouldParseOutline();
 	protected abstract void onParseFinished ( ArrayList< Pair< String, Integer >> toc );
 }

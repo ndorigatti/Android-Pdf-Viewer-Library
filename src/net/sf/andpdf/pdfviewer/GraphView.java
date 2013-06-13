@@ -1,23 +1,34 @@
 package net.sf.andpdf.pdfviewer;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import uk.co.senab.photoview.PhotoView;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.view.animation.Animation;
 
 import com.sun.pdfview.PDFPage;
+import com.sun.pdfview.PDFParseException;
 
 public final class GraphView extends PhotoView
 {
+	private static final ExecutorService sService=Executors.newSingleThreadExecutor();
 	private static final Handler uiHandler = new Handler();
 	private PDFPage mPdfPage;
-	private volatile Thread backgroundThread;
+	
 	private final int mPage;
-	private float scale;
+	private float scale=1.0f;
 	private PdfViewer viewer;
-	private OnScaleChangedListener listener; 
+	private OnScaleChangedListener listener;
+	private PageLoadListener plistener; 
+	private boolean isPdfReady;
+	private volatile Future< ? > task;
 
 	public GraphView ( Context ctx, int page, PdfViewer viewer )
 	{
@@ -25,24 +36,45 @@ public final class GraphView extends PhotoView
 		setMinScale( 1.0f );
 		setMaxScale( 1.8f );
 		mPage = page + viewer.startPage;
-		this.viewer = viewer;
+		this.viewer = viewer;		
 	}
-
+	public Bitmap getPageBitmap ()
+	{
+		Drawable drw=getDrawable();
+		if (isPdfReady&&drw instanceof BitmapDrawable)
+			return ( ( BitmapDrawable ) drw ).getBitmap();
+		return null;
+	}
 	private synchronized void startRenderThread ( final int viewWith, final int viewHeight )
 	{
-		if ( backgroundThread != null )
-			return;
-
-		backgroundThread = new Thread()
-		{
-			@Override
-			public void run ()
+		if (task==null||task.isDone())
+		{	
+			Runnable backgroundRunnable = new Runnable()
 			{
-				showPage( viewWith, viewHeight );
-				backgroundThread = null;
-			}
-		};
-		backgroundThread.start();
+				@Override
+				public void run ()
+				{
+					try
+					{
+						showPage( viewWith, viewHeight );
+					}
+					catch (PDFParseException e)
+					{
+						viewer.onParseException( e );
+					}
+					catch ( IOException e )
+					{
+						viewer.onIOException( e );
+					}
+					finally 
+					{
+						if (plistener!=null)
+							plistener.onPageLoadingCompleted();
+					}
+				}
+			};
+			task=sService.submit( backgroundRunnable );
+		}
 	}
 
 	@Override
@@ -51,6 +83,8 @@ public final class GraphView extends PhotoView
 		super.onDetachedFromWindow();
 		recycleOldBitmap();
 		listener=null;
+		plistener=null;
+		task.cancel( true );
 	}
 
 	private void recycleOldBitmap ()
@@ -66,7 +100,12 @@ public final class GraphView extends PhotoView
 
 	private void updateImage ( final Bitmap bitmap )
 	{
-		getAnimation().cancel();
+		Animation anim=getAnimation();
+		if (anim!=null)
+		{	
+			anim.cancel();
+			anim=null;
+		}
 		uiHandler.post( new Runnable()
 		{
 			@Override
@@ -77,6 +116,7 @@ public final class GraphView extends PhotoView
 				recycleOldBitmap();
 				setImageBitmap( bitmap );
 				zoomTo( scale, 0.0f, 0.0f, false );
+				isPdfReady=true;
 			}
 		} );
 	}
@@ -94,11 +134,13 @@ public final class GraphView extends PhotoView
 		this.scale = scale;
 	}
 
-	private void showPage ( int w, int h )
+	private void showPage ( int w, int h ) throws IOException
 	{
 		// Only load the page if it's a different page (i.e. not just changing the zoom level)
 		if ( mPdfPage == null || mPdfPage.getPageNumber() != mPage )
 			mPdfPage = viewer.mPdfFile.getPage( mPage, true );
+		if (Thread.interrupted())
+			return;		
 		float fwidth = mPdfPage.getWidth();
 		float fheight = mPdfPage.getHeight();
 		float zoom = h / fheight;
@@ -111,7 +153,11 @@ public final class GraphView extends PhotoView
 			oHeight = ( int ) ( fheight * zoom );
 			oWidth = ( int ) ( fwidth * zoom );
 		}
+		if (Thread.interrupted())
+			return;		
 		Bitmap bitmap = mPdfPage.getImage( oWidth, oHeight, null, true, true );
+		if (Thread.interrupted())
+			return;
 		updateImage( bitmap );
 	}
 
@@ -121,6 +167,10 @@ public final class GraphView extends PhotoView
 		scale = getScale();
 		if (listener!=null)
 			listener.onScalechanged( scale );
+	}
+	public void setPageLoadListener(PageLoadListener plistener)
+	{
+		this.plistener=plistener;
 	}
 	public void setOnScaleChangedListener(OnScaleChangedListener listener)
 	{

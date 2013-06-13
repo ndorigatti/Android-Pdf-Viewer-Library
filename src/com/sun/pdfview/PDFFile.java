@@ -1531,8 +1531,9 @@ public class PDFFile {
      * Get the page commands for a given page in a separate thread.
      *
      * @param pagenum the number of the page to get commands for
+     * @throws IOException 
      */
-    public PDFPage getPage(int pagenum) {
+    public PDFPage getPage(int pagenum) throws IOException {
         return getPage(pagenum, false);
     }
 
@@ -1541,8 +1542,9 @@ public class PDFFile {
      *
      * @param pagenum the number of the page to get commands for
      * @param wait if true, do not exit until the page is complete.
+     * @throws IOException 
      */
-    public PDFPage getPage(int pagenum, boolean wait) {
+    public PDFPage getPage(int pagenum, boolean wait) throws IOException {
         Integer key = Integer.valueOf(pagenum);
         HashMap<String,PDFObject> resources = null;
         PDFObject pageObj = null;
@@ -1550,7 +1552,6 @@ public class PDFFile {
         PDFPage page = cache.getPage(key);
         PDFParser parser = cache.getPageParser(key);
         if (page == null) {
-            try {
                 // hunt down the page!
                 resources = new HashMap<String,PDFObject>();
 
@@ -1567,9 +1568,6 @@ public class PDFFile {
                 parser = new PDFParser(page, stream, resources);
 
                 cache.addPage(key, page, parser);
-            } catch (IOException ioe) {
-                return null;
-            }
         }
 
         if (parser != null && !parser.isFinished()) {
