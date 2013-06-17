@@ -1183,9 +1183,9 @@ public class PDFFile {
         
         while (true) {
 			PDFObject xrefObj=readObject(-1, -1, IdentityDecrypter.getInstance());
-//			System.out.println(xrefObj.getDictionary().toString());
-//			System.out.println(xrefObj.toString());
-			
+			//System.out.println(xrefObj.getDictionary().toString());
+			//System.out.println(xrefObj.toString());
+
 			PDFObject[] wNums = xrefObj.getDictionary().get("W").getArray();
 			int l1 = wNums[0].getIntValue();
 			int l2 = wNums[1].getIntValue();

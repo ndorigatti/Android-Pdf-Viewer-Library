@@ -24,19 +24,25 @@ public final class GraphView extends PhotoView
 	
 	private final int mPage;
 	private float scale=1.0f;
+	private final float startFactor;
 	private PdfViewer viewer;
 	private OnScaleChangedListener listener;
 	private PageLoadListener plistener; 
 	private boolean isPdfReady;
 	private volatile Future< ? > task;
 
-	public GraphView ( Context ctx, int page, PdfViewer viewer )
+	public GraphView ( Context ctx, int page, PdfViewer viewer ,float startFactor)
 	{
 		super( ctx );
 		setMinScale( 1.0f );
-		setMaxScale( 1.8f );
+		this.startFactor=startFactor;
+		setMaxScale( startFactor*1.8f );
 		mPage = page + viewer.startPage;
-		this.viewer = viewer;		
+		this.viewer = viewer;
+	}
+	public GraphView ( Context ctx, int page, PdfViewer viewer )
+	{
+		this( ctx, page, viewer, 1.0f );
 	}
 	public Bitmap getPageBitmap ()
 	{
@@ -98,7 +104,7 @@ public final class GraphView extends PhotoView
 		}
 	}
 
-	private void updateImage ( final Bitmap bitmap )
+	private void updateImage ( final Bitmap bitmap, final float zoom )
 	{
 		Animation anim=getAnimation();
 		if (anim!=null)
@@ -115,7 +121,10 @@ public final class GraphView extends PhotoView
 				setScaleType( ScaleType.FIT_CENTER );
 				recycleOldBitmap();
 				setImageBitmap( bitmap );
-				zoomTo( scale, 0.0f, 0.0f, false );
+				setMaxScale( startFactor*getMaxScale()*zoom );
+				setMidScale( getMidScale()*zoom );
+				setMinScale( getMinScale()*zoom );
+				zoomTo( scale*zoom, 0.0f, 0.0f, false );
 				isPdfReady=true;
 			}
 		} );
@@ -130,8 +139,8 @@ public final class GraphView extends PhotoView
 
 	public void setScale ( float scale )
 	{
-		zoomTo( scale, 0.0f, 0.0f, false );
 		this.scale = scale;
+		zoomTo( scale, 0.0f, 0.0f, false );
 	}
 
 	private void showPage ( int w, int h ) throws IOException
@@ -143,7 +152,8 @@ public final class GraphView extends PhotoView
 			return;		
 		float fwidth = mPdfPage.getWidth();
 		float fheight = mPdfPage.getHeight();
-		float zoom = h / fheight;
+		float zoom = w / fwidth;
+		zoom*=startFactor;
 		int oHeight = ( int ) ( fheight * zoom * 1.5f );
 		int oWidth = ( int ) ( fwidth * zoom * 1.5f );
 		int maxDim = Math.max( oHeight, oWidth );
@@ -158,7 +168,10 @@ public final class GraphView extends PhotoView
 		Bitmap bitmap = mPdfPage.getImage( oWidth, oHeight, null, true, true );
 		if (Thread.interrupted())
 			return;
-		updateImage( bitmap );
+		zoom=zoom/(h/fheight);
+		if (zoom<1.0f)
+			zoom=1.0f;
+		updateImage( bitmap,zoom );
 	}
 
 	@Override
