@@ -30,6 +30,7 @@ public final class GraphView extends PhotoView
 	private PageLoadListener plistener; 
 	private boolean isPdfReady;
 	private volatile Future< ? > task;
+	protected float mZoom=1.0f;
 
 	public GraphView ( Context ctx, int page, PdfViewer viewer ,float startFactor)
 	{
@@ -117,14 +118,15 @@ public final class GraphView extends PhotoView
 			@Override
 			public void run ()
 			{
+				mZoom=zoom;
 				setZoomable( true );
 				setScaleType( ScaleType.FIT_CENTER );
 				recycleOldBitmap();
 				setImageBitmap( bitmap );
-				setMaxScale( startFactor*getMaxScale()*zoom );
-				setMidScale( getMidScale()*zoom );
-				setMinScale( getMinScale()*zoom );
-				zoomTo( scale*zoom, 0.0f, 0.0f, false );
+				setMaxScale( startFactor*getMaxScale()*mZoom );
+				setMidScale( getMidScale()*mZoom );
+				setMinScale( getMinScale()*mZoom );
+				zoomTo( scale*mZoom, 0.0f, 0.0f, false );
 				isPdfReady=true;
 			}
 		} );
@@ -134,7 +136,8 @@ public final class GraphView extends PhotoView
 	protected void onSizeChanged ( int w, int h, int oldw, int oldh )
 	{
 		super.onSizeChanged( w, h, oldw, oldh );
-		startRenderThread( w, h );
+		if (oldh==0&&oldw==0)
+			startRenderThread( w, h );
 	}
 
 	public void setScale ( float scale )
@@ -179,7 +182,7 @@ public final class GraphView extends PhotoView
 	{
 		scale = getScale();
 		if (listener!=null)
-			listener.onScalechanged( scale );
+			listener.onScalechanged( scale/mZoom );
 	}
 	public void setPageLoadListener(PageLoadListener plistener)
 	{
