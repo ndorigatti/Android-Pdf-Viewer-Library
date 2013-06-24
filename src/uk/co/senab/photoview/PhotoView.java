@@ -25,7 +25,7 @@ import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-public abstract class PhotoView extends ImageView implements IPhotoView {
+public class PhotoView extends ImageView implements IPhotoView {
 
 	private final PhotoViewAttacher mAttacher;
 
@@ -175,6 +175,9 @@ public abstract class PhotoView extends ImageView implements IPhotoView {
 		super.onDetachedFromWindow();
 	}
 
-	public abstract void onScale ();
+	public void onScale ()
+	{
+		//no-op
+	}
 
 }
