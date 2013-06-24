@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class DefaultMutableTreeNode {
 	private DefaultMutableTreeNode parent;
 	private Object userObject;
-	//TODO getter
-	public ArrayList<DefaultMutableTreeNode> children;
+	
+	private ArrayList<DefaultMutableTreeNode> children;
 	protected DefaultMutableTreeNode(){
 		parent = null;
 		userObject = null;
@@ -26,6 +26,9 @@ public class DefaultMutableTreeNode {
 	public DefaultMutableTreeNode getParent() {
 		return parent;
 	}
-	
+	public ArrayList<DefaultMutableTreeNode> getChildren()
+	{
+		return children;
+	}
 
 }

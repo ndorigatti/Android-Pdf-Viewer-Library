@@ -46,7 +46,7 @@ public abstract class PdfViewer
 			OutlineNode outline = ( OutlineNode ) child;
 			PDFDestination dst = ( ( GoToAction ) outline.getAction() ).getDestination();
 			toc.add( Pair.create( outline.toString(), mPdfFile.getPageNumber( dst.getPage() ) ) );
-			parseOutline( child.children, toc );
+			parseOutline( child.getChildren(), toc );
 		}
 	}
 
@@ -104,7 +104,7 @@ public abstract class PdfViewer
 			if (shouldParseOutline())
 			{	
 				OutlineNode page = mPdfFile.getOutline();
-				parseOutline( page.children, toc );
+				parseOutline( page.getChildren(), toc );
 				if ( !toc.isEmpty() )
 					startPage = toc.get( 0 ).second;
 			}
