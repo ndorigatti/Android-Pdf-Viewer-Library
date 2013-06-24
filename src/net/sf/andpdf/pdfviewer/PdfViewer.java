@@ -37,6 +37,7 @@ public abstract class PdfViewer
 	{
 		this.ctx=ctx;
 		this.pdfResId=pdfResId;
+		pdfsDir=new File (ctx.getCacheDir(),"pdfs");
 	}
 	
 	private void parseOutline ( List< DefaultMutableTreeNode > list, List< Pair< String, Integer >> toc ) throws IOException
@@ -69,6 +70,7 @@ public abstract class PdfViewer
 		}
 
 	};
+	private final File pdfsDir;
 	
 	public final void loadPDFAsync ()
 	{
@@ -84,7 +86,13 @@ public abstract class PdfViewer
 		final ArrayList< Pair< String, Integer >> toc = new ArrayList< Pair< String, Integer > >();
 		try
 		{
-			File dest=new File(ctx.getCacheDir(),String.valueOf( pdfResId ));
+			File[] oldFiles = pdfsDir.listFiles();
+			if (oldFiles!=null)
+				for (File f:oldFiles)
+					f.delete();
+			if (!pdfsDir.isDirectory())
+				pdfsDir.mkdirs();
+			File dest=new File(pdfsDir,String.valueOf( pdfResId ));
 			raf=new RandomAccessFile( dest, "rw" );
 			//if (!dest.exists())
 			{	
