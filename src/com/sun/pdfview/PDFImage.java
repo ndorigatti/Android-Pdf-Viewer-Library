@@ -25,11 +25,12 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.pdfview.colorspace.PDFColorSpace;
-import com.sun.pdfview.function.FunctionType0;
-
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.Color;
+
+import com.sun.pdfview.colorspace.PDFColorSpace;
+import com.sun.pdfview.function.FunctionType0;
 
 /**
  * Encapsulates a PDF Image
@@ -98,7 +99,7 @@ public class PDFImage
 	{
 		// create the image
 //		if ( !PDFParser.RELEASE )
-//			dump( obj );
+			dump( obj );
 		PDFImage image = new PDFImage( obj );
 
 		// get the width (required)
@@ -282,15 +283,13 @@ public class PDFImage
 				int n = 0;
 				for ( int h = 0; h < maxH; h++ )
 				{
-					for ( int w = 0; w < height; w++ )
+					for ( int w = 0; w < maxW; w++ )
 					{
-						line[ w ] = ( ( 0xff & imgBytes[ n ] ) << 8 | ( 0xff & imgBytes[ n + 1 ] ) ) << 8
-								| ( 0xff & imgBytes[ n + 2 ] ) | 0xFF000000;
-						// line[w] = Color.rgb(0xff&(int)imgBytes[n], 0xff&(int)imgBytes[n+1],0xff&(int)imgBytes[n+2]);
-						n += 3;
+						line[w] =Color.argb( 0xff&imgBytes[n+3],0xff&imgBytes[n],0xff&imgBytes[n+1],0xff&imgBytes[n+2] ); 
+						n += 4;
 					}
 					bi.setPixels( line, 0, maxW, 0, h, maxW, 1 );
-				}
+				}			
 			}
 		}
 		else if ( colorSpace.getType() == PDFColorSpace.COLORSPACE_GRAY )
@@ -330,7 +329,7 @@ public class PDFImage
 					n += 1;
 				}
 				bi.setPixels( line, 0, maxW, 0, h, maxW, 1 );
-			}
+			}			
 		}
 		else
 		{

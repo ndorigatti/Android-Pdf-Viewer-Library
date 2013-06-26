@@ -209,7 +209,7 @@ public class PDFPage
 			info.bgColor = Color.WHITE;
 		}
 
-		Bitmap image = Bitmap.createBitmap( width, height, Config.RGB_565 );
+		Bitmap image = Bitmap.createBitmap( width, height, Config.ARGB_8888 );
 		renderer = new PDFRenderer( this, info, image );
 
 		renderers.put( info, new WeakReference< PDFRenderer >( renderer ) );
