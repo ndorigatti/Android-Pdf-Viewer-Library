@@ -19,7 +19,9 @@ import uk.co.senab.photoview.PhotoViewAttacher.OnMatrixChangedListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnViewTapListener;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -173,6 +175,15 @@ public class PhotoView extends ImageView implements IPhotoView {
 	protected void onDetachedFromWindow() {
 		mAttacher.cleanup();
 		super.onDetachedFromWindow();
+//		Drawable drw=getDrawable();
+//		if (drw instanceof BitmapDrawable)
+//		{	
+//			Bitmap bmp=( ( BitmapDrawable ) drw ).getBitmap();
+//			if (bmp!=null)
+//				bmp.recycle();
+//		}
+//		setImageDrawable( null );
+		System.gc();
 	}
 
 	public void onScale ()
