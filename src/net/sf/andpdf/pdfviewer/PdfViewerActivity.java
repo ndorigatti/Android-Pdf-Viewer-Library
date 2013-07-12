@@ -37,6 +37,7 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -178,7 +179,8 @@ public abstract class PdfViewerActivity extends Activity {
 	        mOldGraphView = null;
 	        mGraphView.mImageView.setImageBitmap(mGraphView.mBi);
 	        mGraphView.updateTexts();
-	        setContentView(mGraphView);
+	        // setContentView(mGraphView);
+            ( (FrameLayout) findViewById( R.id.graph_frame ) ).addView( mGraphView, new FrameLayout.LayoutParams( android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT ) );
         }
         else {
 	        mGraphView = new GraphView(this);	        
@@ -219,11 +221,14 @@ public abstract class PdfViewerActivity extends Activity {
 	private void setContent(String password) {
         try { 
     		parsePDF(pdffilename, password);
-	        setContentView(mGraphView);
+	        // setContentView(mGraphView);
+            ( (FrameLayout) findViewById( R.id.graph_frame ) ).addView( mGraphView, new FrameLayout.LayoutParams( android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT ) );
+
 	        startRenderThread(mPage, mZoom);
     	}
         catch (PDFAuthenticationFailureException e) {
         	setContentView(getPdfPasswordLayoutResource());
+
            	final EditText etPW= (EditText) findViewById(getPdfPasswordEditField());
            	Button btOK= (Button) findViewById(getPdfPasswordOkButton());
         	Button btExit = (Button) findViewById(getPdfPasswordExitButton());
@@ -494,6 +499,7 @@ public abstract class PdfViewerActivity extends Activity {
         public GraphView(Context context) {
             super(context);
 
+            setContentView( R.layout.root );
             //setContentView(R.layout.graphics_view);
             // layout params
 			LinearLayout.LayoutParams lpWrap1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);
