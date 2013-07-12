@@ -20,20 +20,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.RectF;
-import android.graphics.Bitmap.Config;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +43,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TableLayout.LayoutParams;
 
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFImage;
@@ -520,9 +522,11 @@ public abstract class PdfViewerActivity extends Activity {
 		        mImageView = new ImageView(context);
 		        setPageBitmap(null);
 		        updateImage();
-		        mImageView.setLayoutParams(lpWrap1);
-		        mImageView.setPadding(5, 5, 5, 5);
-		        vl.addView(mImageView);
+
+                mImageView.setLayoutParams( lpWrap1 );
+                mImageView.setPadding( 5, 5, 5, 5 );
+                vl.addView( mImageView );
+
 		        /*mImageView = (ImageView) findViewById(R.id.pdf_image);
 		        if (mImageView == null) {
 		        	Log.i(TAG, "mImageView is null!!!!!!");
@@ -793,9 +797,41 @@ public abstract class PdfViewerActivity extends Activity {
 	        //Log.i(TAG, pageInfo);
 	        RectF clip = null;
 	        //middleTime = System.currentTimeMillis();
-	        Bitmap bi = mPdfPage.getImage((int)(width*zoom), (int)(height*zoom), clip, true, true);
+
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize( size );
+            int screenWidth = size.x;
+            int screenHeight = size.y;
+
+            final float r = height / width;
+            final float h = r * screenWidth;
+            final float w = screenWidth;
+            
+            Log.d( "PDF", String.format( "PDF Resolution: %.2f x %.2f",  width, height ) );
+            Log.d( "PDF", String.format( "Screen Resolution: %d x %d",  screenWidth, screenHeight ) );
+            Log.d( "PDF", String.format( "Render Resolution %.2f x %.2f",  w, h ) );
+            
+            
+            Bitmap bi = mPdfPage.getImage((int)(width*zoom), (int)(height*zoom), clip, true, true);
+            // Bitmap bi = mPdfPage.getImage( (int)w, (int) h, clip, true, true);
+	        
 	        mGraphView.setPageBitmap(bi);
 	        mGraphView.updateImage();
+	        
+	        mGraphView.post(  new Runnable() {
+	            public void run() {
+                    ViewGroup.LayoutParams p = mGraphView.mImageView.getLayoutParams();
+                    p.width = (int) w;
+                    p.height = (int) h;
+                    mGraphView.mImageView.setLayoutParams( p );
+	            }
+	        });
+	        
+//	        ViewGroup.LayoutParams pp = mGraphView.getLayoutParams();
+//	        pp.width = (int) w;
+//	        pp.height = (int) h;
+//	        mGraphView.setLayoutParams( pp );
 	        
 	        if (progress != null)
 	        	progress.dismiss();
