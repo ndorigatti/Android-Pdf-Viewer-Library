@@ -4,11 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+    </LinearLayout>
+    
     <FrameLayout
         android:id="@+id/graph_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/footer"
         >
+
     </FrameLayout>
+
 
 </RelativeLayout>
