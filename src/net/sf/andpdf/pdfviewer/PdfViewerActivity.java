@@ -407,29 +407,27 @@ public abstract class PdfViewerActivity extends Activity {
     	}
 	}
 
-	protected void nextPage() {
-    	if (mPdfFile != null) {
-    		if (mPage < mPdfFile.getNumPages()) {
-    			mPage += 1;
-    			mGraphView.bZoomOut.setEnabled(true);
-    			mGraphView.bZoomIn.setEnabled(true);
-    			progress = ProgressDialog.show(PdfViewerActivity.this, "Loading", "Loading PDF Page " + mPage, true, true);
-    			startRenderThread(mPage, mZoom);
-    		}
-    	}
-	}
+    protected void nextPage() {
+        if ( mPdfFile != null ) {
+            if ( mPage < mPdfFile.getNumPages() ) {
+                mPage += 1;
+                progress = ProgressDialog.show( PdfViewerActivity.this, "Loading", "Loading PDF Page " + mPage, true, true );
+                startRenderThread( mPage, mZoom );
+            }
+        }
+        invalidateOptionsMenu();
+    }
 
     protected void prevPage() {
-    	if (mPdfFile != null) {
-    		if (mPage > 1) {
-    			mPage -= 1;
-    			mGraphView.bZoomOut.setEnabled(true);
-    			mGraphView.bZoomIn.setEnabled(true);
-    			progress = ProgressDialog.show(PdfViewerActivity.this, "Loading", "Loading PDF Page " + mPage, true, true);
-    			startRenderThread(mPage, mZoom);
-    		}
-    	}
-	}
+        if ( mPdfFile != null ) {
+            if ( mPage > 1 ) {
+                mPage -= 1;
+                progress = ProgressDialog.show( PdfViewerActivity.this, "Loading", "Loading PDF Page " + mPage, true, true );
+                startRenderThread( mPage, mZoom );
+            }
+        }
+        invalidateOptionsMenu();
+    }
     
 	private void gotoPage() {
     	if (mPdfFile != null) {
