@@ -515,7 +515,7 @@ public abstract class PdfViewerActivity extends Activity {
 			if (mOldGraphView == null)
 				progress = ProgressDialog.show(PdfViewerActivity.this, "Loading", "Loading PDF Page", true, true);
 			
-			addNavButtons(vl);
+			// addNavButtons(vl);
 		        // remember page button for updates
 		        mBtPage2 = mBtPage;
 		        
@@ -524,7 +524,7 @@ public abstract class PdfViewerActivity extends Activity {
 		        updateImage();
 
                 mImageView.setLayoutParams( lpWrap1 );
-                mImageView.setPadding( 5, 5, 5, 5 );
+                // mImageView.setPadding( 5, 5, 5, 5 );
                 vl.addView( mImageView );
 
 		        /*mImageView = (ImageView) findViewById(R.id.pdf_image);
@@ -805,15 +805,14 @@ public abstract class PdfViewerActivity extends Activity {
             int screenHeight = size.y;
 
             final float r = height / width;
-            final float h = r * screenWidth;
-            final float w = screenWidth;
+            final int h = (int) (r * screenWidth);
+            final int w = (int) screenWidth;
             
             Log.d( "PDF", String.format( "PDF Resolution: %.2f x %.2f",  width, height ) );
             Log.d( "PDF", String.format( "Screen Resolution: %d x %d",  screenWidth, screenHeight ) );
-            Log.d( "PDF", String.format( "Render Resolution %.2f x %.2f",  w, h ) );
+            Log.d( "PDF", String.format( "Render Resolution %d x %d",  w, h ) );
             
-            
-            Bitmap bi = mPdfPage.getImage((int)(width*zoom), (int)(height*zoom), clip, true, true);
+            Bitmap bi = mPdfPage.getImage( w, h, clip, true, true);
             // Bitmap bi = mPdfPage.getImage( (int)w, (int) h, clip, true, true);
 	        
 	        mGraphView.setPageBitmap(bi);
@@ -822,8 +821,8 @@ public abstract class PdfViewerActivity extends Activity {
 	        mGraphView.post(  new Runnable() {
 	            public void run() {
                     ViewGroup.LayoutParams p = mGraphView.mImageView.getLayoutParams();
-                    p.width = (int) w;
-                    p.height = (int) h;
+                    p.width = w;
+                    p.height = h;
                     mGraphView.mImageView.setLayoutParams( p );
 	            }
 	        });
