@@ -90,26 +90,33 @@ public abstract class PdfViewerActivity extends Activity {
 	
 	private final static int DIALOG_PAGENUM = 1;
 	
-	private GraphView mOldGraphView;
-	private GraphView mGraphView;
-	private String pdffilename;
-	private PDFFile mPdfFile;
-	private int mPage;
-	private float mZoom;
-    private File mTmpFile;
-    private ProgressDialog progress;
+	protected GraphView mOldGraphView;
+	protected GraphView mGraphView;
+	protected String pdffilename;
+	protected PDFFile mPdfFile;
+	protected int mPage;
+	protected float mZoom;
+	protected File mTmpFile;
+	protected ProgressDialog progress;
 
     /*private View navigationPanel;
     private Handler closeNavigationHandler;
     private Thread closeNavigationThread;*/
 
     
-    private PDFPage mPdfPage; 
+	protected PDFPage mPdfPage; 
     
-    private Thread backgroundThread;
-    private Handler uiHandler;
-
+	protected Thread backgroundThread;
+	protected Handler uiHandler;
 	
+    public int getPageCount() {
+        return ( mPdfFile == null ) ? 0 : mPdfFile.getNumPages();
+    }
+    
+    public int getCurrentPage() {
+        return mPage;
+    }
+
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		// return a reference to the current instance
@@ -400,7 +407,7 @@ public abstract class PdfViewerActivity extends Activity {
     	}
 	}
 
-	private void nextPage() {
+	protected void nextPage() {
     	if (mPdfFile != null) {
     		if (mPage < mPdfFile.getNumPages()) {
     			mPage += 1;
@@ -412,7 +419,7 @@ public abstract class PdfViewerActivity extends Activity {
     	}
 	}
 
-    private void prevPage() {
+    protected void prevPage() {
     	if (mPdfFile != null) {
     		if (mPage > 1) {
     			mPage -= 1;
@@ -894,6 +901,8 @@ public abstract class PdfViewerActivity extends Activity {
         	mPdfFile = new PDFFile(bb, new PDFPassword(password));
 	        
         mGraphView.showText("Anzahl Seiten:" + mPdfFile.getNumPages());
+        
+        invalidateOptionsMenu();
     }
     
      
