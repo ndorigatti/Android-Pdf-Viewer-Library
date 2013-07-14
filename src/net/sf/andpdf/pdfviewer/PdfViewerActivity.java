@@ -154,6 +154,8 @@ public abstract class PdfViewerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView( R.layout.root );
+        
         Log.i(TAG, "onCreate");
         //progress = ProgressDialog.show(PdfViewerActivity.this, "Loading", "Loading PDF Page");
         /*closeNavigationHandler = new Handler();
@@ -189,7 +191,8 @@ public abstract class PdfViewerActivity extends Activity {
 	        mGraphView.mImageView.setImageBitmap(mGraphView.mBi);
 	        mGraphView.updateTexts();
 	        // setContentView(mGraphView);
-            ( (FrameLayout) findViewById( R.id.graph_frame ) ).addView( mGraphView, new FrameLayout.LayoutParams( android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT ) );
+	        // ( (FrameLayout) findViewById( R.id.graph_frame ) ).addView( mGraphView, new FrameLayout.LayoutParams( android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT ) );
+	        showGraphView();
         }
         else {
 	        mGraphView = new GraphView(this);	        
@@ -226,15 +229,20 @@ public abstract class PdfViewerActivity extends Activity {
         setContent( null );
     }
 
+    public void showGraphView() {
+        if ( mGraphView.getParent() == null ) {
+            FrameLayout.LayoutParams p = new FrameLayout.LayoutParams( LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT );
+            FrameLayout graphFrame = (FrameLayout) findViewById( R.id.graph_frame );
+            graphFrame.addView( mGraphView, p );
+        }
+    }
+    
 	private void setContent(String password) {
         try { 
     		parsePDF(mPdfFilename, password);
-	        // setContentView(mGraphView);
-            ( (FrameLayout) findViewById( R.id.graph_frame ) ).addView( mGraphView, new FrameLayout.LayoutParams( android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT ) );
-
+    		showGraphView();
 	        startRenderThread(mPage, mZoom);
-    	}
-        catch (PDFAuthenticationFailureException e) {
+    	} catch (PDFAuthenticationFailureException e) {
         	setContentView(getPdfPasswordLayoutResource());
 
            	final EditText etPW= (EditText) findViewById(getPdfPasswordEditField());
@@ -254,8 +262,10 @@ public abstract class PdfViewerActivity extends Activity {
         }
 	}
 	private synchronized void startRenderThread(final int page, final float zoom) {
-		if (backgroundThread != null)
-			return;
+        if ( backgroundThread != null ) {
+            Log.d( "PDF", "Background thread != null, aborting" );
+		    return;
+		}
 		
 		mGraphView.showText("reading page "+ page+", zoom:"+zoom);
 		//progress = ProgressDialog.show(PdfViewerActivity.this, "Loading", "Loading PDF Page");
@@ -503,11 +513,8 @@ public abstract class PdfViewerActivity extends Activity {
     	ImageButton bZoomIn;
         
         public GraphView(Context context) {
-            super(context);
-
-            setContentView( R.layout.root );
-            //setContentView(R.layout.graphics_view);
-            // layout params
+            super( context );
+            
 			LinearLayout.LayoutParams lpWrap1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);
 			LinearLayout.LayoutParams lpWrap10 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,10);
 
@@ -580,7 +587,7 @@ public abstract class PdfViewerActivity extends Activity {
 
 		        //addNavButtons(vl);
 			    
-			setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 100));
+			setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 100));
 			setBackgroundColor(Color.LTGRAY);
 			setHorizontalScrollBarEnabled(true);
 			setHorizontalFadingEdgeEnabled(true);
@@ -589,118 +596,118 @@ public abstract class PdfViewerActivity extends Activity {
 			addView(vl);
         }
 
-        private void addNavButtons(ViewGroup vg) {
-        	
-	        addSpace(vg, 6, 6);
-	        
-			LinearLayout.LayoutParams lpChild1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);
-			LinearLayout.LayoutParams lpWrap10 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,10);
-        	
-        	Context context = vg.getContext();
-			LinearLayout hl=new LinearLayout(context);
-			hl.setLayoutParams(lpWrap10);
-			hl.setOrientation(LinearLayout.HORIZONTAL);
+//        private void addNavButtons(ViewGroup vg) {
+//        	
+//	        addSpace(vg, 6, 6);
+//	        
+//			LinearLayout.LayoutParams lpChild1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);
+//			LinearLayout.LayoutParams lpWrap10 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,10);
+//        	
+//        	Context context = vg.getContext();
+//			LinearLayout hl=new LinearLayout(context);
+//			hl.setLayoutParams(lpWrap10);
+//			hl.setOrientation(LinearLayout.HORIZONTAL);
+//
+//				// zoom out button
+//				bZoomOut=new ImageButton(context);
+//				bZoomOut.setBackgroundDrawable(null);
+//				bZoomOut.setLayoutParams(lpChild1);
+//				//bZoomOut.setText("-");
+//				//bZoomOut.setWidth(40);
+//				bZoomOut.setImageResource(getZoomOutImageResource());
+//				bZoomOut.setOnClickListener(new OnClickListener() {
+//					public void onClick(View v) {
+//			            zoomOut();
+//					}
+//				});
+//		        hl.addView(bZoomOut);
+//		        
+//				// zoom in button
+//		        bZoomIn=new ImageButton(context);
+//		        bZoomIn.setBackgroundDrawable(null);
+//				bZoomIn.setLayoutParams(lpChild1);
+//		        //bZoomIn.setText("+");
+//		        //bZoomIn.setWidth(40);
+//				bZoomIn.setImageResource(getZoomInImageResource());
+//		        bZoomIn.setOnClickListener(new OnClickListener() {
+//					public void onClick(View v) {
+//			            zoomIn();
+//					}
+//				});
+//		        hl.addView(bZoomIn);
+//	    
+//		        addSpace(hl, 6, 6);
+//		        
+//				// prev button
+//		        ImageButton bPrev=new ImageButton(context);
+//		        bPrev.setBackgroundDrawable(null);
+//		        bPrev.setLayoutParams(lpChild1);
+//		        //bPrev.setText("<");
+//		        //bPrev.setWidth(40);
+//		        bPrev.setImageResource(getPreviousPageImageResource());
+//		        bPrev.setOnClickListener(new OnClickListener() {
+//					public void onClick(View v) {
+//			            prevPage();
+//					}
+//				});
+//		        hl.addView(bPrev);
+//        
+//				// page button
+//				mBtPage=new Button(context);
+//				mBtPage.setLayoutParams(lpChild1);
+//				String maxPage = ((mPdfFile==null)?"0":Integer.toString(mPdfFile.getNumPages()));
+//				mBtPage.setText(mPage+"/"+maxPage);
+//				mBtPage.setOnClickListener(new OnClickListener() {
+//					public void onClick(View v) {
+//			    		gotoPage();
+//					}
+//				});
+//		        hl.addView(mBtPage);
+//        
+//				// next button
+//				ImageButton bNext=new ImageButton(context);
+//				bNext.setBackgroundDrawable(null);
+//		        bNext.setLayoutParams(lpChild1);
+//		        //bNext.setText(">");
+//		        //bNext.setWidth(40);
+//		        bNext.setImageResource(getNextPageImageResource());
+//		        bNext.setOnClickListener(new OnClickListener() {
+//					public void onClick(View v) {
+//			    		nextPage();
+//					}
+//				});
+//		        hl.addView(bNext);
+//        
+//		        addSpace(hl, 20, 20);
+//        
+//				// exit button
+//		        /*
+//				Button bExit=new Button(context);
+//		        bExit.setLayoutParams(lpChild1);
+//		        bExit.setText("Back");
+//		        bExit.setWidth(60);
+//		        bExit.setOnClickListener(new OnClickListener() {
+//					@Override
+//					public void onClick(View v) {
+//			            finish();
+//					}
+//				});
+//		        hl.addView(bExit);*/
+//        	        
+//		        vg.addView(hl);
+//		    
+//	        addSpace(vg, 6, 6);
+//		}
 
-				// zoom out button
-				bZoomOut=new ImageButton(context);
-				bZoomOut.setBackgroundDrawable(null);
-				bZoomOut.setLayoutParams(lpChild1);
-				//bZoomOut.setText("-");
-				//bZoomOut.setWidth(40);
-				bZoomOut.setImageResource(getZoomOutImageResource());
-				bZoomOut.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-			            zoomOut();
-					}
-				});
-		        hl.addView(bZoomOut);
-		        
-				// zoom in button
-		        bZoomIn=new ImageButton(context);
-		        bZoomIn.setBackgroundDrawable(null);
-				bZoomIn.setLayoutParams(lpChild1);
-		        //bZoomIn.setText("+");
-		        //bZoomIn.setWidth(40);
-				bZoomIn.setImageResource(getZoomInImageResource());
-		        bZoomIn.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-			            zoomIn();
-					}
-				});
-		        hl.addView(bZoomIn);
-	    
-		        addSpace(hl, 6, 6);
-		        
-				// prev button
-		        ImageButton bPrev=new ImageButton(context);
-		        bPrev.setBackgroundDrawable(null);
-		        bPrev.setLayoutParams(lpChild1);
-		        //bPrev.setText("<");
-		        //bPrev.setWidth(40);
-		        bPrev.setImageResource(getPreviousPageImageResource());
-		        bPrev.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-			            prevPage();
-					}
-				});
-		        hl.addView(bPrev);
-        
-				// page button
-				mBtPage=new Button(context);
-				mBtPage.setLayoutParams(lpChild1);
-				String maxPage = ((mPdfFile==null)?"0":Integer.toString(mPdfFile.getNumPages()));
-				mBtPage.setText(mPage+"/"+maxPage);
-				mBtPage.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-			    		gotoPage();
-					}
-				});
-		        hl.addView(mBtPage);
-        
-				// next button
-				ImageButton bNext=new ImageButton(context);
-				bNext.setBackgroundDrawable(null);
-		        bNext.setLayoutParams(lpChild1);
-		        //bNext.setText(">");
-		        //bNext.setWidth(40);
-		        bNext.setImageResource(getNextPageImageResource());
-		        bNext.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-			    		nextPage();
-					}
-				});
-		        hl.addView(bNext);
-        
-		        addSpace(hl, 20, 20);
-        
-				// exit button
-		        /*
-				Button bExit=new Button(context);
-		        bExit.setLayoutParams(lpChild1);
-		        bExit.setText("Back");
-		        bExit.setWidth(60);
-		        bExit.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-			            finish();
-					}
-				});
-		        hl.addView(bExit);*/
-        	        
-		        vg.addView(hl);
-		    
-	        addSpace(vg, 6, 6);
-		}
-
-		private void addSpace(ViewGroup vg, int width, int height) {
-			TextView tvSpacer=new TextView(vg.getContext());
-			tvSpacer.setLayoutParams(new LinearLayout.LayoutParams(width,height,1));
-			tvSpacer.setText("");
-//			tvSpacer.setWidth(width);
-//			tvSpacer.setHeight(height);
-	        vg.addView(tvSpacer);
-    
-		}
+//		private void addSpace(ViewGroup vg, int width, int height) {
+//			TextView tvSpacer=new TextView(vg.getContext());
+//			tvSpacer.setLayoutParams(new LinearLayout.LayoutParams(width,height,1));
+//			tvSpacer.setText("");
+////			tvSpacer.setWidth(width);
+////			tvSpacer.setHeight(height);
+//	        vg.addView(tvSpacer);
+//    
+//		}
 
 		private void showText(String text) {
         	Log.i(TAG, "ST='"+text+"'");
@@ -815,11 +822,13 @@ public abstract class PdfViewerActivity extends Activity {
             Log.d( "PDF", String.format( "PDF Resolution: %.2f x %.2f",  width, height ) );
             Log.d( "PDF", String.format( "Screen Resolution: %d x %d",  screenWidth, screenHeight ) );
             Log.d( "PDF", String.format( "Render Resolution %d x %d",  w, h ) );
-            
+
+            Log.d( "PDF", "Loading new page image" );
             Bitmap bi = mPdfPage.getImage( w, h, clip, true, true);
-            // Bitmap bi = mPdfPage.getImage( (int)w, (int) h, clip, true, true);
 	        
 	        mGraphView.setPageBitmap(bi);
+	        
+	        Log.d( "PDF", "Updating graph view image" );
 	        mGraphView.updateImage();
 	        
 	        mGraphView.post(  new Runnable() {
@@ -831,13 +840,9 @@ public abstract class PdfViewerActivity extends Activity {
 	            }
 	        });
 	        
-//	        ViewGroup.LayoutParams pp = mGraphView.getLayoutParams();
-//	        pp.width = (int) w;
-//	        pp.height = (int) h;
-//	        mGraphView.setLayoutParams( pp );
-	        
-	        if (progress != null)
+	        if (progress != null) {
 	        	progress.dismiss();
+	        }
 		} catch (Throwable e) {
 			Log.e(TAG, e.getMessage(), e);
 			mGraphView.showText("Exception: "+e.getMessage());
@@ -854,8 +859,7 @@ public abstract class PdfViewerActivity extends Activity {
         	long len = f.length();
         	if (len == 0) {
         		mGraphView.showText("file '" + filename + "' not found");
-        	}
-        	else {
+        	} else {
         		mGraphView.showText("file '" + filename + "' has " + len + " bytes");
     	    	openFile(f, password);
         	}
@@ -892,10 +896,13 @@ public abstract class PdfViewerActivity extends Activity {
         ByteBuffer bb =
                 ByteBuffer.NEW(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
         // create a PDFFile from the data
-        if (password == null)
-        	mPdfFile = new PDFFile(bb);
-        else
-        	mPdfFile = new PDFFile(bb, new PDFPassword(password));
+
+        if ( password == null ) {
+            Log.d( "PDF", "Opening PDFFile" );
+            mPdfFile = new PDFFile( bb );
+        } else {
+            mPdfFile = new PDFFile( bb, new PDFPassword( password ) );
+        }
 	        
         mGraphView.showText("Anzahl Seiten:" + mPdfFile.getNumPages());
         
