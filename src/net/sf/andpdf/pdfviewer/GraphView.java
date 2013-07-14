@@ -38,7 +38,7 @@ public final class GraphView extends PhotoView
 		setMinScale( 1.0f );
 		this.startFactor=startFactor;
 		setMaxScale( startFactor*1.8f );
-		mPage = page + viewer.startPage;
+		mPage = page + viewer.mStartPage;
 		this.viewer = viewer;
 	}
 	public GraphView ( Context ctx, int page, PdfViewer viewer )

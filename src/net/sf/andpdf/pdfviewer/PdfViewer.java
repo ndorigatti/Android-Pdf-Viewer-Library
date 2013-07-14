@@ -1,16 +1,15 @@
 package net.sf.andpdf.pdfviewer;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.andpdf.nio.ByteBuffer;
-import net.sf.andpdf.utils.Utils;
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.util.Pair;
 import androswing.tree.DefaultMutableTreeNode;
 
@@ -27,17 +26,17 @@ import com.sun.pdfview.action.GoToAction;
  */
 public abstract class PdfViewer
 {
-	protected static final String TAG = "PDFVIEWER";
-	PDFFile mPdfFile;
-	int startPage = 0;
-	private int numPages, pdfResId;
-	private Context ctx;
+    protected static final String TAG        = "PDFVIEWER";
+    PDFFile                       mPdfFile;
+    int                           mStartPage = 0;
+    public int                    mNumPages;
+    private Context               mContext;
+    protected Uri                 mUri;
 	
-	public PdfViewer (Context ctx, int pdfResId)
-	{
-		this.ctx=ctx;
-		this.pdfResId=pdfResId;
-		pdfsDir=new File (ctx.getCacheDir(),"pdfs");
+	public PdfViewer( Context context, Uri uri ) {
+	    Log.d( TAG, String.format( "Creating PdfViewer: %s", uri.toString() ) );
+	    mContext = context;
+	    mUri = uri;
 	}
 	
 	private void parseOutline ( List< DefaultMutableTreeNode > list, List< Pair< String, Integer >> toc ) throws IOException
@@ -51,100 +50,83 @@ public abstract class PdfViewer
 		}
 	}
 
-	public int getNumContentPages ()
-	{
-		return numPages - startPage;
-	}
+    public int getNumContentPages() {
+        return mNumPages - mStartPage;
+    }
 
-	public int getStartPageNr ()
-	{
-		return startPage;
-	}
+    public int getStartPageNr() {
+        return mStartPage;
+    }
 
-	private final Runnable parser = new Runnable()
-	{
+	private final Runnable parser = new Runnable() {
 		@Override
 		public final void run ()
 		{
 			parsePDF();
 		}
-
 	};
-	private final File pdfsDir;
 	
-	public final void loadPDFAsync ()
-	{
+	public final void loadPDFAsync () {
 		new Thread( parser ).start();
 	}
 
+    public byte[] readBytes( InputStream inputStream ) throws IOException {
+
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+	    int bufferSize = 1024;
+	    byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ( ( len = inputStream.read( buffer ) ) != -1 ) {
+            byteBuffer.write( buffer, 0, len );
+        }
+
+	    return byteBuffer.toByteArray();
+	  }
+	
 	private void parsePDF ()
 	{
-		FileChannel pdfChannel = null;
-		InputStream is=null;
-		@SuppressWarnings ( "resource" )//bogus
-		RandomAccessFile raf=null;
 		final ArrayList< Pair< String, Integer >> toc = new ArrayList< Pair< String, Integer > >();
 		try
 		{
-			File[] oldFiles = pdfsDir.listFiles();
-			if (oldFiles!=null)
-				for (File f:oldFiles)
-					f.delete();
-			if (!pdfsDir.isDirectory())
-				pdfsDir.mkdirs();
-			File dest=new File(pdfsDir,String.valueOf( pdfResId ));
-			raf=new RandomAccessFile( dest, "rw" );
-			//if (!dest.exists())
-			{	
-				is = ctx.getResources().openRawResource( pdfResId );
-				byte [] buf=new byte[4096];
-				int bytes;
-				while ((bytes=is.read( buf ))>0)
-					raf.write( buf, 0, bytes );
-			}
-			pdfChannel = raf.getChannel();
-			
-			// // now memory-map a byte-buffer
-			ByteBuffer bb = ByteBuffer.NEW( pdfChannel.map( FileChannel.MapMode.READ_ONLY, 0, pdfChannel.size() ) );
-			// create a PDFFile from the data
+		    Log.d( TAG, String.format( "Opening: %s", mUri.toString() ) );
+		    InputStream inputStream = mContext.getContentResolver().openInputStream( mUri );
+		    byte [] pdfBytes = readBytes( inputStream );
+		    inputStream.close();
+
+		    Log.d( TAG, String.format( "Read %d bytes", pdfBytes.length ) );
+		    
+		    ByteBuffer bb = ByteBuffer.NEW( pdfBytes );
+		    
 			mPdfFile = new PDFFile( bb );
-			numPages = mPdfFile.getNumPages();
-			if (shouldParseOutline())
-			{	
+			mNumPages = mPdfFile.getNumPages();
+			if (shouldParseOutline()) {
 				OutlineNode page = mPdfFile.getOutline();
 				parseOutline( page.getChildren(), toc );
-				if ( !toc.isEmpty() )
-					startPage = toc.get( 0 ).second;
+				if ( !toc.isEmpty() ) {
+					mStartPage = toc.get( 0 ).second;
+				}
 			}
-		}
-		catch ( PDFParseException e )
-		{
+		} catch ( PDFParseException e ) {
 			onParseException( e );
-		}
-		catch ( IOException e )
-		{
+		} catch ( IOException e ) {
 			onIOException( e );
 			e.printStackTrace();
-		}
-		finally
-		{
-			Utils.closeSilently( is );
-			Utils.closeSilently( raf );
-			Utils.closeSilently( pdfChannel );
-			if ( numPages < 1 )
+		} finally {
+			if ( mNumPages < 1 ) {
 				mPdfFile = null;
+			}
 		}
 		onParseFinished( toc );
 	}
 
-	protected abstract void onIOException ( IOException e );
+    public PDFFile getPDFFile() {
+        return mPdfFile;
+    }
 
+    protected abstract void onIOException ( IOException e );
 	protected abstract void onParseException ( PDFParseException e );
-
-	public PDFFile getPDFFile ()
-	{
-		return mPdfFile;
-	}
 	protected abstract boolean shouldParseOutline();
 	protected abstract void onParseFinished ( ArrayList< Pair< String, Integer >> toc );
 }
