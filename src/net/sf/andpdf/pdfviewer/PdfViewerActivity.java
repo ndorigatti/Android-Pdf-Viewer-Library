@@ -92,7 +92,7 @@ public abstract class PdfViewerActivity extends Activity {
 	
 	protected GraphView mOldGraphView;
 	protected GraphView mGraphView;
-	protected String pdffilename;
+	protected String mPdfFilename;
 	protected PDFFile mPdfFile;
 	protected int mPage;
 	protected float mZoom;
@@ -142,7 +142,7 @@ public abstract class PdfViewerActivity extends Activity {
 			mPdfPage = inst.mPdfPage;
 			mTmpFile = inst.mTmpFile;
 			mZoom = inst.mZoom;
-			pdffilename = inst.pdffilename;
+			mPdfFilename = inst.mPdfFilename;
 			backgroundThread = inst.backgroundThread; 
 			// mGraphView.invalidate();
 		}
@@ -205,31 +205,30 @@ public abstract class PdfViewerActivity extends Activity {
 	    	boolean keepCaches = getIntent().getBooleanExtra(PdfViewerActivity.EXTRA_KEEPCACHES, PdfViewerActivity.DEFAULTKEEPCACHES);
 	        HardReference.sKeepCaches= keepCaches;
 		        
-	        if (intent != null) {
-	        	if ("android.intent.action.VIEW".equals(intent.getAction())) {
-        			pdffilename = storeUriContentToFile(intent.getData());
-	        	}
-	        	else {
-	                pdffilename = getIntent().getStringExtra(PdfViewerActivity.EXTRA_PDFFILENAME);
-	        	}
-	        }
-	        
-	        if (pdffilename == null)
-	        	pdffilename = "no file selected";
-
-			mPage = STARTPAGE;
-			mZoom = STARTZOOM;
-
-			setContent(null);
-	        
+            if ( intent != null ) {
+                if ( "android.intent.action.VIEW".equals( intent.getAction() ) ) {
+                    open( intent.getData() );
+                } else {
+                    open( getIntent().getStringExtra( PdfViewerActivity.EXTRA_PDFFILENAME ) );
+                }
+            }
         }
     }
     	
+    public void open( Uri uri ) {
+        open( storeUriContentToFile( uri ) );        
+    }
     
+    public void open( String filename ) {
+        mPdfFilename = filename;
+        mPage = STARTPAGE;
+        mZoom = STARTZOOM;
+        setContent( null );
+    }
 
 	private void setContent(String password) {
         try { 
-    		parsePDF(pdffilename, password);
+    		parsePDF(mPdfFilename, password);
 	        // setContentView(mGraphView);
             ( (FrameLayout) findViewById( R.id.graph_frame ) ).addView( mGraphView, new FrameLayout.LayoutParams( android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT ) );
 
@@ -918,7 +917,7 @@ public abstract class PdfViewerActivity extends Activity {
 		return result;
 	}*/
 
-	private String storeUriContentToFile(Uri uri) {
+	public String storeUriContentToFile(Uri uri) {
     	String result = null;
     	try {
 	    	if (mTmpFile == null) {
