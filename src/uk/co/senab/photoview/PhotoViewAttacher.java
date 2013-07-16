@@ -567,17 +567,18 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener, Vers
 
 		final int viewHeight = imageView.getHeight();
 		if (height <= viewHeight) {
-			switch (mScaleType) {
-				case FIT_START:
-					deltaY = -rect.top;
-					break;
-				case FIT_END:
-					deltaY = viewHeight - height - rect.top;
-					break;
-				default:
-					deltaY = (viewHeight - height) / 2 - rect.top;
-					break;
-			}
+		    deltaY = -rect.top;
+//			switch (mScaleType) {
+//				case FIT_START:
+//					deltaY = -rect.top;
+//					break;
+//				case FIT_END:
+//					deltaY = viewHeight - height - rect.top;
+//					break;
+//				default:
+//					deltaY = (viewHeight - height) / 2 - rect.top;
+//					break;
+//			}
 		} else if (rect.top > 0) {
 			deltaY = -rect.top;
 		} else if (rect.bottom < viewHeight) {
