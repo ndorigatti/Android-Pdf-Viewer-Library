@@ -27,7 +27,8 @@ public class RC4Engine implements StreamCipher
      * @exception IllegalArgumentException if the params argument is
      * inappropriate.
      */
-    public void init(
+    @Override
+	public void init(
         boolean             forEncryption, 
         CipherParameters     params
    )
@@ -48,12 +49,14 @@ public class RC4Engine implements StreamCipher
         throw new IllegalArgumentException("invalid parameter passed to RC4 init - " + params.getClass().getName());
     }
 
-    public String getAlgorithmName()
+    @Override
+	public String getAlgorithmName()
     {
         return "RC4";
     }
 
-    public byte returnByte(byte in)
+    @Override
+	public byte returnByte(byte in)
     {
         x = (x + 1) & 0xff;
         y = (engineState[x] + y) & 0xff;
@@ -67,7 +70,8 @@ public class RC4Engine implements StreamCipher
         return (byte)(in ^ engineState[(engineState[x] + engineState[y]) & 0xff]);
     }
 
-    public void processBytes(
+    @Override
+	public void processBytes(
         byte[]     in, 
         int     inOff, 
         int     len, 
@@ -100,7 +104,8 @@ public class RC4Engine implements StreamCipher
         }
     }
 
-    public void reset()
+    @Override
+	public void reset()
     {
         setKey(workingKey);
     }
