@@ -82,7 +82,8 @@ public class PostTable extends TrueTypeTable {
     }
     
     /** get the data in this map as a ByteBuffer */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         int size = getLength();
         
         ByteBuffer buf = ByteBuffer.allocate(size);
@@ -109,7 +110,8 @@ public class PostTable extends TrueTypeTable {
     }
     
     /** Initialize this structure from a ByteBuffer */
-    public void setData(ByteBuffer data) {
+    @Override
+	public void setData(ByteBuffer data) {
         setFormat(data.getInt());
         setItalicAngle(data.getInt());
         setUnderlinePosition(data.getShort());
@@ -135,8 +137,8 @@ public class PostTable extends TrueTypeTable {
                 break;
             default:
                 nameMap = new PostMap();
-                System.out.println("Unknown post map type: " + 
-                                   Integer.toHexString(format));
+                //System.out.println("Unknown post map type: " + 
+                //                   Integer.toHexString(format));
                 break;
         }
         
@@ -147,7 +149,8 @@ public class PostTable extends TrueTypeTable {
     /**
      * Get the length of this table
      */
-    public int getLength() {
+    @Override
+	public int getLength() {
         int size = 32;
         if (nameMap != null) {
             size += nameMap.getLength();
@@ -369,7 +372,8 @@ public class PostTable extends TrueTypeTable {
         };
         
         /** map a name to a character index */
-        short getCharIndex(String charName) {
+        @Override
+		short getCharIndex(String charName) {
             for (int i = 0; i < stdNames.length; i++) {
                 if (charName.equals(stdNames[i])) {
                     return (short) i;
@@ -380,22 +384,26 @@ public class PostTable extends TrueTypeTable {
         }
         
         /** name a character index to a name */
-        String getCharName(char charIndex) {
+        @Override
+		String getCharName(char charIndex) {
             return stdNames[charIndex];
         }
         
         /** get the length of the data in this map */
-        int getLength() {
+        @Override
+		int getLength() {
             return 0;
         }
         
         /** get the data in this map as a ByteBuffer */
-        ByteBuffer getData() {
+        @Override
+		ByteBuffer getData() {
             return ByteBuffer.allocate(0);
         }
         
         /** set the data in this map from a ByteBuffer */
-        void setData(ByteBuffer data) {
+        @Override
+		void setData(ByteBuffer data) {
             // do nothing
             return;
         }
@@ -410,7 +418,8 @@ public class PostTable extends TrueTypeTable {
         String[] glyphNames;
     
         /** Map a character name to an index */
-        short getCharIndex(String charName) {
+        @Override
+		short getCharIndex(String charName) {
             // find the index of this character name
             short idx = -1;
             
@@ -440,7 +449,8 @@ public class PostTable extends TrueTypeTable {
         }
         
         /** Map an index to a character name */
-        String getCharName(char charIndex) {
+        @Override
+		String getCharName(char charIndex) {
             if (charIndex >= stdNames.length) {
                 return glyphNames[charIndex - stdNames.length];
             }
@@ -449,7 +459,8 @@ public class PostTable extends TrueTypeTable {
         }
         
         /** get the length of this class's data */
-        int getLength() {
+        @Override
+		int getLength() {
             // the size of the header plus the table of mappings
             int size = 2 + (2 * glyphNameIndex.length);
             
@@ -463,7 +474,8 @@ public class PostTable extends TrueTypeTable {
         }
         
         /** get the data in this map as a byte array */
-        ByteBuffer getData() {
+        @Override
+		ByteBuffer getData() {
             ByteBuffer buf = ByteBuffer.allocate(getLength());
             
             // write the number of glyphs
@@ -487,7 +499,8 @@ public class PostTable extends TrueTypeTable {
         }
         
         /** set the contents of this map from a ByteBuffer */
-        void setData(ByteBuffer data) {
+        @Override
+		void setData(ByteBuffer data) {
             short numGlyphs = data.getShort();
             glyphNameIndex = new short[numGlyphs];
             

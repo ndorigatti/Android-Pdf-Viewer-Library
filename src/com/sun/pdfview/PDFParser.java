@@ -32,7 +32,6 @@ import java.util.Stack;
 
 import net.sf.andpdf.nio.ByteBuffer;
 import net.sf.andpdf.utils.Utils;
-
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -56,7 +55,7 @@ public class PDFParser extends BaseWatchable {
 
     /** emit a file of DCT stream data. */
     public final static String DEBUG_DCTDECODE_DATA = "debugdctdecode";
-    static final boolean RELEASE = true;
+    public static final boolean RELEASE = true;
     static final int PDF_CMDS_RANGE1_MIN = 1;
     static final int PDF_CMDS_RANGE1_MAX = Integer.MAX_VALUE;
     static final int PDF_CMDS_RANGE2_MIN = 0;
@@ -90,10 +89,11 @@ public class PDFParser extends BaseWatchable {
     HashMap<String, PDFObject> resources;
 //    public static int debuglevel = 4000;
 // TODO [FHe]: changed for debugging
-    public static int debuglevel = -1;
+    static int debuglevel = -1;
 
-    public static void debug(String msg, int level) {
-        if (level > debuglevel) {
+    @SuppressWarnings ( "unused" )
+	public static void debug(String msg, int level) {
+        if (!RELEASE&&level > debuglevel) {
             System.out.println(escape(msg));
         }
     }
@@ -304,7 +304,7 @@ public class PDFParser extends BaseWatchable {
                             tok.type = Tok.CMD;
                             tok.name = readName();
                         } else {
-                            System.out.println("Encountered character: " + c + " (" + (char) c + ")");
+                           // System.out.println("Encountered character: " + c + " (" + (char) c + ")");
                             tok.type = Tok.UNK;
                         }
                 }
@@ -516,12 +516,13 @@ public class PDFParser extends BaseWatchable {
      *                 no longer available
      *         </ul> 
      */
-    public int iterate() throws Exception {
+    @Override
+	public int iterate() throws Exception {
         // make sure the page is still available, and create the reference
         // to it for use within this iteration
         cmds = (PDFPage) pageRef.get();
         if (cmds == null) {
-            System.out.println("Page gone.  Stopping");
+            //System.out.println("Page gone.  Stopping");
             return Watchable.STOPPED;
         }
 
@@ -920,7 +921,7 @@ public class PDFParser extends BaseWatchable {
                     case 'D' + ('P' << 8): {
                         // mark point with dictionary (role, ref)
                         // ref is either inline dict or name in "Properties" rsrc
-                        Object ref = stack.pop();
+                        stack.pop();
                         popString();
                         break;
                     }
@@ -931,7 +932,7 @@ public class PDFParser extends BaseWatchable {
                     case 'B' + ('D' << 8) + ('C' << 16): {
                         // begin marked content with dict (role, ref)
                         // ref is either inline dict or name in "Properties" rsrc
-                        Object ref = stack.pop();
+                        stack.pop();
                         popString();
                         break;
                     }
@@ -967,8 +968,11 @@ public class PDFParser extends BaseWatchable {
                             throw new PDFParseException("Unknown command: " + cmd);
                         }
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "cmd='" + cmd + ":" + e.getMessage(), e);
+            } 
+            catch (PDFParseException e) 
+            {
+            	if (!RELEASE)
+            		Log.e(TAG, "cmd='" + cmd + ":" + e.getMessage(), e);
             }
             if (stack.size() != 0) {
                 if (!RELEASE) {
@@ -995,7 +999,7 @@ public class PDFParser extends BaseWatchable {
         // pop graphics state ('Q')
         cmds.addPop();
         // pop the parser state
-        state = (ParserState) parserStates.pop();
+        state = parserStates.pop();
     }
 
     /**
@@ -1042,27 +1046,6 @@ public class PDFParser extends BaseWatchable {
 
     public String dumpStream() {
         return escape(new String(stream).replace('\r', '\n'));
-    }
-
-    /**
-     * take a byte array and write a temporary file with it's data.
-     * This is intended to capture data for analysis, like after decoders.
-     *
-     * @param ary
-     * @param name
-     */
-    public static void emitDataFile(byte[] ary, String name) {
-        FileOutputStream ostr;
-
-        try {
-            File file = File.createTempFile("DateFile", name);
-            ostr = new FileOutputStream(file);
-            System.out.println("Write: " + file.getPath());
-            ostr.write(ary);
-            ostr.close();
-        } catch (IOException ex) {
-            // ignore
-        }
     }
 
     /////////////////////////////////////////////////////////////////
@@ -1138,7 +1121,7 @@ public class PDFParser extends BaseWatchable {
             } else {
                 float elts[] = new float[6];
                 for (int i = 0; i < elts.length; i++) {
-                    elts[i] = ((PDFObject) matrix.getAt(i)).getFloatValue();
+                    elts[i] = matrix.getAt(i).getFloatValue();
                 }
                 at = new Matrix();
                 Utils.setMatValues(at, elts);
@@ -1196,7 +1179,7 @@ public class PDFParser extends BaseWatchable {
 
         switch (t.type) {
             case Tok.NUM:
-                return new Double(tok.value);
+                return Double.valueOf( tok.value);
             case Tok.STR:
             // the fall-through is intended!
             case Tok.NAME:
@@ -1285,16 +1268,16 @@ public class PDFParser extends BaseWatchable {
         }
 
 
-        PDFObject imObj = (PDFObject) hm.get("ImageMask");
+        PDFObject imObj = hm.get("ImageMask");
         if (imObj != null && imObj.getBooleanValue()) {
             // [PATCHED by michal.busta@gmail.com] - default value according to PDF spec. is [0, 1]
             // there is no need to swap array - PDF image should handle this values
-            Double[] decode = {new Double(0), new Double(1)};
+            Double[] decode = {0.0, 0.0};
 
-            PDFObject decodeObj = (PDFObject) hm.get("Decode");
+            PDFObject decodeObj = hm.get("Decode");
             if (decodeObj != null) {
-                decode[0] = new Double(decodeObj.getAt(0).getDoubleValue());
-                decode[1] = new Double(decodeObj.getAt(1).getDoubleValue());
+                decode[0] = decodeObj.getAt(0).getDoubleValue();
+                decode[1] = decodeObj.getAt(1).getDoubleValue();
             }
 
             hm.put("Decode", new PDFObject(decode));
@@ -1561,14 +1544,14 @@ public class PDFParser extends BaseWatchable {
         if (stk.size() == 0) {
             return "[]";
         }
-        String result = "";
+        StringBuilder result = new StringBuilder();
         String delimiter = "[";
         for (Object obj : stk) {
-            result += delimiter + dumpObj(obj);
+            result.append( delimiter).append( dumpObj(obj));
             delimiter = ",";
         }
-        result += "]";
-        return result;
+        result.append( "]");
+        return result.toString();
     }
 
     private String dumpObj(Object obj) {
@@ -1588,13 +1571,13 @@ public class PDFParser extends BaseWatchable {
         if (objs.length == 0) {
             return "[]";
         }
-        String result = "";
+        StringBuilder result=new StringBuilder();
         String delimiter = "[";
         for (Object obj : objs) {
-            result += delimiter + dumpObj(obj);
+            result .append( delimiter).append( dumpObj(obj));
             delimiter = ",";
         }
-        result += "]";
-        return result;
+        result .append( "]");
+        return result.toString();
     }
 }

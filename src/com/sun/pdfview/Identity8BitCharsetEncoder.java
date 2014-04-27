@@ -19,15 +19,10 @@
 
 package com.sun.pdfview;
 
-import com.sun.pdfview.PDFStringUtil;
-
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.nio.charset.Charset;
 import java.nio.CharBuffer;
 import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * A {@link CharsetEncoder} that attempts to write out the lower 8 bits
@@ -42,7 +37,8 @@ public class Identity8BitCharsetEncoder extends CharsetEncoder {
         super(null, 1, 1);
     }
 
-    protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out) {
+    @Override
+	protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out) {
         while (in.remaining() > 0) {
             if (out.remaining() < 1) {
                 return CoderResult.OVERFLOW;

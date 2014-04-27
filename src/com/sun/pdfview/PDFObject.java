@@ -27,7 +27,6 @@ import net.sf.andpdf.refs.SoftReference;
 import java.util.*;
 
 import net.sf.andpdf.nio.ByteBuffer;
-
 import com.sun.pdfview.decode.PDFDecoder;
 import com.sun.pdfview.decrypt.PDFDecrypter;
 import com.sun.pdfview.decrypt.IdentityDecrypter;
@@ -279,7 +278,14 @@ public class PDFObject {
 
                 // Can't use the direct buffer, so copy the data (bad)
                 data = new byte[streamBuf.remaining()];
-                streamBuf.get(data);
+                
+                /* 
+                 * FYI
+                 * This is the same hack as explained in FlateDecode
+                 * //streamBuf.get(data);
+                 */
+                data[0] = streamBuf.get();
+                streamBuf.get(data, 1, data.length - 1);
 
                 // return the stream to its starting position
                 streamBuf.flip();
@@ -396,9 +402,11 @@ public class PDFObject {
      * char will be between 0 and 255.
      */
     public String getStringValue() throws IOException {
-        if (type == INDIRECT) {
+        if (type == INDIRECT) 
+        {
             return dereference().getStringValue();
-        } else if (type == STRING || type == NAME || type == KEYWORD) {
+        } else if (type == STRING || type == NAME || type == KEYWORD) 
+        {
             return (String) value;
         }
 
@@ -443,7 +451,7 @@ public class PDFObject {
         if (type == INDIRECT) {
             return dereference().getBooleanValue();
         } else if (type == BOOLEAN) {
-            return value == Boolean.TRUE;
+            return Boolean.TRUE.equals( value );
         }
 
         // wrong type
@@ -679,11 +687,12 @@ public class PDFObject {
             }
 
             if (obj == null || obj.value == null) {
-                if (owner == null) {
-                    System.out.println("Bad seed (owner==null)!  Object=" + this);
-                }
-
-                obj = owner.dereference((PDFXref)value, getDecrypter());
+                if (owner == null) 
+                    {
+                	//System.out.println("Bad seed (owner==null)!  Object=" + this);
+                    }
+                else
+                	obj = owner.dereference((PDFXref)value, getDecrypter());
 
                 cache = new SoftReference<PDFObject>(obj);
             }
@@ -707,7 +716,7 @@ public class PDFObject {
                 obj = (PDFObject) cache.get();
             }
 
-            if (obj == null || obj.value == null) {
+/*            if (obj == null || obj.value == null) {
                 if (owner == null) {
                     System.out.println("Bad seed (owner==null)!  Object=" + this);
                 }
@@ -715,7 +724,7 @@ public class PDFObject {
 //                obj = owner.dereference((PDFXref)value, getDecrypter());
 //
 //                cache = new SoftReference<PDFObject>(obj);
-            }
+            }*/
 
             return obj;
         } else {
@@ -757,5 +766,16 @@ public class PDFObject {
         }
 
         return false;
+    }
+    @Override
+    public int hashCode ()
+    {
+    	int hash=super.hashCode();
+    	if (type == INDIRECT) 
+    	{
+    		PDFXref lXref = (PDFXref) value;
+    		hash+=lXref.getID()+lXref.getGeneration()+(lXref.getCompressed()?1231 : 1237);
+    	}	
+    	return hash;
     }
 }

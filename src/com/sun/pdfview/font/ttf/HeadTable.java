@@ -97,9 +97,9 @@ public class HeadTable extends TrueTypeTable {
         setCreated(System.currentTimeMillis());
         setModified(System.currentTimeMillis());
         setXMin((short) 0);
-        setXMax((short) Short.MAX_VALUE);
+        setXMax(Short.MAX_VALUE);
         setYMin((short) 0);
-        setYMax((short) Short.MAX_VALUE);
+        setYMax(Short.MAX_VALUE);
         setMacStyle((short) 0x0);
         setLowestRecPPem((short) 0);
         setFontDirectionHint((short) 0);
@@ -110,7 +110,8 @@ public class HeadTable extends TrueTypeTable {
     /**
      * Parse the data before it is set
      */
-    public void setData(ByteBuffer data) {
+    @Override
+	public void setData(ByteBuffer data) {
         if (data.remaining() != 54) {
             throw new IllegalArgumentException("Bad Head table size");
         }
@@ -136,7 +137,8 @@ public class HeadTable extends TrueTypeTable {
     /**
      * Get the data we have stored
      */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         ByteBuffer buf = ByteBuffer.allocate(getLength());
         
         buf.putInt(getVersion());
@@ -166,7 +168,8 @@ public class HeadTable extends TrueTypeTable {
     /**
      * Get the length of this table
      */
-    public int getLength() {
+    @Override
+	public int getLength() {
         return 54;
     }
     
@@ -445,7 +448,8 @@ public class HeadTable extends TrueTypeTable {
     /**
      * Create a pretty string
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer buf = new StringBuffer();
         String indent = "    ";
         

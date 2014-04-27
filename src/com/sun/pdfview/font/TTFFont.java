@@ -64,7 +64,6 @@ public class TTFFont extends OutlineFont {
             throws IOException {
         super(baseFont, fontObj, descriptor);
 
-        String fontName = descriptor.getFontName();
         PDFObject ttfObj = descriptor.getFontFile2();
 
         // try {
@@ -91,7 +90,8 @@ public class TTFFont extends OutlineFont {
     /**
      * Get the outline of a character given the character code
      */
-    protected synchronized Path getOutline(char src, float width) {
+    @Override
+	protected synchronized Path getOutline(char src, float width) {
         // find the cmaps
         CmapTable cmap = (CmapTable) font.getTable("cmap");
 
@@ -147,7 +147,8 @@ public class TTFFont extends OutlineFont {
     /**
      * Get the outline of a character given the character name
      */
-    protected synchronized Path getOutline(String name, float width) {
+    @Override
+	protected synchronized Path getOutline(String name, float width) {
         int idx;
         PostTable post = (PostTable) font.getTable("post");
         if (post != null) {
@@ -185,7 +186,7 @@ public class TTFFont extends OutlineFont {
 
         // calculate the advance
         HmtxTable hmtx = (HmtxTable) font.getTable("hmtx");
-        float advance = (float) hmtx.getAdvance(glyphId) / (float) unitsPerEm;
+        float advance = hmtx.getAdvance(glyphId) / unitsPerEm;
 
         // scale the glyph to match the desired advance
         float widthfactor = width / advance;
@@ -327,7 +328,7 @@ public class TTFFont extends OutlineFont {
     }
 
     /** add a point on the curve */
-    private void addOnCurvePoint(PointRec rec, RenderState rs) {
+    private static void addOnCurvePoint(PointRec rec, RenderState rs) {
         // if the point is on the curve, either move to it,
         // or draw a line from the previous point
         if (rs.firstOn == null) {

@@ -31,7 +31,7 @@ public class FontSupport {
      * of the glyphs in a font, not the mapping of character number to
      * character.
      */
-    public static final String stdNames[] = {
+    static final String stdNames[] = {
         ".notdef", "space", "exclam", "quotedbl", "numbersign", "dollar",
         "percent", "ampersand", "quoteright", "parenleft", "parenright",
         "asterisk", "plus", "comma", "hyphen", "period", "slash", "zero",
@@ -199,7 +199,7 @@ public class FontSupport {
      * glyph order of the glyphs for the Type1C Expert character set.  These
      * are indices into the glyph name array.
      */
-    public static final int type1CExpertCharset[] = {
+    static final int type1CExpertCharset[] = {
         1, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 13, 14, 15, 99,
         239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 27, 28, 249, 250,
         251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264,
@@ -218,7 +218,7 @@ public class FontSupport {
      * glyph order of the glyphs for the Type1C Expert Sub character set.
      * These are indices into the glyph name array.
      */
-    public static final int type1CExpertSubCharset[] = {
+    static final int type1CExpertSubCharset[] = {
         1, 231, 232, 235, 236, 237, 238, 13, 14, 15, 99, 239, 240, 241, 242,
         243, 244, 245, 246, 247, 248, 27, 28, 249, 250, 251, 253, 254, 255,
         256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 109, 110, 267,
@@ -244,7 +244,7 @@ public class FontSupport {
      * character mapping from values to glyphs for the Macintosh MacRoman
      * encoding
      */
-    public static final int macRomanEncoding[] = {
+    static final int macRomanEncoding[] = {
         391, 154, 167, 140, 146, 192, 221, 197, 226, 392, 393, 157, 162, 394,
         199, 228, 395, 396, 397, 398, 399, 155, 158, 150, 163, 169, 164, 160,
         166, 168, 400, 401, 1, 2, 3, 4, 5, 6, 7, 104, 9, 10, 11, 12, 13, 14,
@@ -267,7 +267,7 @@ public class FontSupport {
     /**
      * character mapping from values to glyphs for the isoLatin1Encoding
      */
-    public static final int isoLatin1Encoding[] = {
+    static final int isoLatin1Encoding[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
         166, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -290,7 +290,7 @@ public class FontSupport {
      * character mapping from values to glyphs for the Windows winAnsi
      * character encoding
      */
-    public static final int winAnsiEncoding[] = {
+    static final int winAnsiEncoding[] = {
         124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 145,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5,
         6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
@@ -314,7 +314,7 @@ public class FontSupport {
      * character mapping from values to glyphs for Adobe's standard
      * character encoding
      */
-    public static final int standardEncoding[] = {
+    static final int standardEncoding[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
         14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,

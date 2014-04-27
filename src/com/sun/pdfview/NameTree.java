@@ -96,7 +96,7 @@ public class NameTree {
      * Find an object in a (key,value) array.  Do this by splitting in half
      * repeatedly.
      */
-    private PDFObject findInArray(PDFObject[] array, String key)
+    private static PDFObject findInArray(PDFObject[] array, String key)
             throws IOException {
         int start = 0;
         int end = array.length / 2;

@@ -610,7 +610,7 @@ public class CCITTFaxDecoder {
 			entry = initBlack[current];
 
 			// Get the 3 fields from the entry
-			isT = entry & 0x0001;
+			//isT = entry & 0x0001;
 			bits = (entry >>> 1) & 0x000f;
 			code = (entry >>> 5) & 0x07ff;
 
@@ -1521,7 +1521,7 @@ public class CCITTFaxDecoder {
 		this.fillBits = fillBits;
 	}
 
-	private void setToBlack(byte[] buffer, int lineOffset, int bitOffset,
+	private static void setToBlack(byte[] buffer, int lineOffset, int bitOffset,
 			int numBits) {
 		int bitNum = (8 * lineOffset) + bitOffset;
 		int lastBit = bitNum + numBits;

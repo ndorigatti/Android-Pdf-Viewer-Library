@@ -81,8 +81,8 @@ public class GlyfCompound extends Glyf {
                 cur.f = data.getShort();
             } else if (!((cur.flags & ARG_1_AND_2_ARE_WORDS) != 0) &&
                         ((cur.flags & ARGS_ARE_XY_VALUES) != 0)) {
-                cur.e = (float) data.get();
-                cur.f = (float) data.get();
+                cur.e = data.get();
+                cur.f = data.get();
             } else if ( ((cur.flags & ARG_1_AND_2_ARE_WORDS) != 0) &&
                        !((cur.flags & ARGS_ARE_XY_VALUES) != 0)) {
                 cur.compoundPoint = data.getShort();
@@ -179,12 +179,12 @@ public class GlyfCompound extends Glyf {
     public float[] getTransform(int index) {
         GlyfComponent gc = components[index];
 
-        float m = (float) Math.max(Math.abs(gc.a), Math.abs(gc.b));
+        float m = Math.max(Math.abs(gc.a), Math.abs(gc.b));
         if (Math.abs(Math.abs(gc.a) - Math.abs(gc.c)) < (33 / 65536)) {
             m *= 2;
         }
 
-	float n = (float) Math.max(Math.abs(gc.c), Math.abs(gc.d));
+	float n = Math.max(Math.abs(gc.c), Math.abs(gc.d));
         if (Math.abs(Math.abs(gc.c) - Math.abs(gc.d)) < (33 / 65536)) {
             n *= 2;
         }

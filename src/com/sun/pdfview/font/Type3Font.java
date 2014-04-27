@@ -86,7 +86,7 @@ public class Type3Font extends PDFFont {
         at = Utils.createMatrix(matrixAry);
 
         // get the scale from the matrix
-        float scale = matrixAry[0] + matrixAry[2];
+        //float scale = matrixAry[0] + matrixAry[2];
 
         // put all the resources in a Hash
         PDFObject rsrcObj = fontObj.getDictRef("Resources");
@@ -150,7 +150,8 @@ public class Type3Font extends PDFFont {
      * @param name the name of this glyph or null if unknown
      * @return a glyph for this character
      */
-    protected PDFGlyph getGlyph(char src, String name) {
+    @Override
+	protected PDFGlyph getGlyph(char src, String name) {
         if (name == null) {
             throw new IllegalArgumentException("Glyph name required for Type3 font!" +
                     "Source character: " + (int) src);
@@ -180,8 +181,7 @@ public class Type3Font extends PDFFont {
             return new PDFGlyph(src, name, page, advance);
         } catch (IOException ioe) {
             // help!
-            System.out.println("IOException in Type3 font: " + ioe);
-            ioe.printStackTrace();
+            //System.out.println("IOException in Type3 font: " + ioe);
             return null;
         }
     }

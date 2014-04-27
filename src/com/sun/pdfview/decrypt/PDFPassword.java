@@ -141,7 +141,8 @@ public class PDFPassword {
                     new PDFDocEncodingByteGenerator(Byte.valueOf((byte) '?')),
                     // just strip the higher 8 bits!
                     new PasswordByteGenerator() {
-                        public byte[] generateBytes(String password) {
+                        @Override
+						public byte[] generateBytes(String password) {
                             return PDFStringUtil.asBytes(password);
                         }
                     },
@@ -179,7 +180,7 @@ public class PDFPassword {
         return possibilties;
     }
 
-    private boolean isAlphaNum7BitString(String string) {
+    private static boolean isAlphaNum7BitString(String string) {
         for (int i = 0; i < string.length(); ++i) {
             final char c = string.charAt(i);
             if (c >= 127 || !Character.isLetterOrDigit(c)) {
@@ -218,7 +219,8 @@ public class PDFPassword {
         }
 
 
-        public byte[] generateBytes(String password) {
+        @Override
+		public byte[] generateBytes(String password) {
             final CharsetEncoder encoder = createCharsetEncoder();
             if (replacementByte != null) {
                 encoder.replaceWith(new byte[]{replacementByte});
@@ -252,7 +254,8 @@ public class PDFPassword {
             super(replacementByte);
         }
 
-        protected CharsetEncoder createCharsetEncoder() {
+        @Override
+		protected CharsetEncoder createCharsetEncoder() {
             return new PDFDocCharsetEncoder();
         }
     }
@@ -268,7 +271,8 @@ public class PDFPassword {
             super(replacementByte);
         }
 
-        protected CharsetEncoder createCharsetEncoder() {
+        @Override
+		protected CharsetEncoder createCharsetEncoder() {
             return new Identity8BitCharsetEncoder();
         }
     }

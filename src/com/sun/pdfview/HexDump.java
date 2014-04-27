@@ -20,16 +20,13 @@
  */
 package com.sun.pdfview;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 public class HexDump {
 
     public static void printData(byte[] data) {
         char[] parts = new char[17];
         int partsloc = 0;
         for (int i = 0; i < data.length; i++) {
-            int d = ((int) data[i]) & 0xff;
+            int d = (data[i]) & 0xff;
             if (d == 0) {
                 parts[partsloc++] = '.';
             } else if (d < 32 || d >= 127) {
@@ -64,23 +61,4 @@ public class HexDump {
         System.out.println();
     }
 
-    public static void main(String args[]) {
-        if (args.length != 1) {
-            System.out.println("Usage: ");
-            System.out.println("    HexDump <filename>");
-            System.exit(-1);
-        }
-
-        try {
-            RandomAccessFile raf = new RandomAccessFile(args[0], "r");
-
-            int size = (int) raf.length();
-            byte[] data = new byte[size];
-
-            raf.readFully(data);
-            printData(data);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-    }
 }

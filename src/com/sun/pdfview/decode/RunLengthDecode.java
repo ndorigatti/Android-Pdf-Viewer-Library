@@ -59,7 +59,8 @@ public class RunLengthDecode {
         byte[] buffer = new byte[128];
         while ((dupAmount = buf.get()) != -1 &&
                 dupAmount != RUN_LENGTH_EOD) {
-            if (dupAmount <= 127) {
+            if (dupAmount <= 127) 
+            {
                 int amountToCopy = dupAmount + 1;
                 while (amountToCopy > 0) {
                     buf.get(buffer, 0, amountToCopy);
@@ -67,7 +68,7 @@ public class RunLengthDecode {
                 }
             } else {
                 byte dupByte = buf.get();
-                for (int i = 0; i < 257 - (int) (dupAmount & 0xFF); i++) {
+                for (int i = 0; i < 257 - (dupAmount & 0xFF); i++) {
                     baos.write(dupByte);
                 }
             }

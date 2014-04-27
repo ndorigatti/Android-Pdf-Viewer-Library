@@ -128,7 +128,7 @@ public class PDFXref {
      */
     public PDFObject getObject() {
         if (reference != null) {
-            return (PDFObject) reference.get();
+            return reference.get();
         }
 
         return null;

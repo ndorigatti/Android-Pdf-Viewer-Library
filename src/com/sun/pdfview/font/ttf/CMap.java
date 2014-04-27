@@ -93,7 +93,7 @@ public abstract class CMap {
 //                outMap = new CMapFormat_12(language);
 //                break;
             default:
-                System.out.println ("Unsupport CMap format: " + format);
+                //System.out.println ("Unsupport CMap format: " + format);
                 return null;
         }
 
@@ -109,7 +109,7 @@ public abstract class CMap {
     public static CMap getMap (ByteBuffer data) {
         short format = data.getShort ();
         short lengthShort = data.getShort ();
-        int length = 0xFFFF & (int) lengthShort;
+        int length = 0xFFFF & lengthShort;
 //        System.out.println (
 //                "CMAP, length: " + length + ", short: " + lengthShort);
 

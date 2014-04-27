@@ -80,7 +80,8 @@ public class CryptFilterDecrypter implements PDFDecrypter {
         }
     }
 
-    public ByteBuffer decryptBuffer(
+    @Override
+	public ByteBuffer decryptBuffer(
             String cryptFilterName, PDFObject streamObj, ByteBuffer streamBuf)
             throws PDFParseException {
         final PDFDecrypter decrypter;
@@ -104,12 +105,14 @@ public class CryptFilterDecrypter implements PDFDecrypter {
                 streamBuf);
     }
 
-    public String decryptString(int objNum, int objGen, String inputBasicString)
+    @Override
+	public String decryptString(int objNum, int objGen, String inputBasicString)
             throws PDFParseException {
         return defaultStringDecrypter.decryptString(objNum, objGen, inputBasicString);
     }
 
-    public boolean isEncryptionPresent() {
+    @Override
+	public boolean isEncryptionPresent() {
         for (final PDFDecrypter decrypter : decrypters.values()) {
             if (decrypter.isEncryptionPresent()) {
                 return true;
@@ -118,7 +121,8 @@ public class CryptFilterDecrypter implements PDFDecrypter {
         return false;
     }
 
-    public boolean isOwnerAuthorised() {
+    @Override
+	public boolean isOwnerAuthorised() {
         for (final PDFDecrypter decrypter : decrypters.values()) {
             if (decrypter.isOwnerAuthorised()) {
                 return true;

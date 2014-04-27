@@ -1,6 +1,5 @@
 package net.sf.andpdf.nio;
 
-import java.nio.MappedByteBuffer;
 
 public abstract class ByteBuffer {
 
@@ -73,8 +72,8 @@ public abstract class ByteBuffer {
 	public abstract boolean hasRemaining();
 
 	
-	public static boolean sUseNIO = true;
-	public static ByteBuffer NEW(MappedByteBuffer map) {
+	public static final boolean sUseNIO = true;
+	public static ByteBuffer NEW(java.nio.ByteBuffer map) {
 		return new NioByteBuffer(map);
 	}
 	public static ByteBuffer NEW(byte[] buf) {

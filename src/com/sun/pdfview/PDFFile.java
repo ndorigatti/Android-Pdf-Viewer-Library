@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.andpdf.nio.ByteBuffer;
-
 import android.graphics.RectF;
 
 import com.sun.pdfview.action.GoToAction;
@@ -169,14 +168,10 @@ public class PDFFile {
     /**
      * return the number of pages in this PDFFile.  The pages will be
      * numbered from 1 to getNumPages(), inclusive.
+     * @throws IOException 
      */
-    public int getNumPages() {
-        try {
+    public int getNumPages() throws IOException {
             return root.getDictRef("Pages").getDictRef("Count").getIntValue();
-        } catch (Exception ioe) {
-        	ioe.printStackTrace();
-            return 0;
-        }
     }
 
     /**
@@ -265,7 +260,7 @@ public class PDFFile {
 		    PDFXref compRef = new PDFXref(compId, 0);
 		    PDFObject compObj = dereference(compRef, decrypter);
 		    int first = compObj.getDictionary().get("First").getIntValue();
-		    int length = compObj.getDictionary().get("Length").getIntValue();
+		    //int length = compObj.getDictionary().get("Length").getIntValue();
 		    int n = compObj.getDictionary().get("N").getIntValue();
 		    if (idx >= n)
 		        return PDFObject.nullObj;
@@ -275,8 +270,8 @@ public class PDFFile {
 			buf = strm;
 		    // skip other nums
 		    for (int i=0; i<idx; i++) {
-		    	PDFObject skip1num= readObject(-1, -1, true, IdentityDecrypter.getInstance());
-		    	PDFObject skip2num= readObject(-1, -1, true, IdentityDecrypter.getInstance());
+		    	readObject(-1, -1, true, IdentityDecrypter.getInstance());
+		    	readObject(-1, -1, true, IdentityDecrypter.getInstance());
 		    }
 			PDFObject objNumPO= readObject(-1, -1, true, IdentityDecrypter.getInstance());
 			PDFObject offsetPO= readObject(-1, -1, true, IdentityDecrypter.getInstance());
@@ -501,7 +496,7 @@ public class PDFFile {
             majorVersion = Integer.parseInt(tokens.nextToken());
             minorVersion = Integer.parseInt(tokens.nextToken());
             this.versionString = versionString;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             // ignore
         }
     }
@@ -828,7 +823,7 @@ public class PDFFile {
         }
         PDFObject[] objlist = new PDFObject[ary.size()];
         for (int i = 0; i < objlist.length; i++) {
-            objlist[i] = (PDFObject) ary.get(i);
+            objlist[i] = ary.get(i);
         }
         return new PDFObject(this, PDFObject.ARRAY, objlist);
     }
@@ -894,7 +889,7 @@ public class PDFFile {
         if (neg) {
             value = -value;
         }
-        return new PDFObject(this, PDFObject.NUMBER, new Double(value));
+        return new PDFObject(this, PDFObject.NUMBER, Double.valueOf(value));
     }
 
     /**
@@ -936,16 +931,13 @@ public class PDFFile {
             // skip until we see \n
             readLine();
             ByteBuffer data = readStream(obj);
-            if (data == null) {
-                data = ByteBuffer.allocate(0);
-            }
             obj.setStream(data);
 	    endkey= readObject(objNum, objGen, decrypter);
         }
         // at this point, obj is the object, keyword should be "endobj"
         String endcheck = endkey.getStringValue();
         if (endcheck == null || !endcheck.equals("endobj")) {
-            System.out.println("WARNING: object at " + debugpos + " didn't end with 'endobj'");
+            //System.out.println("WARNING: object at " + debugpos + " didn't end with 'endobj'");
         //throw new PDFParseException("Object musst end with 'endobj'");
         }
         obj.setObjectId(objNum, objGen);
@@ -981,8 +973,8 @@ public class PDFFile {
         int ending = buf.position();
 
         if (!nextItemIs("endstream")) {
-            System.out.println("read " + length + " chars from " + start + " to " +
-                    ending);
+//            System.out.println("read " + length + " chars from " + start + " to " +
+//                    ending);
             throw new PDFParseException("Stream ended inappropriately");
         }
 
@@ -1126,7 +1118,7 @@ public class PDFFile {
 
             PDFObject xrefstmPos = trailerdict.getDictRef("XRefStm");
             if (xrefstmPos != null) {
-            	System.out.println("XRefStm:" + xrefstmPos.getIntValue());
+            	//System.out.println("XRefStm:" + xrefstmPos.getIntValue());
                 int pos14 = buf.position(); 
                 buf.position(xrefstmPos.getIntValue());
             	readTrailer15(password);
@@ -1156,12 +1148,10 @@ public class PDFFile {
         // check what permissions are relevant
         if (encrypt != null) {
             PDFObject permissions = encrypt.getDictRef("P");
-            if (permissions!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
-                int perms= permissions != null ? permissions.getIntValue() : 0;
-                if (permissions!=null) {
+            if (permissions!=null&&newDefaultDecrypter!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
+                int perms=permissions.getIntValue();
                     printable = (perms & 4) != 0;
                     saveable = (perms & 16) != 0;
-                }
             }
             // Install the new default decrypter only after the trailer has
             // been read, as nothing we're reading passing through is encrypted
@@ -1193,21 +1183,21 @@ public class PDFFile {
         
         while (true) {
 			PDFObject xrefObj=readObject(-1, -1, IdentityDecrypter.getInstance());
-//			System.out.println(xrefObj.getDictionary().toString());
-//			System.out.println(xrefObj.toString());
-			
+			//System.out.println(xrefObj.getDictionary().toString());
+			//System.out.println(xrefObj.toString());
+
 			PDFObject[] wNums = xrefObj.getDictionary().get("W").getArray();
 			int l1 = wNums[0].getIntValue();
 			int l2 = wNums[1].getIntValue();
 			int l3 = wNums[2].getIntValue();
-			int entrySize = l1+l2+l3;
+			//int entrySize = l1+l2+l3;
 //			System.out.println("["+l1+","+l2+","+l3+"]");
 	
 			int size = xrefObj.getDictionary().get("Size").getIntValue();
 //			System.out.println("Size = " + size);
 
 			byte[] strmbuf = xrefObj.getStream();
-			int strmEntries = strmbuf.length / entrySize;
+			//int strmEntries = strmbuf.length / entrySize;
 			int strmPos = 0;
 //			System.out.println("strmEntries = " + strmEntries);
 			
@@ -1329,12 +1319,10 @@ public class PDFFile {
         // check what permissions are relevant
         if (encrypt != null) {
             PDFObject permissions = encrypt.getDictRef("P");
-            if (permissions!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
-                int perms= permissions != null ? permissions.getIntValue() : 0;
-                if (permissions!=null) {
+            if (permissions!=null&&newDefaultDecrypter!=null && !newDefaultDecrypter.isOwnerAuthorised()) {
+                int perms= permissions.getIntValue();
                     printable = (perms & 4) != 0;
                     saveable = (perms & 16) != 0;
-                }
             }
             // Install the new default decrypter only after the trailer has
             // been read, as nothing we're reading passing through is encrypted
@@ -1345,7 +1333,7 @@ public class PDFFile {
         root.dereference();
     }
 
-    private int readNum(byte[] sbuf, int pos, int numBytes) {
+    private static int readNum(byte[] sbuf, int pos, int numBytes) {
     	int result = 0;
     	for (int i=0; i<numBytes; i++)
     		result = (result << 8) + (sbuf[pos+i]&0xff);
@@ -1428,15 +1416,16 @@ public class PDFFile {
      * of DefaultMutableTreeNode.  If there is no outline tree, this method
      * returns null.
      */
-    public OutlineNode getOutline() throws IOException {
+    @SuppressWarnings ( "null" )//bogus
+	public OutlineNode getOutline() throws IOException {
         // find the outlines entry in the root object
         PDFObject oroot = root.getDictRef("Outlines");
-        OutlineNode work = null;
+        OutlineNode work;
         OutlineNode outline = null;
         if (oroot != null) {
             // find the first child of the outline root
             PDFObject scan = oroot.getDictRef("First");
-            outline = work = new OutlineNode("<top>");
+            outline = work= new OutlineNode("<top>");
 
             // scan each sibling in turn
             while (scan != null) {
@@ -1460,6 +1449,7 @@ public class PDFFile {
                                     PDFDestination.getDestination(destObj, getRoot());
 
                             action = new GoToAction(dest);
+                            
                         } catch (IOException ioe) {
                             // oh well
                         }
@@ -1541,8 +1531,9 @@ public class PDFFile {
      * Get the page commands for a given page in a separate thread.
      *
      * @param pagenum the number of the page to get commands for
+     * @throws IOException 
      */
-    public PDFPage getPage(int pagenum) {
+    public PDFPage getPage(int pagenum) throws IOException {
         return getPage(pagenum, false);
     }
 
@@ -1551,17 +1542,16 @@ public class PDFFile {
      *
      * @param pagenum the number of the page to get commands for
      * @param wait if true, do not exit until the page is complete.
+     * @throws IOException 
      */
-    public PDFPage getPage(int pagenum, boolean wait) {
-        Integer key = new Integer(pagenum);
+    public PDFPage getPage(int pagenum, boolean wait) throws IOException {
+        Integer key = Integer.valueOf(pagenum);
         HashMap<String,PDFObject> resources = null;
         PDFObject pageObj = null;
-        boolean needread = false;
 
         PDFPage page = cache.getPage(key);
         PDFParser parser = cache.getPageParser(key);
         if (page == null) {
-            try {
                 // hunt down the page!
                 resources = new HashMap<String,PDFObject>();
 
@@ -1578,11 +1568,6 @@ public class PDFFile {
                 parser = new PDFParser(page, stream, resources);
 
                 cache.addPage(key, page, parser);
-            } catch (IOException ioe) {
-                System.out.println("GetPage inner loop:");
-                ioe.printStackTrace();
-                return null;
-            }
         }
 
         if (parser != null && !parser.isFinished()) {
@@ -1596,7 +1581,7 @@ public class PDFFile {
      * Stop the rendering of a particular image on this page
      */
     public void stop(int pageNum) {
-        PDFParser parser = cache.getPageParser(new Integer(pageNum));
+        PDFParser parser = cache.getPageParser(Integer.valueOf(pageNum));
         if (parser != null) {
             // stop it
             parser.stop();
@@ -1610,7 +1595,7 @@ public class PDFFile {
      * @return a concatenation of any content streams for the requested
      * page.
      */
-    private byte[] getContents(PDFObject pageObj) throws IOException {
+    private static byte[] getContents(PDFObject pageObj) throws IOException {
         // concatenate all the streams
         PDFObject contentsObj = pageObj.getDictRef("Contents");
         if (contentsObj == null) {

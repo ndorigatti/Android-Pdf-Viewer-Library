@@ -85,7 +85,7 @@ public class GlyfSimple extends Glyf {
             // check for repeats
             if ((flags_[i] & 0x8) != 0) {
                 final byte f = flags_[i];
-                final int n = (int) (data.get() & 0xff);
+                final int n = data.get() & 0xff;
                 for (int c = 0; c < n; c++) {
                     flags_[++i] = f;
                 }
@@ -102,7 +102,7 @@ public class GlyfSimple extends Glyf {
 
             // read this value
             if (xIsByte(i)) {
-                int val = (int) (data.get() & 0xff);
+                int val = data.get() & 0xff;
                 if (!xIsSame(i)) {
                     // the xIsSame bit controls the sign
                     val = -val;
@@ -122,7 +122,7 @@ public class GlyfSimple extends Glyf {
             }
             // read this value
             if (yIsByte(i)) {
-                int val = (int) (data.get() & 0xff);
+                int val = data.get() & 0xff;
                 if (!yIsSame(i)) {
                     // the xIsSame bit controls the sign
                     val = -val;

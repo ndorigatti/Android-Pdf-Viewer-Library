@@ -67,7 +67,7 @@ public class CmapTable extends TrueTypeTable {
      */
     public CMap getCMap(short platformID, short platformSpecificID) {
         CmapSubtable key = new CmapSubtable(platformID, platformSpecificID);
-        return (CMap) subtables.get(key);
+        return subtables.get(key);
     }
     
     /**
@@ -115,10 +115,10 @@ public class CmapTable extends TrueTypeTable {
                     addCMap(platformID, platformSpecificID, cMap);
                 }
             } catch (Exception ex) {
-                System.out.println("Error reading map.  PlatformID=" +
-                                    platformID + ", PlatformSpecificID=" + 
-                                    platformSpecificID);
-                System.out.println("Reason: " + ex);
+//                System.out.println("Error reading map.  PlatformID=" +
+//                                    platformID + ", PlatformSpecificID=" + 
+//                                    platformSpecificID);
+//                System.out.println("Reason: " + ex);
             }
         }
     }
@@ -137,7 +137,7 @@ public class CmapTable extends TrueTypeTable {
         // write the subtables
         for (Iterator i = subtables.keySet().iterator(); i.hasNext();) {
             CmapSubtable cms = (CmapSubtable) i.next();
-            CMap map = (CMap) subtables.get(cms);
+            CMap map = subtables.get(cms);
             
             buf.putShort(cms.platformID);
             buf.putShort(cms.platformSpecificID);
@@ -216,7 +216,7 @@ public class CmapTable extends TrueTypeTable {
             buf.append(indent + "Map: platformID: " + key.platformID +
                        " PlatformSpecificID: " + key.platformSpecificID + "\n");
             
-            CMap map = (CMap) subtables.get(key);
+            CMap map = subtables.get(key);
             
             buf.append(map.toString());
         }
@@ -242,7 +242,11 @@ public class CmapTable extends TrueTypeTable {
             this.platformID = platformID;
             this.platformSpecificID = platformSpecificID;
         }
-            
+        @Override
+        public int hashCode ()
+        {
+        	return platformID+platformSpecificID;
+        }
         /**
          * Compare two subtables
          */
@@ -253,7 +257,8 @@ public class CmapTable extends TrueTypeTable {
         /**
          * Sort ascending by platform ID and then specific ID
          */
-        public int compareTo(Object obj) {
+        @Override
+		public int compareTo(Object obj) {
             if (!(obj instanceof CmapSubtable)) {
                 return -1;
             }

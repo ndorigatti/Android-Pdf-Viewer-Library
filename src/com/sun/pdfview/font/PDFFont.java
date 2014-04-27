@@ -35,7 +35,7 @@ import com.sun.pdfview.PDFParseException;
  */
 public abstract class PDFFont {
 
-	public static boolean sUseFontSubstitution = false;
+	public static final boolean sUseFontSubstitution = false;
 	
     /** the font SubType of this font */
     private String subtype;
@@ -145,10 +145,7 @@ public abstract class PDFFont {
             font = new Type0Font(baseFont, obj, descriptor);
         } else if (subType.equals("Type1")) {
             // load a type1 font
-            if (descriptor == null) {
-                // it's one of the built-in fonts
-                font = new BuiltinFont(baseFont, obj);
-            } else if (descriptor.getFontFile() != null) {
+        	if (descriptor.getFontFile() != null) {
                 // it's a Type1 font, included.
                 font = new Type1Font(baseFont, obj, descriptor);
             } else if (descriptor.getFontFile3() != null) {
@@ -303,12 +300,12 @@ public abstract class PDFFont {
         }
 
         // try the cache
-        PDFGlyph glyph = (PDFGlyph) charCache.get(new Character(src));
+        PDFGlyph glyph = charCache.get(Character.valueOf(src));
 
         // if it's not there, add it to the cache
         if (glyph == null) {
             glyph = getGlyph(src, name);
-            charCache.put(new Character(src), glyph);
+            charCache.put(Character.valueOf(src), glyph);
         }
 
         return glyph;

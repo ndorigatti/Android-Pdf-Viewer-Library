@@ -53,7 +53,7 @@ public class PDFTextFormat implements Cloneable {
     /** text mode */
     private int tm = PDFShapeCmd.FILL;
     /** text knockout */
-    private float tk = 0;
+   // private float tk = 0;
     /** current matrix transform */
     private final Matrix cur;
     /** matrix transform at start of line */
@@ -63,13 +63,13 @@ public class PDFTextFormat implements Cloneable {
     /** font size */
     private float fsize = 1;
     /** are we between BT and ET? */
-    private boolean inuse = false;
+   // private boolean inuse = false;
     //    private Object array[]= new Object[1];
     /** build text rep of word */
     private StringBuffer word = new StringBuffer();
     // this is where we build and keep the word list for this page.
     /** start location of the hunk of text */
-    private PointF wordStart;
+    //private PointF wordStart;
     /** location of the end of the previous hunk of text */
     private final PointF prevEnd;
 
@@ -79,10 +79,10 @@ public class PDFTextFormat implements Cloneable {
     public PDFTextFormat() {
         cur = new Matrix();
         line = new Matrix();
-        wordStart = new PointF(-100, -100);
+       // wordStart = new PointF(-100, -100);
         prevEnd = new PointF(-100, -100);
-
-        tc = tw = tr = tk = 0;
+        //tk = 0
+        tc = tw = tr = 0;
         tm = PDFShapeCmd.FILL;
         th = 1;
     }
@@ -93,7 +93,7 @@ public class PDFTextFormat implements Cloneable {
     public void reset() {
         cur.reset();
         line.reset();
-        inuse = true;
+       // inuse = true;
         word.setLength(0);
     }
 
@@ -101,7 +101,7 @@ public class PDFTextFormat implements Cloneable {
      * end a span of text
      */
     public void end() {
-        inuse = false;
+      //  inuse = false;
     }
 
     /** get the char spacing */
@@ -321,7 +321,7 @@ public class PDFTextFormat implements Cloneable {
         Utils.setMatValues(scale, fsize, 0, 0, fsize * th, 0, tr);
         final Matrix at = new Matrix();
 
-        final List<PDFGlyph> l = (List<PDFGlyph>) font.getGlyphs(text);
+        final List<PDFGlyph> l = font.getGlyphs(text);
 
         for (final PDFGlyph glyph : l) {
             at.set(cur);
@@ -378,15 +378,15 @@ public class PDFTextFormat implements Cloneable {
         PDFTextFormat newFormat = new PDFTextFormat();
 
         // copy values
-        newFormat.setCharSpacing(getCharSpacing());
-        newFormat.setWordSpacing(getWordSpacing());
+        newFormat.setCharSpacing(tc);
+        newFormat.setWordSpacing(tw);
         newFormat.setHorizontalScale(getHorizontalScale());
-        newFormat.setLeading(getLeading());
-        newFormat.setTextFormatMode(getMode());
-        newFormat.setRise(getRise());
+        newFormat.setLeading(tl);
+        newFormat.setTextFormatMode(tm);
+        newFormat.setRise(tr);
 
         // copy immutable fields
-        newFormat.setFont(getFont(), getFontSize());
+        newFormat.setFont(font, fsize);
 
         // clone transform (mutable)
         // newFormat.getTransform().setTransform(getTransform());

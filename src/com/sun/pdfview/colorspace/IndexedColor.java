@@ -23,7 +23,6 @@ package com.sun.pdfview.colorspace;
 import java.io.IOException;
 
 import com.sun.pdfview.PDFObject;
-import com.sun.pdfview.PDFPaint;
 
 /**
  * A PDFColorSpace for an IndexedColor model
@@ -53,15 +52,15 @@ public class IndexedColor extends PDFColorSpace {
         this.count = count;
         byte[] data = stream.getStream();
         int nchannels = base.getNumComponents();
-        boolean offSized = (data.length / nchannels) < count;
+       // boolean offSized = (data.length / nchannels) < count;
         table = new int[count];
         float comps[] = new float[nchannels];
         int loc = 0;
-        int finalloc = 0;
+      //  int finalloc = 0;
         for (int i = 0; i < count; i++) {
             for (int j = 0; j < comps.length; j++) {
                 if (loc < data.length) {
-                    comps[j] = (((int) data[loc++]) & 0xff) / 255f;
+                    comps[j] = ((data[loc++]) & 0xff) / 255f;
                 } else {
                     comps[j] = 1.0f;
                 }

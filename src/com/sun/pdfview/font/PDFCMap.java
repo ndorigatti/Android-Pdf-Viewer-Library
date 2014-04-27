@@ -67,7 +67,7 @@ public abstract class PDFCMap {
             throw new IOException("Unknown CMap: " + mapName);
         }
             
-        return (PDFCMap) cache.get(mapName);
+        return cache.get(mapName);
     }
     
     /**
@@ -78,7 +78,8 @@ public abstract class PDFCMap {
     
         // add the Identity-H map
         cache.put("Identity-H", new PDFCMap() {
-            public char map(char src) {
+            @Override
+			public char map(char src) {
                 return src;
             }
         });

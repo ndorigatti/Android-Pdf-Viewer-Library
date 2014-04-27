@@ -108,7 +108,7 @@ public class Type1Font extends OutlineFont {
         password = 4330;
         int matrixloc = findSlashName(font, "FontMatrix");
         if (matrixloc < 0) {
-            System.out.println("No FontMatrix!");
+            //System.out.println("No FontMatrix!");
             at = Utils.createMatrix(0.001f, 0, 0, 0.001f, 0, 0);
         } else {
             PSParser psp2 = new PSParser(font, matrixloc + 11);
@@ -176,7 +176,6 @@ public class Type1Font extends OutlineFont {
         // end at "def"
         PSParser psp = new PSParser(d, i);
         String type = psp.readThing();     // read the key (i is the start of the key)
-        double val;
         type = psp.readThing();
         if (type.equals("StandardEncoding")) {
             byte[] stdenc[] = new byte[FontSupport.standardEncoding.length][];
@@ -226,7 +225,7 @@ public class Type1Font extends OutlineFont {
      * @return the decrypted bytes.  The length of this array will be
      * (start-end-skip) bytes long
      */
-    private byte[] decrypt(byte[] d, int start, int end, int key, int skip) {
+    private static byte[] decrypt(byte[] d, int start, int end, int key, int skip) {
         if (end - start - skip < 0) {
             skip = 0;
         }
@@ -253,7 +252,7 @@ public class Type1Font extends OutlineFont {
      * @param start where in the array to start decrypting
      * @param end where in the array to stop decrypting
      */
-    private byte[] readASCII(byte[] data, int start, int end) {
+    private static byte[] readASCII(byte[] data, int start, int end) {
         // each byte of output is derived from one character (two bytes) of
         // input
         byte[] o = new byte[(end - start) / 2];
@@ -293,7 +292,7 @@ public class Type1Font extends OutlineFont {
      * 'A' - 'F' or 'a' - 'f'), then the data is binary.  Otherwise it is
      * ASCII
      */
-    private boolean isASCII(byte[] data, int start) {
+    private static boolean isASCII(byte[] data, int start) {
         // look at the first 4 bytes
         for (int i = start; i < start + 4; i++) {
             // get the byte as a character
@@ -427,7 +426,7 @@ public class Type1Font extends OutlineFont {
      * @param name the name to look for, without the initial /
      * @return the index of the first occurance of /name in the array.
      */
-    private int findSlashName(byte[] d, String name) {
+    private static int findSlashName(byte[] d, String name) {
         int i;
         for (i = 0; i < d.length; i++) {
             if (d[i] == '/') {
@@ -508,20 +507,20 @@ public class Type1Font extends OutlineFont {
         int loc = 0;
         float x1, x2, x3, y1, y2, y3;
         while (loc < cs.length) {
-            int v = ((int) cs[loc++]) & 0xff;
+            int v = (cs[loc++]) & 0xff;
             if (v == 255) {
-                stack[sloc++] = ((((int) cs[loc]) & 0xff) << 24) +
-                        ((((int) cs[loc + 1]) & 0xff) << 16) +
-                        ((((int) cs[loc + 2]) & 0xff) << 8) +
-                        ((((int) cs[loc + 3]) & 0xff));
+                stack[sloc++] = (((cs[loc]) & 0xff) << 24) +
+                        (((cs[loc + 1]) & 0xff) << 16) +
+                        (((cs[loc + 2]) & 0xff) << 8) +
+                        (((cs[loc + 3]) & 0xff));
                 loc += 4;
 //		System.out.println("Pushed long "+stack[sloc-1]);
             } else if (v >= 251) {
-                stack[sloc++] = -((v - 251) << 8) - (((int) cs[loc]) & 0xff) - 108;
+                stack[sloc++] = -((v - 251) << 8) - ((cs[loc]) & 0xff) - 108;
                 loc++;
 //		System.out.println("Pushed lo "+stack[sloc-1]);
             } else if (v >= 247) {
-                stack[sloc++] = ((v - 247) << 8) + (((int) cs[loc]) & 0xff) + 108;
+                stack[sloc++] = ((v - 247) << 8) + ((cs[loc]) & 0xff) + 108;
                 loc++;
 //		System.out.println("Pushed hi "+stack[sloc-1]);
             } else if (v >= 32) {
@@ -582,11 +581,11 @@ public class Type1Font extends OutlineFont {
                     case 10:  // n callsubr
                         int n = (int) pop();
                         if (subrs[n] == null) {
-                            System.out.println("No subroutine #" + n);
+                            //System.out.println("No subroutine #" + n);
                         } else {
                             callcount++;
                             if (callcount > 10) {
-                                System.out.println("Call stack too large");
+                               // System.out.println("Call stack too large");
                             //			    throw new RuntimeException("Call stack too large");
                             } else {
                                 parse(subrs[n], gp, pt, wid);
@@ -597,7 +596,7 @@ public class Type1Font extends OutlineFont {
                     case 11:  // return
                         return;
                     case 12:  // ext...
-                        v = ((int) cs[loc++]) & 0xff;
+                        v = (cs[loc++]) & 0xff;
                         if (v == 6) {  // s x y b a seac
                         	char a = (char) pop();
                             char b = (char) pop();
@@ -700,7 +699,7 @@ public class Type1Font extends OutlineFont {
                         y2 = pop();
                         x2 = pop();
                         y1 = pop();
-                        x1 = y3 = 0;
+                        //x1 = y3 = 0;
                         gp.cubicTo(pt.x, pt.y + y1,
                                 pt.x + x2, pt.y + y1 + y2,
                                 pt.x + x2 + x3, pt.y + y1 + y2);
@@ -713,7 +712,7 @@ public class Type1Font extends OutlineFont {
                         y2 = pop();
                         x2 = pop();
                         x1 = pop();
-                        y1 = x3 = 0;
+                        //y1 = x3 = 0;
                         gp.cubicTo(pt.x + x1, pt.y,
                                 pt.x + x1 + x2, pt.y + y2,
                                 pt.x + x1 + x2, pt.y + y2 + y3);
@@ -762,7 +761,7 @@ public class Type1Font extends OutlineFont {
 
         Path pathBorig = getOutline(b, getWidth(b, null));
         // don't manipulate the original glyph
-        Path pathB = (Path) new Path(pathBorig);
+        Path pathB = new Path(pathBorig);
 
         Matrix xformB = new Matrix();
         if (at.invert(xformB)) {
@@ -833,7 +832,8 @@ public class Type1Font extends OutlineFont {
      * @param name the name of the desired glyph
      * @return the glyph outline, or null if unavailable
      */
-    protected Path getOutline(String name, float width) {
+    @Override
+	protected Path getOutline(String name, float width) {
         // make sure we have a valid name
         if (name == null || !name2outline.containsKey(name)) {
             name = ".notdef";
@@ -880,7 +880,8 @@ public class Type1Font extends OutlineFont {
      * @param src the character code of the desired glyph
      * @return the glyph outline
      */
-    protected Path getOutline(char src, float width) {
+    @Override
+	protected Path getOutline(char src, float width) {
         return getOutline(chr2name[src & 0xff], width);
     }
 }

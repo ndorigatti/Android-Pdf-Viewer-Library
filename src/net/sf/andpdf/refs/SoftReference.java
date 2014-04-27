@@ -1,7 +1,5 @@
 package net.sf.andpdf.refs;
 
-import java.util.ArrayList;
-
 public class SoftReference<T> {
 
 	java.lang.ref.SoftReference<T> softRef;

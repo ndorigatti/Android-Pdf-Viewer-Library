@@ -184,9 +184,10 @@ public class TrueTypeTable {
     /**
      * Put into a nice string
      */
-    public String toString() {
-        String out = "    " + tagToString(getTag()) + " Table.  Data is: ";
-        if (getData() == null) {
+    @Override
+	public String toString() {
+        String out = "    " + tagToString(tag) + " Table.  Data is: ";
+        if (data == null) {
             out += "not set";
         } else {
             out += "set";

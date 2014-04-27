@@ -21,19 +21,13 @@
 
 package com.sun.pdfview.decode;
 
-import java.io.IOException;
-import java.nio.IntBuffer;
-
 import net.sf.andpdf.nio.ByteBuffer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.Config;
-import android.util.Log;
-
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParseException;
-import com.sun.pdfview.colorspace.PDFColorSpace;
 
 /**
  * decode a DCT encoded array into a byte array.  This class uses Java's
@@ -70,14 +64,20 @@ public class DCTDecode {
         
         // copy the data into a byte array required by createimage
         byte[] ary = new byte[buf.remaining()];
-        buf.get(ary);
+        
+        /*
+         * FYI
+         * This is the same hack as explained in FlateDecode
+         * //buf.get(ary);
+         */
+        ary[0] = buf.get();
+        buf.get(ary, 1, ary.length - 1);
 
         Bitmap img = BitmapFactory.decodeByteArray(ary, 0, ary.length);
 
         if (img == null)
         	throw new PDFParseException("could not decode image of compressed size "+ary.length);
     	Config conf = img.getConfig();
-    	Log.e("ANDPDF.dctdecode", "decoded image type"+conf);
     	int size = 4*img.getWidth()*img.getHeight();
     	if (conf == Config.RGB_565) 
     		size = 2*img.getWidth()*img.getHeight();

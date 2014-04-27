@@ -21,10 +21,7 @@
 package com.sun.pdfview;
 
 import android.graphics.Matrix;
-import android.graphics.Path;
 import android.graphics.RectF;
-import android.graphics.Paint.FontMetrics;
-import android.util.Log;
 
 
 /**
@@ -37,9 +34,7 @@ import android.util.Log;
  */
 public class PDFNativeTextCmd extends PDFCmd {
 
-	private static final String TAG = "ANDPDF.natTXT";
-	
-    /** stroke the outline of the path with the stroke paint */
+	/** stroke the outline of the path with the stroke paint */
     public static final int STROKE = 1;
     /** fill the path with the fill paint */
     public static final int FILL = 2;
@@ -81,7 +76,8 @@ public class PDFNativeTextCmd extends PDFCmd {
     /**
      * perform the stroke and record the dirty region
      */
-    public RectF execute(PDFRenderer state) {
+    @Override
+	public RectF execute(PDFRenderer state) {
         RectF rect = state.drawNativeText(text, bounds);
         return rect;
     }

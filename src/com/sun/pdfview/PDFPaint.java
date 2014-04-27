@@ -38,7 +38,7 @@ import android.graphics.Paint.Style;
 public class PDFPaint {
 
     private Paint mainPaint;
-    public static boolean s_doAntiAlias = false;
+    public static final boolean s_doAntiAlias = true;
 
     /**
      * create a new PDFPaint based on a solid color
@@ -75,7 +75,8 @@ public class PDFPaint {
      * @param g the graphics into which to draw
      * @param s the path to fill
      */
-    public RectF fill(final PDFRenderer state, final Canvas g, final Path s) {
+    @SuppressWarnings ( "deprecation" ) //wontfix
+	public RectF fill(final PDFRenderer state, final Canvas g, final Path s) {
         g.drawPath(s, mainPaint);
 
         final RectF bounds = new RectF();

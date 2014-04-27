@@ -71,7 +71,7 @@ public class CMapFormat4 extends CMap {
         Segment s = new Segment(startCode, endCode, false);
         // make sure we remove any old entries
         segments.remove(s);
-        segments.put(s, new Integer(idDelta));
+        segments.put(s, Integer.valueOf(idDelta));
     }
     
     /**
@@ -85,7 +85,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Get the length of this table
      */
-    public short getLength() {
+    @Override
+	public short getLength() {
         // start with the size of the fixed header
         short size = 16;
         
@@ -110,9 +111,10 @@ public class CMapFormat4 extends CMap {
     /** 
      * Cannot map from a byte
      */
-    public byte map(byte src) {
+    @Override
+	public byte map(byte src) {
         char c = map((char) src);
-        if (c < Byte.MIN_VALUE || c > Byte.MAX_VALUE) {
+        if ( c > Byte.MAX_VALUE) {
             // out of range
             return 0;
         }
@@ -123,7 +125,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Map from char
      */
-    public char map(char src) {
+    @Override
+	public char map(char src) {
         // find first segment with endcode > src
         for (Iterator i = segments.keySet().iterator(); i.hasNext();) {
             Segment s = (Segment) i.next();
@@ -155,7 +158,8 @@ public class CMapFormat4 extends CMap {
     /**
      * Get the src code which maps to the given glyphID
      */
-    public char reverseMap(short glyphID) {
+    @Override
+	public char reverseMap(short glyphID) {
         // look at each segment
         for (Iterator i = segments.keySet().iterator(); i.hasNext();) {
             Segment s = (Segment) i.next();
@@ -192,12 +196,13 @@ public class CMapFormat4 extends CMap {
     /**
      * Get the data in this map as a ByteBuffer
      */
-    public void setData(int length, ByteBuffer data) {
+    @Override
+	public void setData(int length, ByteBuffer data) {
         // read the table size values
         short segCount = (short) (data.getShort() / 2);
-        short searchRange = data.getShort();
-        short entrySelector = data.getShort();
-        short rangeShift = data.getShort();
+        data.getShort();
+        data.getShort();
+        data.getShort();
     
         // create arrays to store segment info
         short[] endCodes = new short[segCount];
@@ -205,9 +210,6 @@ public class CMapFormat4 extends CMap {
         short[] idDeltas = new short[segCount];
         short[] idRangeOffsets = new short[segCount];
           
-        // the start of the glyph array
-        int glyphArrayPos = 16 + (8 * segCount);
-        
         // read the endCodes
         for (int i = 0; i < segCount; i++) {
            endCodes[i] = data.getShort();
@@ -264,12 +266,13 @@ public class CMapFormat4 extends CMap {
     /** 
      * Get the data in the map as a byte buffer
      */
-    public ByteBuffer getData() {
+    @Override
+	public ByteBuffer getData() {
         ByteBuffer buf = ByteBuffer.allocate(getLength());
     
         // write the header
         buf.putShort(getFormat());
-        buf.putShort((short) getLength());
+        buf.putShort(getLength());
         buf.putShort(getLanguage());
         
         // write the various values
@@ -427,14 +430,19 @@ public class CMapFormat4 extends CMap {
             
             this.hasMap = hasMap;
         }
-        
+        @Override
+        public int hashCode ()
+        {
+        	return endCode+startCode+Boolean.valueOf( hasMap ).hashCode();
+        }
         /** Equals based on compareTo (only compares endCode) */
         @Override public boolean equals(Object o) {
             return (compareTo(o) == 0);
         }
         
         /** Segments sort by increasing endCode */
-        public int compareTo(Object o) {
+        @Override
+		public int compareTo(Object o) {
             if (!(o instanceof Segment)) {
                 return -1;
             }

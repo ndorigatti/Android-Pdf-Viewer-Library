@@ -124,7 +124,7 @@ public abstract class PDFColorSpace {
             } else if (name.equals("Pattern")) {
                 return getColorSpace(COLORSPACE_PATTERN);
             } else if (colorSpaces != null) {
-                csobj = (PDFObject) colorSpaces.getDictRef(name);
+                csobj = colorSpaces.getDictRef(name);
             }
         }
 

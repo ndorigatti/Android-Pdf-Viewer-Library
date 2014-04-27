@@ -78,7 +78,8 @@ public class PDFDocCharsetEncoder extends CharsetEncoder {
         super(null, 1, 1);
     }
 
-    protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out) {
+    @Override
+	protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out) {
         while (in.remaining() > 0) {
             if (out.remaining() < 1) {
                 return CoderResult.OVERFLOW;
