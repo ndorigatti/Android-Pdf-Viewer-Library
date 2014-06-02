@@ -14,8 +14,7 @@ gen/
 
 # Local configuration file (sdk path, etc)
 local.properties
-
-# Eclipse project files
+proguard-project.txt
 .classpath
 .project
 

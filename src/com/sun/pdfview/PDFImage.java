@@ -24,19 +24,22 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
 import android.graphics.Color;
-
+import android.graphics.Paint;
+import android.util.Log;
 import com.sun.pdfview.colorspace.PDFColorSpace;
 import com.sun.pdfview.function.FunctionType0;
 
 /**
  * Encapsulates a PDF Image
  */
-public class PDFImage
-{
+public class PDFImage {
+
+	private static final String TAG = "AWTPDF.pdfimage";
+
 
 	public static void dump ( PDFObject obj ) throws IOException
 	{
@@ -53,9 +56,8 @@ public class PDFImage
 		}
 	}
 
-	private static void p ( String string )
-	{
-		System.out.println( string );
+	public static void p(String string) {
+		Log.d(TAG, string);
 	}
 
 	/**
@@ -95,8 +97,7 @@ public class PDFImage
 	 * @param resources
 	 *            the current resources
 	 */
-	public static PDFImage createImage ( PDFObject obj, Map resources ) throws IOException
-	{
+	public static PDFImage createImage(PDFObject obj, Map<?, ?> resources) throws IOException {
 		// create the image
 //		if ( !PDFParser.RELEASE )
 			dump( obj );
@@ -202,7 +203,7 @@ public class PDFImage
 					{
 						if ( !PDFParser.RELEASE )
 						{
-							p( "ERROR: there was a problem parsing the mask for this object" );
+							p( "ERROR: there was a problem parsing the mask for this object: " +ex.getMessage()  );
 							dump( obj );
 						}
 					}
@@ -219,7 +220,7 @@ public class PDFImage
 					{
 						if ( !PDFParser.RELEASE )
 						{
-							p( "ERROR: there was a problem parsing the color mask for this object" );
+							p( "ERROR: there was a problem parsing the color mask for this object: " +ex.getMessage() );
 							dump( obj );
 						}
 					}
@@ -248,10 +249,26 @@ public class PDFImage
 				imageObj.setCache( bi );
 			}
 			return bi;
-		}
-		catch ( IOException ioe )
-		{
+		} catch (IOException ioe) {
+			Log.e(TAG, "Error reading image, IOException! ", ioe);
+			//ioe.printStackTrace();
 			return null;
+		} catch (OutOfMemoryError e) {
+			// fix for too large images
+			Log.e(TAG, "image too large (OutOfMemoryError)");
+			int size = 15;
+			int max = size - 1;
+			int half = size / 2 - 1;
+			Bitmap bi = Bitmap.createBitmap(size, size, Config.RGB_565);
+			Canvas c = new Canvas(bi);
+			c.drawColor(Color.RED);
+			Paint p = new Paint();
+			p.setColor(Color.WHITE);
+			c.drawLine(0, 0, max, max, p);
+			c.drawLine(0, max, max, 0, p);
+			c.drawLine(half, 0, half, max, p);
+			c.drawLine(0, half, max, half, p);
+			return bi;
 		}
 	}
 
@@ -261,39 +278,15 @@ public class PDFImage
 		// long startTime = System.currentTimeMillis();
 		// parse the stream data into an actual image
 		// Log.i(TAG, "Creating Image width="+getWidth() + ", Height="+getHeight()+", bpc="+getBitsPerComponent()+",cs="+colorSpace);
-		if ( colorSpace == null )
-		{
-			throw new UnsupportedOperationException( "image without colorspace" );
-		}
-		else if ( colorSpace.getType() == PDFColorSpace.COLORSPACE_RGB )
-		{
-			int maxH = height;
-			int maxW = width;
-			if ( imgBytes.length == 2 * maxW * maxH )
-			{
-				// decoded JPEG as RGB565
-				bi = Bitmap.createBitmap( maxW, maxH, Config.RGB_565 );
-				bi.copyPixelsFromBuffer( ByteBuffer.wrap( imgBytes ) );
-			}
-			else
-			{
-				// create RGB image
-				bi = Bitmap.createBitmap( width, height, Config.ARGB_8888 );
-				int[] line = new int[ maxW ];
-				int n = 0;
-				for ( int h = 0; h < maxH; h++ )
-				{
-					for ( int w = 0; w < maxW; w++ )
-					{
-						line[w] =Color.argb( 0xff&imgBytes[n+3],0xff&imgBytes[n],0xff&imgBytes[n+1],0xff&imgBytes[n+2] ); 
-						n += 4;
-					}
-					bi.setPixels( line, 0, maxW, 0, h, maxW, 1 );
-				}			
-			}
-		}
-		else if ( colorSpace.getType() == PDFColorSpace.COLORSPACE_GRAY )
-		{
+		if (colorSpace == null) {
+			throw new UnsupportedOperationException("image without colorspace");
+		} else if (colorSpace.getType() == PDFColorSpace.COLORSPACE_RGB) {
+            int maxH = getHeight();
+            int maxW = getWidth();
+            bi = Bitmap.createBitmap(maxW, maxH, imgBytes.length == 2*maxW*maxH ? Config.RGB_565 : Config.ARGB_8888 );
+            bi.copyPixelsFromBuffer(ByteBuffer.wrap(imgBytes));
+        }
+		else if (colorSpace.getType() == PDFColorSpace.COLORSPACE_GRAY) {
 			// create gray image
 			bi = Bitmap.createBitmap( width, height, Config.ARGB_8888 );
 			int maxH = height;
