@@ -24,19 +24,22 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
 import android.graphics.Color;
-
+import android.graphics.Paint;
+import android.util.Log;
 import com.sun.pdfview.colorspace.PDFColorSpace;
 import com.sun.pdfview.function.FunctionType0;
 
 /**
  * Encapsulates a PDF Image
  */
-public class PDFImage
-{
+public class PDFImage {
+
+	private static final String TAG = "AWTPDF.pdfimage";
+
 
 	public static void dump ( PDFObject obj ) throws IOException
 	{
@@ -53,9 +56,8 @@ public class PDFImage
 		}
 	}
 
-	private static void p ( String string )
-	{
-		System.out.println( string );
+	public static void p(String string) {
+		Log.d(TAG, string);
 	}
 
 	/**
@@ -95,8 +97,7 @@ public class PDFImage
 	 * @param resources
 	 *            the current resources
 	 */
-	public static PDFImage createImage ( PDFObject obj, Map resources ) throws IOException
-	{
+	public static PDFImage createImage(PDFObject obj, Map<?, ?> resources) throws IOException {
 		// create the image
 //		if ( !PDFParser.RELEASE )
 			dump( obj );
@@ -202,7 +203,7 @@ public class PDFImage
 					{
 						if ( !PDFParser.RELEASE )
 						{
-							p( "ERROR: there was a problem parsing the mask for this object" );
+							p( "ERROR: there was a problem parsing the mask for this object: " +ex.getMessage()  );
 							dump( obj );
 						}
 					}
@@ -219,7 +220,7 @@ public class PDFImage
 					{
 						if ( !PDFParser.RELEASE )
 						{
-							p( "ERROR: there was a problem parsing the color mask for this object" );
+							p( "ERROR: there was a problem parsing the color mask for this object: " +ex.getMessage() );
 							dump( obj );
 						}
 					}
@@ -248,10 +249,26 @@ public class PDFImage
 				imageObj.setCache( bi );
 			}
 			return bi;
-		}
-		catch ( IOException ioe )
-		{
+		} catch (IOException ioe) {
+			Log.e(TAG, "Error reading image, IOException! ", ioe);
+			//ioe.printStackTrace();
 			return null;
+		} catch (OutOfMemoryError e) {
+			// fix for too large images
+			Log.e(TAG, "image too large (OutOfMemoryError)");
+			int size = 15;
+			int max = size - 1;
+			int half = size / 2 - 1;
+			Bitmap bi = Bitmap.createBitmap(size, size, Config.RGB_565);
+			Canvas c = new Canvas(bi);
+			c.drawColor(Color.RED);
+			Paint p = new Paint();
+			p.setColor(Color.WHITE);
+			c.drawLine(0, 0, max, max, p);
+			c.drawLine(0, max, max, 0, p);
+			c.drawLine(half, 0, half, max, p);
+			c.drawLine(0, half, max, half, p);
+			return bi;
 		}
 	}
 
