@@ -20,12 +20,11 @@
  */
 package com.sun.pdfview;
 
-import net.sf.andpdf.refs.SoftReference;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
+import net.sf.andpdf.refs.SoftReference;
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 
 /**
@@ -37,7 +36,8 @@ public class Cache {
     private Map<Integer,SoftReference<Record>> pages;
 
     /** Creates a new instance of a Cache */
-    public Cache() {
+    @SuppressLint("UseSparseArrays")
+	public Cache() {
         pages = Collections.synchronizedMap(new HashMap<Integer,SoftReference<Record>>());
     }
 
@@ -282,7 +282,7 @@ public class Cache {
         Integer pageNumber = Integer.valueOf(page.getPageNumber());
         PageRecord pageRec = getPageRecord(pageNumber);
         if (pageRec != null) {
-            SoftReference ref = pageRec.images.remove(info);
+            SoftReference<Record> ref = pageRec.images.remove(info);
             if (ref != null) {
                 return (Record) ref.get();
             }

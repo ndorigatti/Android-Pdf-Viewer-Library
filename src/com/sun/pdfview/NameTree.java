@@ -25,12 +25,9 @@ import java.io.IOException;
 /**
  * A PDF name tree consists of three kinds of nodes:
  * <ul>
- * <li> The root node contains only a kids entry, pointing to many
- *      other objects
- * <li> An intermediate node contains the limits of all the children in
- *      its subtree, and a kids entry for each child
- * <li> A leaf node contains a set of name-to-object mappings in a dictionary,
- *      as well as the limits of the data contained in that child.
+ * <li>The root node contains only a kids entry, pointing to many other objects
+ * <li>An intermediate node contains the limits of all the children in its subtree, and a kids entry for each child
+ * <li>A leaf node contains a set of name-to-object mappings in a dictionary, as well as the limits of the data contained in that child.
  * </ul>
  * A PDF name tree is sorted in accordance with the String.compareTo() method.
  */
@@ -47,7 +44,8 @@ public class NameTree {
     /**
      * Find the PDF object corresponding to the given String in a name tree
      *
-     * @param key the key we are looking for in the name tree
+	 * @param key
+	 *            the key we are looking for in the name tree
      * @return the object associated with str,  if found, or null if not
      */
     public PDFObject find(String key) throws IOException {
@@ -57,8 +55,7 @@ public class NameTree {
     /**
      * Recursively walk the name tree looking for a given value
      */
-    private PDFObject find(PDFObject root, String key)
-            throws IOException {
+	private PDFObject find(PDFObject root, String key) throws IOException {
         // first, look for a Names entry, meaning this is a leaf
         PDFObject names = root.getDictRef("Names");
         if (names != null) {
@@ -78,8 +75,7 @@ public class NameTree {
                     String upperLimit = limitsObj.getAt(1).getStringValue();
 
                     // are we in range?
-                    if ((key.compareTo(lowerLimit) >= 0) &&
-                            (key.compareTo(upperLimit) <= 0)) {
+					if ((key.compareTo(lowerLimit) >= 0) && (key.compareTo(upperLimit) <= 0)) {
 
                         // we are, so find in this child
                         return find(kids[i], key);
@@ -96,8 +92,7 @@ public class NameTree {
      * Find an object in a (key,value) array.  Do this by splitting in half
      * repeatedly.
      */
-    private static PDFObject findInArray(PDFObject[] array, String key)
-            throws IOException {
+	private PDFObject findInArray(PDFObject[] array, String key) throws IOException {
         int start = 0;
         int end = array.length / 2;
 
