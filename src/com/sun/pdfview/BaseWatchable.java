@@ -35,7 +35,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
     /** when to stop */
     private Gate gate;
     /** suppress local stack trace on setError. */
-    private static boolean suppressSetErrorStackTrace = true;
+    private static boolean SuppressSetErrorStackTrace = false;
     /** the thread we are running in */
     private Thread thread;
 
@@ -88,7 +88,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
         setStatus(Watchable.PAUSED);
 
         synchronized (parserLock) {
-            while (!isFinished() && status != Watchable.STOPPED) {
+            while (!isFinished() && getStatus() != Watchable.STOPPED) {
                 if (isExecutable()) {
                     // set the status to running
                     setStatus(Watchable.RUNNING);
@@ -96,14 +96,21 @@ public abstract class BaseWatchable implements Watchable, Runnable {
                     try {
                         // keep going until the status is no longer running,
                         // our gate tells us to stop, or no-one is watching
-                        while ((status == Watchable.RUNNING) &&
+                    	int laststatus = Watchable.RUNNING;
+                        while ((getStatus() == Watchable.RUNNING) &&
                                 (gate == null || !gate.iterate())) {
                             // update the status based on this iteration
-                            setStatus(iterate());
+                        	int status = iterate();
+                        	if (status != laststatus) {
+                        		//update status only when necessary, this increases performance
+                        		setStatus(status);
+                        		laststatus = status;
+                        	}
+                        		
                         }
 
                         // make sure we are paused
-                        if (status == Watchable.RUNNING) {
+                        if (getStatus() == Watchable.RUNNING) {
                             setStatus(Watchable.PAUSED);
                         }
                     } catch (Exception ex) {
@@ -128,8 +135,8 @@ public abstract class BaseWatchable implements Watchable, Runnable {
         // System.out.println(Thread.currentThread().getName() + " exiting: status = " + getStatusString());
 
         // call cleanup when we are done
-        if (status == Watchable.COMPLETED ||
-                status == Watchable.ERROR) {
+        if (getStatus() == Watchable.COMPLETED ||
+                getStatus() == Watchable.ERROR) {
 
             cleanup();
         }
@@ -153,7 +160,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * when its status is either COMPLETED, STOPPED or ERROR
      */
     public boolean isFinished() {
-        int s = status;
+        int s = getStatus();
         return (s == Watchable.COMPLETED ||
                 s == Watchable.ERROR);
     }
@@ -172,7 +179,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      */
     @Override
 	public void stop() {
-        setStatus(Watchable.STOPPED);
+    	if (!isFinished()) setStatus(Watchable.STOPPED);
     }
 
     /**
@@ -234,7 +241,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      */
     public void waitForFinish() {
         synchronized (statusLock) {
-            while (!isFinished() && status != Watchable.STOPPED) {
+            while (!isFinished() && getStatus() != Watchable.STOPPED) {
                 try {
                     statusLock.wait();
                 } catch (InterruptedException ex) {
@@ -268,9 +275,17 @@ public abstract class BaseWatchable implements Watchable, Runnable {
             thread = Thread.currentThread();
             run();
         } else {
-            thread = new Thread(this);
-            thread.setName(getClass().getName());
-            thread.start();
+        	this.thread = new Thread(this);
+        	this.thread.setName(getClass().getName());
+        	//Fix for NPE: Taken from http://java.net/jira/browse/PDF_RENDERER-46
+        	synchronized (statusLock) {
+        		thread.start();
+        		try {
+        			statusLock.wait();
+        		} catch (InterruptedException ex) {
+        			// ignore
+        		}
+        	}
         }
     }
 
@@ -293,7 +308,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * @return  boolean
      */
     public static boolean isSuppressSetErrorStackTrace () {
-        return suppressSetErrorStackTrace;
+        return SuppressSetErrorStackTrace;
     }
 
     /**
@@ -302,22 +317,23 @@ public abstract class BaseWatchable implements Watchable, Runnable {
      * @param suppressTrace
      */
     public static void setSuppressSetErrorStackTrace(boolean suppressTrace) {
-        suppressSetErrorStackTrace = suppressTrace;
+        SuppressSetErrorStackTrace = suppressTrace;
     }
 
     /**
      * Set an error on this watchable
      */
     protected void setError(Exception error) {
-        if (!suppressSetErrorStackTrace) {
+        if (!SuppressSetErrorStackTrace) {
             error.printStackTrace();
         }
 
         setStatus(Watchable.ERROR);
     }
 
-    private String getStatusString() {
-        switch (status) {
+    @SuppressWarnings("unused")
+	private String getStatusString() {
+        switch (getStatus()) {
             case Watchable.NOT_STARTED:
                 return "Not started";
             case Watchable.RUNNING:
@@ -341,7 +357,7 @@ public abstract class BaseWatchable implements Watchable, Runnable {
     /** A class that lets us give it a target time or number of steps,
      * and will tell us to stop after that much time or that many steps
      */
-    class Gate {
+    static class Gate {
 
         /** whether this is a time-based (true) or step-based (false) gate */
         private boolean timeBased;
