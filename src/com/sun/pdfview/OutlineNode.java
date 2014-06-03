@@ -32,7 +32,8 @@ public class OutlineNode extends DefaultMutableTreeNode {
     /** 
      * Create a new outline node
      *
-     * @param title the node's visible name in the tree
+	 * @param title
+	 *            the node's visible name in the tree
      */
     public OutlineNode(String title) {
         this.title = title;
