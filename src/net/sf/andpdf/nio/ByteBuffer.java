@@ -1,5 +1,7 @@
 package net.sf.andpdf.nio;
 
+import java.nio.MappedByteBuffer;
+
 
 public abstract class ByteBuffer {
 
@@ -71,19 +73,17 @@ public abstract class ByteBuffer {
 
 	public abstract boolean hasRemaining();
 
+	public static boolean sUseNIO = true;
 	
-	public static final boolean sUseNIO = true;
-	public static ByteBuffer NEW(java.nio.ByteBuffer map) {
+	public static ByteBuffer NEW(MappedByteBuffer map) {
 		return new NioByteBuffer(map);
 	}
 	public static ByteBuffer NEW(byte[] buf) {
 		return new ArrayBackedByteBuffer(buf);
 	}
 	public static ByteBuffer wrap(byte[] decode) {
-		if (sUseNIO)
-			return NioByteBuffer.wrap(decode);
-		else
-			return ArrayBackedByteBuffer.wrap(decode);
+		if (sUseNIO) return NioByteBuffer.wrap(decode);
+		else return ArrayBackedByteBuffer.wrap(decode);
 	}
 	public static ByteBuffer fromNIO(java.nio.ByteBuffer byteBuf) {
 //		if (USE_NIO)
@@ -92,10 +92,8 @@ public abstract class ByteBuffer {
 //			return OwnByteBuffer.fromNIO(byteBuf);
 	}
 	public static ByteBuffer allocate(int i) {
-		if (sUseNIO)
-			return NioByteBuffer.allocate(i);
-		else
-			return ArrayBackedByteBuffer.allocate(i);
+		if (sUseNIO) return NioByteBuffer.allocate(i);
+		else return ArrayBackedByteBuffer.allocate(i);
 	}
 
 }
