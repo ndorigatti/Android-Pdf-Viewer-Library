@@ -22,9 +22,9 @@ package com.sun.pdfview;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.graphics.Paint.Style;
 
 /**
  * PDFPaint is some kind of shader that knows how to fill a path.
@@ -37,59 +37,71 @@ import android.graphics.Paint.Style;
  */
 public class PDFPaint {
 
-    private Paint mainPaint;
-    public static final boolean s_doAntiAlias = true;
+	private Paint mainPaint;
+	public static final boolean s_doAntiAlias = false;
 
-    /**
-     * create a new PDFPaint based on a solid color
-     */
-    protected PDFPaint(int p) {
-        this.mainPaint = new Paint();
-        mainPaint.setColor(p);
-        mainPaint.setAntiAlias(s_doAntiAlias);
-    }
+	/**
+	 * create a new PDFPaint based on a solid color
+	 */
+	protected PDFPaint(Paint p) {
+		this.mainPaint = p;
+	}
 
-    /**
-     * get the PDFPaint representing a solid color
-     */
-    public static PDFPaint getColorPaint(int c) {
-        PDFPaint result = new PDFPaint(c);
-//        result.getPaint().setStyle(Style.FILL);
-        result.getPaint().setStyle(Style.STROKE);
-        return result;
-    }
+	/**
+	 * create a new PDFPaint based on a solid color
+	 */
+	protected PDFPaint(int p) {
+		this.mainPaint = new Paint();
+		mainPaint.setColor(p);
+		mainPaint.setAntiAlias(s_doAntiAlias);
+	}
 
-    /**
-     * get the PDFPaint representing a generic paint
-     */
-    public static PDFPaint getPaint(int p) {
-        PDFPaint result = new PDFPaint(p);
-//        result.getPaint().setStyle(Style.STROKE);
-        result.getPaint().setStyle(Style.FILL);
-        return result;
-    }
+	/**
+	 * get the PDFPaint representing a solid color
+	 */
+	public static PDFPaint getColorPaint(int c) {
+		PDFPaint result = new PDFPaint(c);
+		// result.getPaint().setStyle(Style.FILL);
+		result.getPaint().setStyle(Style.STROKE);
+		return result;
+	}
 
-    /**
-     * fill a path with the paint, and record the dirty area.
-     * @param state the current graphics state
-     * @param g the graphics into which to draw
-     * @param s the path to fill
-     */
-    @SuppressWarnings ( "deprecation" ) //wontfix
+	/**
+	 * get the PDFPaint representing a generic paint
+	 */
+	public static PDFPaint getPaint(int p) {
+		PDFPaint result = new PDFPaint(p);
+		// result.getPaint().setStyle(Style.STROKE);
+		result.getPaint().setStyle(Style.FILL);
+		return result;
+	}
+
+	/**
+	 * fill a path with the paint, and record the dirty area.
+	 * 
+	 * @param state
+	 *            the current graphics state
+	 * @param g
+	 *            the graphics into which to draw
+	 * @param s
+	 *            the path to fill
+	 */
+	@SuppressWarnings("deprecation")
+	// wontfix
 	public RectF fill(final PDFRenderer state, final Canvas g, final Path s) {
-        g.drawPath(s, mainPaint);
+		g.drawPath(s, mainPaint);
 
-        final RectF bounds = new RectF();
-        final RectF result = new RectF();
-        s.computeBounds(bounds, false);
-        g.getMatrix().mapRect(result, bounds);
-        return bounds;
-    }
+		final RectF bounds = new RectF();
+		final RectF result = new RectF();
+		s.computeBounds(bounds, false);
+		g.getMatrix().mapRect(result, bounds);
+		return bounds;
+	}
 
-    /**
-     * get the primary color associated with this PDFPaint.
-     */
-    public Paint getPaint() {
-        return mainPaint;
-    }
+	/**
+	 * get the primary color associated with this PDFPaint.
+	 */
+	public Paint getPaint() {
+		return mainPaint;
+	}
 }

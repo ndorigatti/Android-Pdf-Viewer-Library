@@ -33,7 +33,6 @@ import net.sf.andpdf.refs.SoftReference;
 
 import java.util.*;
 
-import net.sf.andpdf.nio.ByteBuffer;
 import com.sun.pdfview.decode.PDFDecoder;
 import com.sun.pdfview.decrypt.PDFDecrypter;
 import com.sun.pdfview.decrypt.IdentityDecrypter;
