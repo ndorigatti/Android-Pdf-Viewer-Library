@@ -169,7 +169,8 @@ public class PDFNativeTextCmd extends PDFCmd {
 //        return count;
 //    }
 
-    /** Get detailed information about this shape
+	/**
+	 * Get detailed information about this shape
      */
     @Override
     public String getDetails() {
