@@ -1,5 +1,5 @@
 /*
- * $Id: PDFObject.java,v 1.8 2009/03/15 20:47:38 tomoke Exp $
+ * $Id: PDFObject.java,v 1.9 2010-06-14 17:32:09 lujke Exp $
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
@@ -21,7 +21,14 @@
 package com.sun.pdfview;
 
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import net.sf.andpdf.nio.ByteBuffer;
 import net.sf.andpdf.refs.SoftReference;
 
 import java.util.*;
@@ -94,7 +101,9 @@ public class PDFObject {
     /** the encoded stream, if this is a STREAM object */
     private ByteBuffer stream;
     /** a cached version of the decoded stream */
-    private SoftReference decodedStream;
+    private SoftReference<ByteBuffer> decodedStream;
+    /** The filter limits used to generate the cached decoded stream */
+    private Set<String> decodedStreamFilterLimits = null;
     /**
      * the PDFFile from which this object came, used for
      * dereferences
@@ -105,7 +114,7 @@ public class PDFObject {
      * garbage collected at any time, after which it will
      * have to be rebuilt.
      */
-    private SoftReference cache;
+    private SoftReference<?> cache;
 
     /** @see #getObjNum() */
     private int objNum = OBJ_NUM_EMBEDDED;
@@ -254,15 +263,15 @@ public class PDFObject {
      * object isn't a STREAM.
      * @return the stream, or null, if this isn't a STREAM.
      */
-    public byte[] getStream() throws IOException {
+	public byte[] getStream(Set<String> filterLimits) throws IOException {
         if (type == INDIRECT) {
-            return dereference().getStream();
+			return dereference().getStream(filterLimits);
         } else if (type == STREAM && stream != null) {
             byte[] data = null;
 
             synchronized (stream) {
                 // decode
-                ByteBuffer streamBuf = decodeStream();
+				ByteBuffer streamBuf = decodeStream(filterLimits);
                 // ByteBuffer streamBuf = stream;
 
                 // First try to use the array with no copying.  This can only
@@ -278,6 +287,7 @@ public class PDFObject {
 
                 // Can't use the direct buffer, so copy the data (bad)
                 data = new byte[streamBuf.remaining()];
+				//TODO streamBuf.get(data);
                 
                 /* 
                  * FYI
@@ -286,6 +296,7 @@ public class PDFObject {
                  */
                 data[0] = streamBuf.get();
                 streamBuf.get(data, 1, data.length - 1);
+				//TODO END
 
                 // return the stream to its starting position
                 streamBuf.flip();
@@ -301,16 +312,34 @@ public class PDFObject {
     }
 
     /**
+     * get the stream from this object.  Will return null if this
+     * object isn't a STREAM.
+     * @return the stream, or null, if this isn't a STREAM.
+     */
+    public byte[] getStream() throws IOException {
+       return getStream(Collections.<String>emptySet());
+    }
+
+    /**
      * get the stream from this object as a byte buffer.  Will return null if 
      * this object isn't a STREAM.
      * @return the buffer, or null, if this isn't a STREAM.
      */
     public ByteBuffer getStreamBuffer() throws IOException {
+        return getStreamBuffer(Collections.<String>emptySet());
+    }
+	
+    /**
+     * get the stream from this object as a byte buffer.  Will return null if 
+     * this object isn't a STREAM.
+     * @return the buffer, or null, if this isn't a STREAM.
+     */
+    public ByteBuffer getStreamBuffer(Set<String> filterLimits) throws IOException {
         if (type == INDIRECT) {
-            return dereference().getStreamBuffer();
+            return dereference().getStreamBuffer(filterLimits);
         } else if (type == STREAM && stream != null) {
             synchronized (stream) {
-                ByteBuffer streamBuf = decodeStream();
+                ByteBuffer streamBuf = decodeStream(filterLimits);
                 // ByteBuffer streamBuf = stream;
                 return streamBuf.duplicate();
             }
@@ -326,19 +355,20 @@ public class PDFObject {
     /**
      * Get the decoded stream value
      */
-    private ByteBuffer decodeStream() throws IOException {
+    private ByteBuffer decodeStream(Set<String> filterLimits) throws IOException {
         ByteBuffer outStream = null;
 
         // first try the cache
-        if (decodedStream != null) {
-            outStream = (ByteBuffer) decodedStream.get();
+        if (decodedStream != null && filterLimits.equals(decodedStreamFilterLimits)) {
+            outStream = decodedStream.get();
         }
 
         // no luck in the cache, do the actual decoding
         if (outStream == null) {
             stream.rewind();
-            outStream = PDFDecoder.decodeStream(this, stream);
-            decodedStream = new SoftReference(outStream);
+            outStream = PDFDecoder.decodeStream(this, stream, filterLimits);
+            decodedStreamFilterLimits = new HashSet<String>(filterLimits);
+            decodedStream = new SoftReference<ByteBuffer>(outStream);
         }
 
         return outStream;
@@ -390,6 +420,14 @@ public class PDFObject {
     }
 
     /**
+     * Returns the root of this object.
+     * @return
+     */
+    public PDFObject getRoot() {
+    	return owner.getRoot();
+    }
+    
+    /**
      * get the value as a String.  Will return null if the object
      * isn't a STRING, NAME, or KEYWORD.  This method will <b>NOT</b>
      * convert a NUMBER to a String. If the string is actually
@@ -402,11 +440,9 @@ public class PDFObject {
      * char will be between 0 and 255.
      */
     public String getStringValue() throws IOException {
-        if (type == INDIRECT) 
-        {
+        if (type == INDIRECT) {
             return dereference().getStringValue();
-        } else if (type == STRING || type == NAME || type == KEYWORD) 
-        {
+        } else if (type == STRING || type == NAME || type == KEYWORD) {
             return (String) value;
         }
 
@@ -480,21 +516,22 @@ public class PDFObject {
      * this object is not a DICTIONARY or a STREAM, returns an
      * Iterator over the empty list.
      */
-    public Iterator getDictKeys() throws IOException {
+    public Iterator<?> getDictKeys() throws IOException {
         if (type == INDIRECT) {
             return dereference().getDictKeys();
         } else if (type == DICTIONARY || type == STREAM) {
-            return ((HashMap) value).keySet().iterator();
+            return ((HashMap<?, ?>) value).keySet().iterator();
         }
 
         // wrong type
-        return new ArrayList().iterator();
+        return new ArrayList<Object>().iterator();
     }
 
     /**
      * get the dictionary as a HashMap.  If this isn't a DICTIONARY
      * or a STREAM, returns null
      */
+	@SuppressWarnings("unchecked")
     public HashMap<String,PDFObject> getDictionary() throws IOException {
         if (type == INDIRECT) {
             return dereference().getDictionary();
@@ -516,7 +553,7 @@ public class PDFObject {
             return dereference().getDictRef(key);
         } else if (type == DICTIONARY || type == STREAM) {
             key = key.intern();
-            HashMap h = (HashMap) value;
+            HashMap<?, ?> h = (HashMap<?, ?>) value;
             PDFObject obj = (PDFObject) h.get(key.intern());
             return obj;
         }
@@ -602,7 +639,7 @@ public class PDFObject {
         try {
             if (type == INDIRECT) {
                 StringBuffer str = new StringBuffer ();
-                str.append("Indirect to #" + ((PDFXref) value).getID()+(((PDFXref) value).getCompressed()?" comp":""));
+                str.append("Indirect to #" + ((PDFXref) value).getObjectNumber());
                 try {
 // TODO [FHe] uncomment
 //              str.append("\n" + dereference().toString());
@@ -638,11 +675,11 @@ public class PDFObject {
                     sb.append("Untyped");
                 }
                 sb.append(" dictionary. Keys:");
-                HashMap hm = (HashMap) value;
-                Iterator it = hm.entrySet().iterator();
-                Map.Entry entry;
+                HashMap<?, ?> hm = (HashMap<?, ?>) value;
+                Iterator<?> it = hm.entrySet().iterator();
+                Map.Entry<?,?> entry;
                 while (it.hasNext()) {
-                    entry = (Map.Entry) it.next();
+                    entry = (Map.Entry<?,?>) it.next();
                     sb.append("\n   " + entry.getKey() + "  " + entry.getValue());
                 }
                 return sb.toString();
@@ -656,16 +693,6 @@ public class PDFObject {
                 return "Null";
             } else if (type == KEYWORD) {
                 return "Keyword: " + getStringValue();
-            /*	    } else if (type==IMAGE) {
-            StringBuffer sb= new StringBuffer();
-            java.awt.Image im= (java.awt.Image)stream;
-            sb.append("Image ("+im.getWidth(null)+"x"+im.getHeight(null)+", with keys:");
-            HashMap hm= (HashMap)value;
-            Iterator it= hm.keySet().iterator();
-            while(it.hasNext()) {
-            sb.append(" "+(String)it.next());
-            }
-            return sb.toString();*/
             } else {
                 return "Whoops!  big error!  Unknown type";
             }
@@ -687,11 +714,10 @@ public class PDFObject {
             }
 
             if (obj == null || obj.value == null) {
-                if (owner == null) 
-                    {
-                	//System.out.println("Bad seed (owner==null)!  Object=" + this);
+                if (owner == null) {
+                    System.out.println("Bad seed (owner==null)!  Object=" + this);
                     }
-                else
+
                 	obj = owner.dereference((PDFXref)value, getDecrypter());
 
                 cache = new SoftReference<PDFObject>(obj);
@@ -716,7 +742,7 @@ public class PDFObject {
                 obj = (PDFObject) cache.get();
             }
 
-/*            if (obj == null || obj.value == null) {
+            if (obj == null || obj.value == null) {
                 if (owner == null) {
                     System.out.println("Bad seed (owner==null)!  Object=" + this);
                 }
@@ -724,7 +750,7 @@ public class PDFObject {
 //                obj = owner.dereference((PDFXref)value, getDecrypter());
 //
 //                cache = new SoftReference<PDFObject>(obj);
-            }*/
+            }
 
             return obj;
         } else {
@@ -759,23 +785,11 @@ public class PDFObject {
                 PDFXref lXref = (PDFXref) value;
                 PDFXref rXref = (PDFXref) obj.value;
 
-                return ((lXref.getID() == rXref.getID()) &&
-                		(lXref.getGeneration() == rXref.getGeneration()) &&
-                		(lXref.getCompressed() == rXref.getCompressed()));
+                return ((lXref.getObjectNumber() == rXref.getObjectNumber()) &&
+                		(lXref.getGeneration() == rXref.getGeneration()));
             }
         }
 
         return false;
-    }
-    @Override
-    public int hashCode ()
-    {
-    	int hash=super.hashCode();
-    	if (type == INDIRECT) 
-    	{
-    		PDFXref lXref = (PDFXref) value;
-    		hash+=lXref.getID()+lXref.getGeneration()+(lXref.getCompressed()?1231 : 1237);
-    	}	
-    	return hash;
     }
 }

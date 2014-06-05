@@ -20,8 +20,6 @@
  */
 package com.sun.pdfview;
 
-import net.sf.andpdf.refs.SoftReference;
-
 /**
  * a cross reference representing a line in the PDF cross referencing
  * table.
@@ -45,51 +43,15 @@ import net.sf.andpdf.refs.SoftReference;
  */
 public class PDFXref {
 
-    private int id;
+    private int objectNumber;
     private int generation;
-    private boolean compressed;
-    
-    // this field is only used in PDFFile.objIdx
-    private SoftReference<PDFObject> reference = null;
 
     /**
      * create a new PDFXref, given a parsed id and generation.
      */
-    public PDFXref(int id, int gen) {
-        this.id = id;
+    public PDFXref(int objectNumber, int gen) {
+        this.objectNumber = objectNumber;
         this.generation = gen;
-        this.compressed = false;
-    }
-
-    /**
-     * create a new PDFXref, given a parsed id, compressedObjId and index
-     */
-    public PDFXref(int id, int gen, boolean compressed) {
-        this.id = id;
-        this.generation = gen;
-        this.compressed = compressed;
-    }
-
-    /**
-     * create a new PDFXref, given a sequence of bytes representing the
-     * fixed-width cross reference table line
-     */
-    public PDFXref(byte[] line) {
-        if (line == null) {
-            id = -1;
-            generation = -1;
-        } else {
-            id = Integer.parseInt(new String(line, 0, 10));
-            generation = Integer.parseInt(new String(line, 11, 5));
-        }
-        compressed = false;
-    }
-
-    /**
-     * get the character index into the file of the start of this object
-     */
-    public int getFilePos() {
-        return id;
     }
 
     /**
@@ -98,46 +60,23 @@ public class PDFXref {
     public int getGeneration() {
         return generation;
     }
-
-    /**
-     * get the generation of this object
-     */
-    public int getIndex() {
-        return generation;
-    }
-
+    
     /**
      * get the object number of this object
      */
-    public int getID() {
-        return id;
+    public int getObjectNumber() {
+        return objectNumber;
     }
 
-    /**
-     * get compressed flag of this object
-     */
-    public boolean getCompressed() {
-        return compressed;
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof PDFXref) &&
+                ((PDFXref)obj).objectNumber == objectNumber &&
+                ((PDFXref)obj).generation == generation;
     }
 
-
-    /**
-     * Get the object this reference refers to, or null if it hasn't been
-     * set.
-     * @return the object if it exists, or null if not
-     */
-    public PDFObject getObject() {
-        if (reference != null) {
-            return reference.get();
-        }
-
-        return null;
-    }
-
-    /**
-     * Set the object this reference refers to.
-     */
-    public void setObject(PDFObject obj) {
-        this.reference = new SoftReference<PDFObject>(obj);
+    @Override
+    public int hashCode() {
+        return objectNumber ^ (generation << 8);
     }
 }
