@@ -52,7 +52,7 @@ public class ASCIIHexDecode {
         // read until we hit a non-whitespace character or the
         // end of the stream
         while (buf.remaining() > 0) {
-            int c = buf.get();
+            int c = (int) buf.get();
         
             // see if we found a useful character
             if (!PDFFile.isWhiteSpace((char) c)) {
