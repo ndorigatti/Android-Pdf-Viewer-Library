@@ -30,7 +30,10 @@ package com.sun.pdfview.decrypt;
 public class EncryptionUnsupportedByPlatformException
         extends UnsupportedEncryptionException {
 
-	private static final long serialVersionUID = 1L;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1324393050608958953L;
 
 	public EncryptionUnsupportedByPlatformException(String message) {
         super(message);

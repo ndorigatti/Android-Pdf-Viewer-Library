@@ -121,7 +121,11 @@ public class CryptFilterDecrypter implements PDFDecrypter {
         return false;
     }
 
-    @Override
+    public boolean isEncryptionPresent(String cryptFilterName) {
+        PDFDecrypter decrypter = decrypters.get(cryptFilterName);
+        return decrypter != null && decrypter.isEncryptionPresent(cryptFilterName);
+    }
+
 	public boolean isOwnerAuthorised() {
         for (final PDFDecrypter decrypter : decrypters.values()) {
             if (decrypter.isOwnerAuthorised()) {
