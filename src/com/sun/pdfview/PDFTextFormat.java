@@ -378,15 +378,15 @@ public class PDFTextFormat implements Cloneable {
         PDFTextFormat newFormat = new PDFTextFormat();
 
         // copy values
-        newFormat.setCharSpacing(tc);
-        newFormat.setWordSpacing(tw);
+        newFormat.setCharSpacing(getCharSpacing());
+        newFormat.setWordSpacing(getWordSpacing());
         newFormat.setHorizontalScale(getHorizontalScale());
-        newFormat.setLeading(tl);
-        newFormat.setTextFormatMode(tm);
-        newFormat.setRise(tr);
+        newFormat.setLeading(getLeading());
+        newFormat.setTextFormatMode(getMode());
+        newFormat.setRise(getRise());
 
         // copy immutable fields
-        newFormat.setFont(font, fsize);
+        newFormat.setFont(getFont(), getFontSize());
 
         // clone transform (mutable)
         // newFormat.getTransform().setTransform(getTransform());
