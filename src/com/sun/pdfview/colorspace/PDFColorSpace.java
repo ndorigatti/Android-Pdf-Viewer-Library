@@ -59,7 +59,7 @@ public abstract class PDFColorSpace {
     private static PDFColorSpace cmykSpace = new CMYKColorSpace(); 
 
     /** the pattern space */
-    private static PDFColorSpace patternSpace = new RGBColorSpace(); // TODO [FHe]
+    private static PDFColorSpace patternSpace = new PatternSpace();//new RGBColorSpace(); // TODO [FHe]
 
     /** graySpace and the gamma correction for it. */
     private static PDFColorSpace graySpace = new GrayColorSpace(); 
@@ -102,7 +102,7 @@ public abstract class PDFColorSpace {
      *
      * @param csobj the PDFObject with the colorspace information
      */
-    public static PDFColorSpace getColorSpace(PDFObject csobj, Map resources)
+    public static PDFColorSpace getColorSpace(PDFObject csobj, Map<?, ?> resources)
         throws IOException {
         String name;
 
@@ -124,7 +124,7 @@ public abstract class PDFColorSpace {
             } else if (name.equals("Pattern")) {
                 return getColorSpace(COLORSPACE_PATTERN);
             } else if (colorSpaces != null) {
-                csobj = colorSpaces.getDictRef(name);
+                csobj = (PDFObject) colorSpaces.getDictRef(name);
             }
         }
 
@@ -162,7 +162,12 @@ public abstract class PDFColorSpace {
             int count = ary[2].getIntValue();
             value = new IndexedColor(refspace, count, ary[3]);
         } else if (name.equals("Pattern")) {
-            return rgbSpace; // TODO [FHe]
+        	if (ary.length == 1) {
+                return getColorSpace(COLORSPACE_PATTERN);
+            }
+        	PDFColorSpace base = getColorSpace(ary[1], resources);
+            return new PatternSpace(base);
+            //TODO FIXME return patternSpace; // TODO [FHe]
         } else {
             throw new PDFParseException("Unknown color space: " + name +
                 " with " + ary[1]);

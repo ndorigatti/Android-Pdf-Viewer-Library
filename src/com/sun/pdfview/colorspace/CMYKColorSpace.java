@@ -23,7 +23,11 @@ package com.sun.pdfview.colorspace;
 
 import android.graphics.Color;
 
-
+/**
+ * A ColorSpace for the CMYK color space.
+ *
+ * @author Mike Wessler
+ */
 public class CMYKColorSpace extends PDFColorSpace {
 	
     public CMYKColorSpace() {
