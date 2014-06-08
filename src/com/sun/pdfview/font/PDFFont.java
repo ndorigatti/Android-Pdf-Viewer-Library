@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import android.util.Log;
+import androswing.tree.Constants;
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFParseException;
 
@@ -132,7 +133,11 @@ public abstract class PDFFont {
         }
 
         if (encodingObj != null) {
+			try {
             encoding = new PDFFontEncoding(subType, encodingObj);
+			} catch (Exception e) {
+				Log.e(Constants.TAG,"Exception setting encoding: " + e.getMessage());
+			}
         }
 
         if (descObj != null) {
@@ -170,8 +175,8 @@ public abstract class PDFFont {
         } else if (subType.equals("CIDFontType2")) {
             font = new CIDFontType2(baseFont, obj, descriptor);
         } else if (subType.equals("CIDFontType0")) {
-            font = new CIDFontType2(baseFont, obj, descriptor);
-//            font = new CIDFontType0(baseFont, obj, descriptor);
+//            font = new CIDFontType2(baseFont, obj, descriptor);
+            font = new CIDFontType0(baseFont, obj, descriptor);
 //            throw new IOException ("CIDFontType0 is unimplemented. " + obj);
         } else {
             throw new PDFParseException("Don't know how to handle a '" +
@@ -300,7 +305,7 @@ public abstract class PDFFont {
         }
 
         // try the cache
-        PDFGlyph glyph = charCache.get(Character.valueOf(src));
+        PDFGlyph glyph = (PDFGlyph) charCache.get(Character.valueOf(src));
 
         // if it's not there, add it to the cache
         if (glyph == null) {

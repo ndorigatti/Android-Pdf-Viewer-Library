@@ -83,12 +83,12 @@ public abstract class OutlineFont extends PDFFont {
 
     /** Get the number of characters */
     public int getCharCount() {
-        return (lastChar - firstChar) + 1;
+        return (getLastChar() - getFirstChar()) + 1;
     }
 
     /** Get the width of a given character */
     public float getWidth(char code, String name) {
-        int idx = (code & 0xff) -firstChar;
+        int idx = (code & 0xff) - getFirstChar();
 
         // make sure we're in range
         if (idx < 0 || widths == null || idx >= widths.length) {

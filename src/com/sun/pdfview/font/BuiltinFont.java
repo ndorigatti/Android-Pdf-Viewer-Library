@@ -20,25 +20,24 @@
  */
 package com.sun.pdfview.font;
 
-import android.content.res.Resources;
-import android.graphics.Typeface;
-
-import com.sun.pdfview.PDFObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 import net.sf.andpdf.utils.Utils;
+import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.util.Log;
+import com.sun.pdfview.PDFObject;
 
 /**
- * This class represents the 14 built-in fonts. It reads these fonts from files in the "res" directory, as specified in BaseNames.properties.
+ * This class represents the 14 built-in fonts. It reads these fonts
+ * from files in the "res" directory, as specified in
+ * BaseNames.properties.
  * 
  * @author Ferenc Hechler (ferenc@hechler.de)
  * @author Joerg Jahnke (joergjahnke@users.sourceforge.net)
  */
-public class BuiltinFont extends Type1Font
-{
+public class BuiltinFont extends Type1Font {
 
 	/** the properties file */
 	private static Properties props;
@@ -51,25 +50,22 @@ public class BuiltinFont extends Type1Font
 	 */
 	private static String pkg;
 	/** the names of the 14 base fonts */
-	private static final String[] baseFonts = { "Courier", "Courier-Bold", "Courier-BoldOblique", "Courier-Oblique", "Helvetica",
-			"Helvetica-Bold", "Helvetica-BoldOblique", "Helvetica-Oblique", "Times-Roman", "Times-Bold", "Times-BoldItalic",
-			"Times-Italic", "Symbol", "ZapfDingbats" };
+	private static final String[] baseFonts = { "Courier", "Courier-Bold", "Courier-BoldOblique", "Courier-Oblique", "Helvetica", "Helvetica-Bold",
+			"Helvetica-BoldOblique", "Helvetica-Oblique", "Times-Roman", "Times-Bold", "Times-BoldItalic", "Times-Italic", "Symbol", "ZapfDingbats" };
 	/**
-	 * fonts others (e.g. Acrobad PDFWriter 3.02 for Windows) assume are there, even though they're not in the spec. Grrr...
-	 * 
+	 * fonts others (e.g. Acrobad PDFWriter 3.02 for Windows) assume
+	 * are there, even though they're not in the spec. Grrr...
 	 * the format is <Name_in_PDF> <Builtin_To_Use>
 	 */
 	private static final String[] mappedFonts = {
 			// map arial to helvetica
-			"Arial", "Helvetica", "Arial,Bold", "Helvetica-Bold", "Arial,BoldItalic", "Helvetica-BoldOblique", "Arial,Italic",
-			"Helvetica-Oblique",
+			"Arial", "Helvetica", "Arial,Bold", "Helvetica-Bold", "Arial,BoldItalic", "Helvetica-BoldOblique", "Arial,Italic", "Helvetica-Oblique",
 			// map TimesNewRoman to Times
 			"TimesNewRoman", "Times-Roman", "TimesNewRoman,Bold", "Times-Bold", "TimesNewRoman,BoldItalic", "Times-BoldItalic",
 			"TimesNewRoman,Italic", "Times-Italic", };
 
 	/**
 	 * Create a new Builtin object based on the name of a built-in font
-	 * 
 	 * This must be the name of one of the 14 built-in fonts!
 	 * 
 	 * @param baseFont
@@ -77,115 +73,83 @@ public class BuiltinFont extends Type1Font
 	 * @param fontObj
 	 *            the object containing font information
 	 */
-	public BuiltinFont ( String baseFont, PDFObject fontObj ) throws IOException
-	{
-		super( baseFont, fontObj, null );
+	public BuiltinFont(String baseFont, PDFObject fontObj) throws IOException {
+		super(baseFont, fontObj, null);
 
-		parseFont( baseFont );
+		parseFont(baseFont);
 	}
 
 	/**
-	 * create a new BuiltingFont object based on a description of the font from the PDF file. Parse the description for key information and use that to generate an appropriate font.
+	 * create a new BuiltingFont object based on a description of the
+	 * font from the PDF file. Parse the description for key information
+	 * and use that to generate an appropriate font.
 	 */
-	public BuiltinFont ( String baseFont, PDFObject fontObj, PDFFontDescriptor descriptor ) throws IOException
-	{
-		super( baseFont, fontObj, descriptor );
+	public BuiltinFont(String baseFont, PDFObject fontObj, PDFFontDescriptor descriptor) throws IOException {
+		super(baseFont, fontObj, descriptor);
 
 		String fontName = descriptor.getFontName();
 
 		// check if it's one of the 14 base fonts
-		for ( int i = 0; i < baseFonts.length; i++ )
-		{
-			if ( fontName.equalsIgnoreCase( baseFonts[ i ] ) )
-			{
-				parseFont( fontName );
+		for (int i = 0; i < baseFonts.length; i++) {
+			if (fontName.equalsIgnoreCase(baseFonts[i])) {
+				parseFont(fontName);
 				return;
 			}
 		}
 
 		// check if it's a mapped font
-		for ( int i = 0; i < mappedFonts.length; i += 2 )
-		{
-			if ( fontName.equalsIgnoreCase( mappedFonts[ i ] ) )
-			{
-				parseFont( mappedFonts[ i + 1 ] );
+		for (int i = 0; i < mappedFonts.length; i += 2) {
+			if (fontName.equalsIgnoreCase(mappedFonts[i])) {
+				parseFont(mappedFonts[i + 1]);
 				return;
 			}
 		}
 
 		int flags = descriptor.getFlags();
-		int style = ( ( flags & PDFFontDescriptor.FORCEBOLD ) != 0 ) ? Typeface.BOLD : Typeface.NORMAL;
+		int style = ((flags & PDFFontDescriptor.FORCEBOLD) != 0) ? Typeface.BOLD : Typeface.NORMAL;
 
-		if ( fontName.indexOf( "Bold" ) > 0 )
-		{
+		if (fontName.indexOf("Bold") > 0) {
 			style |= Typeface.BOLD;
 		}
-		if ( ( descriptor.getItalicAngle() != 0 ) || ( ( flags & PDFFontDescriptor.NONSYMBOLIC ) != 0 ) )
-		{
+		if ((descriptor.getItalicAngle() != 0) || ((flags & PDFFontDescriptor.NONSYMBOLIC) != 0)) {
 			style |= Typeface.ITALIC;
 		}
 
 		String name = null;
 
-		if ( ( flags & PDFFontDescriptor.FIXED_PITCH ) != 0 )
-		{ // fixed width
-			if ( ( ( style & Typeface.BOLD ) > 0 ) && ( ( style & Typeface.ITALIC ) > 0 ) )
-			{
+		if ((flags & PDFFontDescriptor.FIXED_PITCH) != 0) { // fixed width
+			if (((style & Typeface.BOLD) > 0) && ((style & Typeface.ITALIC) > 0)) {
 				name = "Courier-BoldOblique";
-			}
-			else if ( ( style & Typeface.BOLD ) > 0 )
-			{
+			} else if ((style & Typeface.BOLD) > 0) {
 				name = "Courier-Bold";
-			}
-			else if ( ( style & Typeface.ITALIC ) > 0 )
-			{
+			} else if ((style & Typeface.ITALIC) > 0) {
 				name = "Courier-Oblique";
-			}
-			else
-			{
+			} else {
 				name = "Courier";
 			}
-		}
-		else if ( ( flags & PDFFontDescriptor.SERIF ) != 0 )
-		{ // serif font
-			if ( ( ( style & Typeface.BOLD ) > 0 ) && ( ( style & Typeface.ITALIC ) > 0 ) )
-			{
+		} else if ((flags & PDFFontDescriptor.SERIF) != 0) { // serif font
+			if (((style & Typeface.BOLD) > 0) && ((style & Typeface.ITALIC) > 0)) {
 				name = "Times-BoldItalic";
-			}
-			else if ( ( style & Typeface.BOLD ) > 0 )
-			{
+			} else if ((style & Typeface.BOLD) > 0) {
 				name = "Times-Bold";
-			}
-			else if ( ( style & Typeface.ITALIC ) > 0 )
-			{
+			} else if ((style & Typeface.ITALIC) > 0) {
 				name = "Times-Italic";
-			}
-			else
-			{
+			} else {
 				name = "Times-Roman";
 			}
-		}
-		else
-		{
-			if ( ( ( style & Typeface.BOLD ) > 0 ) && ( ( style & Typeface.ITALIC ) > 0 ) )
-			{
+		} else {
+			if (((style & Typeface.BOLD) > 0) && ((style & Typeface.ITALIC) > 0)) {
 				name = "Helvetica-BoldOblique";
-			}
-			else if ( ( style & Typeface.BOLD ) > 0 )
-			{
+			} else if ((style & Typeface.BOLD) > 0) {
 				name = "Helvetica-Bold";
-			}
-			else if ( ( style & Typeface.ITALIC ) > 0 )
-			{
+			} else if ((style & Typeface.ITALIC) > 0) {
 				name = "Helvetica-Oblique";
-			}
-			else
-			{
+			} else {
 				name = "Helvetica";
 			}
 		}
 
-		parseFont( name );
+		parseFont(name);
 	}
 
 	/**
@@ -196,8 +160,7 @@ public class BuiltinFont extends Type1Font
 	 * @param p
 	 *            package where to find the resources
 	 */
-	public static void setResources ( final Resources res, final String p )
-	{
+	public static void setResources(final Resources res, final String p) {
 		resources = res;
 		pkg = p;
 	}
@@ -205,91 +168,74 @@ public class BuiltinFont extends Type1Font
 	/**
 	 * Parse a font given only the name of a builtin font
 	 */
-	private void parseFont ( String baseFont ) throws IOException
-	{
+	private void parseFont(String baseFont) throws IOException {
 		// load the base fonts properties files, if it isn't already loaded
-		if ( props == null )
-		{
+		if (props == null) {
 			props = new Properties();
-			try
-			{
-				props.load( BuiltinFont.class.getResourceAsStream( "res/BaseFonts.properties" ) );
-			}
-			catch ( NullPointerException e )
-			{
-				props.load( resources.openRawResource( resources.getIdentifier( "basefonts", "raw", pkg ) ) );
+			try {
+				props.load(BuiltinFont.class.getResourceAsStream("res/BaseFonts.properties"));
+			} catch (NullPointerException e) {
+				Log.e("com.sun.pdfview", "Null pointer exception getting base fonts!");
+				props.load(resources.openRawResource(resources.getIdentifier("basefonts", "raw", pkg)));
 			}
 		}
 
 		// make sure we're a known font
-		if ( !props.containsKey( baseFont + ".file" ) )
-		{
-			throw new IllegalArgumentException( "Unknown Base Font: " + baseFont );
+		if (!props.containsKey(baseFont + ".file")) {
+			throw new IllegalArgumentException("Unknown Base Font: " + baseFont);
 		}
 
 		// get the font information from the properties file
-		String file = props.getProperty( baseFont + ".file" );
+		String file = props.getProperty(baseFont + ".file");
 
 		// the size of the file
-		int length = Integer.parseInt( props.getProperty( baseFont + ".length" ) );
+		int length = Integer.parseInt(props.getProperty(baseFont + ".length"));
 		// the size of the unencrypted portion
 		int length1 = 0;
 		// the size of the encrypted portion
 		int length2 = 0;
 
 		// read the data from the file
-		byte[] data = new byte[ length ];
+		byte[] data = new byte[length];
 		InputStream fontStream = null;
-		try
-		{
-			fontStream = BuiltinFont.class.getResourceAsStream( "res/" + file );
-			if ( fontStream == null )
-			{
-				fontStream = resources.openRawResource( resources.getIdentifier( file.substring( 0, file.indexOf( '.' ) ), "raw",
-						pkg ) );
+		try {
+			fontStream = BuiltinFont.class.getResourceAsStream("res/" + file);
+			if (fontStream == null) {
+				fontStream = resources.openRawResource(resources.getIdentifier(file.substring(0, file.indexOf('.')), "raw", pkg));
 			}
 			int cur = 0;
-			while ( cur < length )
-			{
-				cur += fontStream.read( data, cur, length - cur );
+			while (cur < length) {
+				cur += fontStream.read(data, cur, length - cur);
 			}
-		}
-		finally
-		{
-			Utils.closeSilently( fontStream );
+		} finally {
+			Utils.closeSilently(fontStream);
 		}
 
 		// are we a pfb file?
-		if ( ( data[ 0 ] & 0xff ) == 0x80 )
-		{
+		if ((data[0] & 0xff) == 0x80) {
 			// read lengths from the file
-			length1 = ( data[ 2 ] & 0xff );
-			length1 |= ( data[ 3 ] & 0xff ) << 8;
-			length1 |= ( data[ 4 ] & 0xff ) << 16;
-			length1 |= ( data[ 5 ] & 0xff ) << 24;
+			length1 = (data[2] & 0xff);
+			length1 |= (data[3] & 0xff) << 8;
+			length1 |= (data[4] & 0xff) << 16;
+			length1 |= (data[5] & 0xff) << 24;
 			length1 += 6;
 
-			length2 = ( data[ length1 + 2 ] & 0xff );
-			length2 |= ( data[ length1 + 3 ] & 0xff ) << 8;
-			length2 |= ( data[ length1 + 4 ] & 0xff ) << 16;
-			length2 |= ( data[ length1 + 5 ] & 0xff ) << 24;
+			length2 = (data[length1 + 2] & 0xff);
+			length2 |= (data[length1 + 3] & 0xff) << 8;
+			length2 |= (data[length1 + 4] & 0xff) << 16;
+			length2 |= (data[length1 + 5] & 0xff) << 24;
 			length1 += 6;
-		}
-		else
-		{
+		} else {
 			// get the values from the properties file
-			length1 = Integer.parseInt( props.getProperty( baseFont + ".length1" ) );
+			length1 = Integer.parseInt(props.getProperty(baseFont + ".length1"));
 
-			if ( props.containsKey( baseFont + ".length2" ) )
-			{
-				length2 = Integer.parseInt( props.getProperty( baseFont + ".lenth2" ) );
-			}
-			else
-			{
+			if (props.containsKey(baseFont + ".length2")) {
+				length2 = Integer.parseInt(props.getProperty(baseFont + ".lenth2"));
+			} else {
 				length2 = length - length1;
 			}
 		}
 
-		parseFont( data, length1, length2 );
+		parseFont(data, length1, length2);
 	}
 }

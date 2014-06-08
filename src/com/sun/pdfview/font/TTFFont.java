@@ -64,8 +64,11 @@ public class TTFFont extends OutlineFont {
             throws IOException {
         super(baseFont, fontObj, descriptor);
 
+        @SuppressWarnings("unused")
+		String fontName = descriptor.getFontName();
         PDFObject ttfObj = descriptor.getFontFile2();
 
+        // TODO font is null sometimes!
         // try {
         //    byte[] fontData = ttfObj.getStream();
         //    java.io.FileOutputStream fis = new java.io.FileOutputStream("/tmp/" + fontName + ".ttf");
@@ -186,7 +189,7 @@ public class TTFFont extends OutlineFont {
 
         // calculate the advance
         HmtxTable hmtx = (HmtxTable) font.getTable("hmtx");
-        float advance = hmtx.getAdvance(glyphId) / unitsPerEm;
+        float advance = (float) hmtx.getAdvance(glyphId) / (float) unitsPerEm;
 
         // scale the glyph to match the desired advance
         float widthfactor = width / advance;

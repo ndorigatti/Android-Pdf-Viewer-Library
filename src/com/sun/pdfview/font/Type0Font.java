@@ -22,7 +22,6 @@
 package com.sun.pdfview.font;
 
 import java.io.IOException;
-
 import com.sun.pdfview.PDFObject;
 
 /**

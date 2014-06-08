@@ -23,14 +23,11 @@ package com.sun.pdfview.font;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import net.sf.andpdf.utils.Utils;
-
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
-
 import com.sun.pdfview.PDFObject;
 import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFParser;
@@ -47,7 +44,7 @@ public class Type3Font extends PDFFont {
     /** resources for the character definitions */
     HashMap<String,PDFObject> rsrc;
     /** the character processes, mapped by name */
-    Map charProcs;
+	Map<?, ?> charProcs;
     /** bounding box for the font characters */
     RectF bbox;
     /** affine transform for the font characters */
@@ -61,14 +58,18 @@ public class Type3Font extends PDFFont {
 
     /**
      * Generate a Type 3 font.
-     * @param baseFont the postscript name of this font
-     * @param fontObj a dictionary containing references to the character
+	 * 
+	 * @param baseFont
+	 *            the postscript name of this font
+	 * @param fontObj
+	 *            a dictionary containing references to the character
      * definitions and font information
-     * @param resources a set of resources used by the character definitions
-     * @param descriptor the descriptor for this font
+	 * @param resources
+	 *            a set of resources used by the character definitions
+	 * @param descriptor
+	 *            the descriptor for this font
      */
-    public Type3Font(String baseFont, PDFObject fontObj,
-            HashMap<String,PDFObject> resources, PDFFontDescriptor descriptor) throws IOException {
+	public Type3Font(String baseFont, PDFObject fontObj, HashMap<String, PDFObject> resources, PDFFontDescriptor descriptor) throws IOException {
         super(baseFont, descriptor);
 
         rsrc = new HashMap<String,PDFObject>();
@@ -86,7 +87,8 @@ public class Type3Font extends PDFFont {
         at = Utils.createMatrix(matrixAry);
 
         // get the scale from the matrix
-        //float scale = matrixAry[0] + matrixAry[2];
+		@SuppressWarnings("unused")
+		float scale = matrixAry[0] + matrixAry[2];
 
         // put all the resources in a Hash
         PDFObject rsrcObj = fontObj.getDictRef("Resources");
@@ -103,9 +105,7 @@ public class Type3Font extends PDFFont {
         for (int i = 0; i < 4; i++) {
             bboxfdef[i] = bboxdef[i].getFloatValue();
         }
-        bbox = new RectF(bboxfdef[0], bboxfdef[1],
-                bboxfdef[2] - bboxfdef[0],
-                bboxfdef[3] - bboxfdef[1]);
+		bbox = new RectF(bboxfdef[0], bboxfdef[1], bboxfdef[2] - bboxfdef[0], bboxfdef[3] - bboxfdef[1]);
         if (bbox.isEmpty()) {
             bbox = null;
         }
@@ -138,23 +138,21 @@ public class Type3Font extends PDFFont {
 
     /**
      * Get the glyph for a given character code and name
-     *
      * The preferred method of getting the glyph should be by name.  If the
      * name is null or not valid, then the character code should be used.
      * If the both the code and the name are invalid, the undefined glyph 
      * should be returned.
-     *
      * Note this method must *always* return a glyph.  
      *
-     * @param src the character code of this glyph
-     * @param name the name of this glyph or null if unknown
+	 * @param src
+	 *            the character code of this glyph
+	 * @param name
+	 *            the name of this glyph or null if unknown
      * @return a glyph for this character
      */
-    @Override
 	protected PDFGlyph getGlyph(char src, String name) {
         if (name == null) {
-            throw new IllegalArgumentException("Glyph name required for Type3 font!" +
-                    "Source character: " + (int) src);
+			throw new IllegalArgumentException("Glyph name required for Type3 font!" + "Source character: " + (int) src);
         }
 
         PDFObject pageObj = (PDFObject) charProcs.get(name);
@@ -181,7 +179,8 @@ public class Type3Font extends PDFFont {
             return new PDFGlyph(src, name, page, advance);
         } catch (IOException ioe) {
             // help!
-            //System.out.println("IOException in Type3 font: " + ioe);
+			System.out.println("IOException in Type3 font: " + ioe);
+			ioe.printStackTrace();
             return null;
         }
     }

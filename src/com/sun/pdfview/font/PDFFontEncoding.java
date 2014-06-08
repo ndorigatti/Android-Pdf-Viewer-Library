@@ -1,5 +1,5 @@
 /*
- * $Id: PDFFontEncoding.java,v 1.4 2009/02/12 13:53:54 tomoke Exp $
+ * $Id: PDFFontEncoding.java,v 1.4 2009-02-12 13:53:54 tomoke Exp $
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
@@ -79,15 +79,23 @@ public class PDFFontEncoding {
             }
         } else {
             // loook at the "Type" entry of the encoding to determine the type
-            String typeStr = encoding.getDictRef("Type").getStringValue();
-
+// ______ THIS WAS THE OLD LINE
+//            String typeStr = encoding.getDictRef("Type").getStringValue();
+//_______ THESE ARE THE NEW LINES
+			PDFObject type = encoding.getDictRef("Type");
+			String typeStr = "Encoding";
+			if (type != null) {
+				// The type is optional (cf. Table 114 in PDF 32000-1:2008)
+				typeStr = encoding.getDictRef("Type").getStringValue();
+			}
+// ______ END OF NEW LINES
             if (typeStr.equals("Encoding")) {
                 // it is an encoding
-                type = TYPE_ENCODING;
+                this.type = TYPE_ENCODING;
                 parseEncoding(encoding);
             } else if (typeStr.equals("CMap")) {
                 // it is a CMap
-                type = TYPE_CMAP;
+                this.type = TYPE_CMAP;
                 cmap = PDFCMap.getCMap(encoding);
             } else {
                 throw new IllegalArgumentException("Uknown encoding type: " + type);

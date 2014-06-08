@@ -67,7 +67,7 @@ public abstract class PDFCMap {
             throw new IOException("Unknown CMap: " + mapName);
         }
             
-        return cache.get(mapName);
+        return (PDFCMap) cache.get(mapName);
     }
     
     /**
