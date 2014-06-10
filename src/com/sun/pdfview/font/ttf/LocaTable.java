@@ -100,7 +100,7 @@ public class LocaTable extends TrueTypeTable {
             if (isLongFormat()) {
                 offsets[i] = data.getInt();
             } else {
-                offsets[i] = 2 * ( 0xFFFF & data.getShort());
+                offsets[i] = 2 * ( 0xFFFF & (int) data.getShort());
             }
         }
     }

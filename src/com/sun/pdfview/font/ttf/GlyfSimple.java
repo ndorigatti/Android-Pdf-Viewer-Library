@@ -23,344 +23,343 @@ package com.sun.pdfview.font.ttf;
 import net.sf.andpdf.nio.ByteBuffer;
 
 /**
- * A single simple glyph in a pdf font. 
- *
+ * A single simple glyph in a pdf font.
+ * 
  * @author ?
  * @author Ferenc Hechler (ferenc@hechler.de)
  * @author Joerg Jahnke (joergjahnke@users.sourceforge.net)
  */
 public class GlyfSimple extends Glyf {
 
-    /** the end points of the various contours */
-    private short[] contourEndPts;
-    /** the instructions */
-    private byte[] instructions;
-    /** the flags */
-    private byte[] flags;
-    /** the x coordinates */
-    private short[] xCoords;
-    /** the y coordinates */
-    private short[] yCoords;
+	/** the end points of the various contours */
+	private short[] contourEndPts;
+	/** the instructions */
+	private byte[] instructions;
+	/** the flags */
+	private byte[] flags;
+	/** the x coordinates */
+	private short[] xCoords;
+	/** the y coordinates */
+	private short[] yCoords;
 
-    /** 
-     * Creates a new instance of a simple glyf
-     */
-    protected GlyfSimple() {
-    }
+	/**
+	 * Creates a new instance of a simple glyf
+	 */
+	protected GlyfSimple() {
+	}
 
-    /**
-     * Set the data for this glyf.
-     */
-    @Override
-    public void setData(final ByteBuffer data) {
-        // int pos = data.position();
-        // byte[] prdata = new byte[data.remaining()];
-        // data.get(prdata);
-        // HexDump.printData(prdata);
-        // data.position(pos);
+	/**
+	 * Set the data for this glyf.
+	 */
+	@Override
+	public void setData(final ByteBuffer data) {
+		// int pos = data.position();
+		// byte[] prdata = new byte[data.remaining()];
+		// data.get(prdata);
+		// HexDump.printData(prdata);
+		// data.position(pos);
 
+		// read the contour end points
+		final short[] contourEndPts_ = new short[getNumContours()];
+		for (int i = 0, to = contourEndPts_.length; i < to; ++i) {
+			contourEndPts_[i] = data.getShort();
+		}
+		setContourEndPoints(contourEndPts_);
 
-        // read the contour end points
-        final short[] contourEndPts_ = new short[getNumContours()];
-        for (int i = 0, to = contourEndPts_.length; i < to; ++i) {
-            contourEndPts_[i] = data.getShort();
-        }
-        setContourEndPoints(contourEndPts_);
+		// the number of points in the glyf is the number of the end
+		// point in the last contour
+		final int numPoints = getContourEndPoint(getNumContours() - 1) + 1;
 
-        // the number of points in the glyf is the number of the end
-        // point in the last contour
-        final int numPoints = getContourEndPoint(getNumContours() - 1) + 1;
+		// read the instructions
+		final short numInstructions = data.getShort();
+		final byte[] instructions_ = new byte[numInstructions];
+		data.get(instructions_);
+		setInstructions(instructions_);
 
-        // read the instructions
-        final short numInstructions = data.getShort();
-        final byte[] instructions_ = new byte[numInstructions];
-        data.get(instructions_);
-        setInstructions(instructions_);
+		// read the flags
+		final byte[] flags_ = new byte[numPoints];
+		for (int i = 0, to = flags_.length; i < to; ++i) {
+			flags_[i] = data.get();
 
-        // read the flags
-        final byte[] flags_ = new byte[numPoints];
-        for (int i = 0, to = flags_.length; i < to; ++i) {
-            flags_[i] = data.get();
+			// check for repeats
+			if ((flags_[i] & 0x8) != 0) {
+				final byte f = flags_[i];
+                final int n = (int) (data.get() & 0xff);
+				for (int c = 0; c < n; c++) {
+					flags_[++i] = f;
+				}
+			}
+		}
+		setFlags(flags_);
 
-            // check for repeats
-            if ((flags_[i] & 0x8) != 0) {
-                final byte f = flags_[i];
-                final int n = data.get() & 0xff;
-                for (int c = 0; c < n; c++) {
-                    flags_[++i] = f;
-                }
-            }
-        }
-        setFlags(flags_);
+		// read the x coordinates
+		final short[] xCoords_ = new short[numPoints];
+		for (int i = 0, to = xCoords_.length; i < to; i++) {
+			if (i > 0) {
+				xCoords_[i] = xCoords_[i - 1];
+			}
 
-        // read the x coordinates
-        final short[] xCoords_ = new short[numPoints];
-        for (int i = 0, to = xCoords_.length; i < to; i++) {
-            if (i > 0) {
-                xCoords_[i] = xCoords_[i - 1];
-            }
+			// read this value
+			if (xIsByte(i)) {
+                int val = (int) (data.get() & 0xff);
+				if (!xIsSame(i)) {
+					// the xIsSame bit controls the sign
+					val = -val;
+				}
+				xCoords_[i] += val;
+			} else if (!xIsSame(i)) {
+				xCoords_[i] += data.getShort();
+			}
+		}
+		setXCoords(xCoords_);
 
-            // read this value
-            if (xIsByte(i)) {
-                int val = data.get() & 0xff;
-                if (!xIsSame(i)) {
-                    // the xIsSame bit controls the sign
-                    val = -val;
-                }
-                xCoords_[i] += val;
-            } else if (!xIsSame(i)) {
-                xCoords_[i] += data.getShort();
-            }
-        }
-        setXCoords(xCoords_);
+		// read the y coordinates
+		final short[] yCoords_ = new short[numPoints];
+		for (int i = 0, to = yCoords_.length; i < to; i++) {
+			if (i > 0) {
+				yCoords_[i] = yCoords_[i - 1];
+			}
+			// read this value
+			if (yIsByte(i)) {
+                int val = (int) (data.get() & 0xff);
+				if (!yIsSame(i)) {
+					// the xIsSame bit controls the sign
+					val = -val;
+				}
+				yCoords_[i] += val;
+			} else if (!yIsSame(i)) {
+				yCoords_[i] += data.getShort();
+			}
+		}
+		setYCoords(yCoords_);
+	}
 
-        // read the y coordinates
-        final short[] yCoords_ = new short[numPoints];
-        for (int i = 0, to = yCoords_.length; i < to; i++) {
-            if (i > 0) {
-                yCoords_[i] = yCoords_[i - 1];
-            }
-            // read this value
-            if (yIsByte(i)) {
-                int val = data.get() & 0xff;
-                if (!yIsSame(i)) {
-                    // the xIsSame bit controls the sign
-                    val = -val;
-                }
-                yCoords_[i] += val;
-            } else if (!yIsSame(i)) {
-                yCoords_[i] += data.getShort();
-            }
-        }
-        setYCoords(yCoords_);
-    }
+	/**
+	 * Get the data in this glyf as a byte buffer. Return the basic
+	 * glyf data only, since there is no specific data. This method returns
+	 * the data un-flipped, so subclasses can simply append to the allocated
+	 * buffer.
+	 */
+	@Override
+	public ByteBuffer getData() {
+		ByteBuffer buf = super.getData();
 
-    /**
-     * Get the data in this glyf as a byte buffer.  Return the basic
-     * glyf data only, since there is no specific data.  This method returns
-     * the data un-flipped, so subclasses can simply append to the allocated
-     * buffer.
-     */
-    @Override
-    public ByteBuffer getData() {
-        ByteBuffer buf = super.getData();
+		// write the contour end points
+		for (int i = 0; i < getNumContours(); i++) {
+			buf.putShort(getContourEndPoint(i));
+		}
 
-        // write the contour end points
-        for (int i = 0; i < getNumContours(); i++) {
-            buf.putShort(getContourEndPoint(i));
-        }
+		// write the instructions
+		buf.putShort(getNumInstructions());
+		for (int i = 0; i < getNumInstructions(); i++) {
+			buf.put(getInstruction(i));
+		}
 
-        // write the instructions
-        buf.putShort(getNumInstructions());
-        for (int i = 0; i < getNumInstructions(); i++) {
-            buf.put(getInstruction(i));
-        }
+		// write the flags
+		for (int i = 0; i < getNumPoints(); i++) {
+			// check for repeats
+			byte r = 0;
+			while (i > 0 && (getFlag(i) == getFlag(i - 1))) {
+				r++;
+				i++;
+			}
+			if (r > 0) {
+				buf.put(r);
+			} else {
+				buf.put(getFlag(i));
+			}
+		}
 
-        // write the flags
-        for (int i = 0; i < getNumPoints(); i++) {
-            // check for repeats
-            byte r = 0;
-            while (i > 0 && (getFlag(i) == getFlag(i - 1))) {
-                r++;
-                i++;
-            }
-            if (r > 0) {
-                buf.put(r);
-            } else {
-                buf.put(getFlag(i));
-            }
-        }
+		// write the x coordinates
+		for (int i = 0; i < getNumPoints(); i++) {
+			if (xIsByte(i)) {
+				buf.put((byte) getXCoord(i));
+			} else if (!xIsSame(i)) {
+				buf.putShort(getXCoord(i));
+			}
+		}
 
-        // write the x coordinates
-        for (int i = 0; i < getNumPoints(); i++) {
-            if (xIsByte(i)) {
-                buf.put((byte) getXCoord(i));
-            } else if (!xIsSame(i)) {
-                buf.putShort(getXCoord(i));
-            }
-        }
+		// write the y coordinates
+		for (int i = 0; i < getNumPoints(); i++) {
+			if (yIsByte(i)) {
+				buf.put((byte) getYCoord(i));
+			} else if (!yIsSame(i)) {
+				buf.putShort(getYCoord(i));
+			}
+		}
 
-        // write the y coordinates
-        for (int i = 0; i < getNumPoints(); i++) {
-            if (yIsByte(i)) {
-                buf.put((byte) getYCoord(i));
-            } else if (!yIsSame(i)) {
-                buf.putShort(getYCoord(i));
-            }
-        }
+		// don't flip the buffer, since it may be used by subclasses
+		return buf;
+	}
 
-        // don't flip the buffer, since it may be used by subclasses
-        return buf;
-    }
+	/**
+	 * Get the length of this glyf.
+	 */
+	@Override
+	public short getLength() {
+		// start with the length of the superclass
+		short length = super.getLength();
 
-    /**
-     * Get the length of this glyf. 
-     */
-    @Override
-    public short getLength() {
-        // start with the length of the superclass
-        short length = super.getLength();
+		// add the length of the end points
+		length += getNumContours() * 2;
 
-        // add the length of the end points
-        length += getNumContours() * 2;
+		// add the length of the instructions
+		length += 2 + getNumInstructions();
 
-        // add the length of the instructions
-        length += 2 + getNumInstructions();
+		// add the length of the flags, avoiding repeats
+		for (int i = 0; i < getNumPoints(); i++) {
+			// check for repeats
+			while (i > 0 && (getFlag(i) == getFlag(i - 1))) {
+				// empty
+			}
+			length++;
+		}
 
-        // add the length of the flags, avoiding repeats
-        for (int i = 0; i < getNumPoints(); i++) {
-            // check for repeats
-            while (i > 0 && (getFlag(i) == getFlag(i - 1))) {
-                // empty
-            }
-            length++;
-        }
+		// add the length of the xCoordinates
+		for (int i = 0; i < getNumPoints(); i++) {
+			if (xIsByte(i)) {
+				length++;
+			} else if (!xIsSame(i)) {
+				length += 2;
+			}
 
-        // add the length of the xCoordinates
-        for (int i = 0; i < getNumPoints(); i++) {
-            if (xIsByte(i)) {
-                length++;
-            } else if (!xIsSame(i)) {
-                length += 2;
-            }
+			if (yIsByte(i)) {
+				length++;
+			} else if (!yIsSame(i)) {
+				length += 2;
+			}
+		}
 
-            if (yIsByte(i)) {
-                length++;
-            } else if (!yIsSame(i)) {
-                length += 2;
-            }
-        }
+		return length;
+	}
 
-        return length;
-    }
+	/**
+	 * Get the end point of a given contour
+	 */
+	public short getContourEndPoint(int index) {
+		return contourEndPts[index];
+	}
 
-    /**
-     * Get the end point of a given contour
-     */
-    public short getContourEndPoint(int index) {
-        return contourEndPts[index];
-    }
+	/**
+	 * Set the number of contours in this glyf
+	 */
+	protected void setContourEndPoints(short[] contourEndPts) {
+		this.contourEndPts = contourEndPts;
+	}
 
-    /**
-     * Set the number of contours in this glyf
-     */
-    protected void setContourEndPoints(short[] contourEndPts) {
-        this.contourEndPts = contourEndPts;
-    }
+	/**
+	 * Get the number of instructions
+	 */
+	public short getNumInstructions() {
+		return (short) instructions.length;
+	}
 
-    /**
-     * Get the number of instructions
-     */
-    public short getNumInstructions() {
-        return (short) instructions.length;
-    }
+	/**
+	 * Get a given instruction
+	 */
+	public byte getInstruction(int index) {
+		return instructions[index];
+	}
 
-    /**
-     * Get a given instruction
-     */
-    public byte getInstruction(int index) {
-        return instructions[index];
-    }
+	/**
+	 * Set the instructions
+	 */
+	protected void setInstructions(byte[] instructions) {
+		this.instructions = instructions;
+	}
 
-    /**
-     * Set the instructions
-     */
-    protected void setInstructions(byte[] instructions) {
-        this.instructions = instructions;
-    }
+	/**
+	 * Get the number of points in the glyf
+	 */
+	public short getNumPoints() {
+		return (short) flags.length;
+	}
 
-    /**
-     * Get the number of points in the glyf
-     */
-    public short getNumPoints() {
-        return (short) flags.length;
-    }
+	/**
+	 * Get a given flag
+	 */
+	public byte getFlag(int pointIndex) {
+		return flags[pointIndex];
+	}
 
-    /**
-     * Get a given flag
-     */
-    public byte getFlag(int pointIndex) {
-        return flags[pointIndex];
-    }
+	/**
+	 * Determine whether the given point is on the curve
+	 */
+	public boolean onCurve(int pointIndex) {
+		return ((getFlag(pointIndex) & 0x1) != 0);
+	}
 
-    /**
-     * Determine whether the given point is on the curve
-     */
-    public boolean onCurve(int pointIndex) {
-        return ((getFlag(pointIndex) & 0x1) != 0);
-    }
+	/**
+	 * Determine whether the x value for the given point is byte or short.
+	 * If true, it is a byte, if false it is a short
+	 */
+	protected boolean xIsByte(int pointIndex) {
+		return ((getFlag(pointIndex) & 0x2) != 0);
+	}
 
-    /**
-     * Determine whether the x value for the given point is byte or short.
-     * If true, it is a byte, if false it is a short
-     */
-    protected boolean xIsByte(int pointIndex) {
-        return ((getFlag(pointIndex) & 0x2) != 0);
-    }
+	/**
+	 * Determine whether the x value for the given point is byte or short.
+	 * If true, it is a byte, if false it is a short
+	 */
+	protected boolean yIsByte(int pointIndex) {
+		return ((getFlag(pointIndex) & 0x4) != 0);
+	}
 
-    /**
-     * Determine whether the x value for the given point is byte or short.
-     * If true, it is a byte, if false it is a short
-     */
-    protected boolean yIsByte(int pointIndex) {
-        return ((getFlag(pointIndex) & 0x4) != 0);
-    }
+	/**
+	 * Determine whether this flag repeats
+	 */
+	protected boolean repeat(int pointIndex) {
+		return ((getFlag(pointIndex) & 0x8) != 0);
+	}
 
-    /**
-     * Determine whether this flag repeats
-     */
-    protected boolean repeat(int pointIndex) {
-        return ((getFlag(pointIndex) & 0x8) != 0);
-    }
+	/**
+	 * Determine whether the x value for the given point is the same as
+	 * the previous value.
+	 */
+	protected boolean xIsSame(int pointIndex) {
+		return ((getFlag(pointIndex) & 0x10) != 0);
+	}
 
-    /**
-     * Determine whether the x value for the given point is the same as 
-     * the previous value.
-     */
-    protected boolean xIsSame(int pointIndex) {
-        return ((getFlag(pointIndex) & 0x10) != 0);
-    }
+	/**
+	 * Determine whether the y value for the given point is the same as
+	 * the previous value.
+	 */
+	protected boolean yIsSame(int pointIndex) {
+		return ((getFlag(pointIndex) & 0x20) != 0);
+	}
 
-    /**
-     * Determine whether the y value for the given point is the same as 
-     * the previous value.
-     */
-    protected boolean yIsSame(int pointIndex) {
-        return ((getFlag(pointIndex) & 0x20) != 0);
-    }
+	/**
+	 * Set the flags
+	 */
+	protected void setFlags(byte[] flags) {
+		this.flags = flags;
+	}
 
-    /**
-     * Set the flags
-     */
-    protected void setFlags(byte[] flags) {
-        this.flags = flags;
-    }
+	/**
+	 * Get a given x coordinate
+	 */
+	public short getXCoord(int pointIndex) {
+		return xCoords[pointIndex];
+	}
 
-    /**
-     * Get a given x coordinate
-     */
-    public short getXCoord(int pointIndex) {
-        return xCoords[pointIndex];
-    }
+	/**
+	 * Set the x coordinates
+	 */
+	protected void setXCoords(short[] xCoords) {
+		this.xCoords = xCoords;
+	}
 
-    /**
-     * Set the x coordinates
-     */
-    protected void setXCoords(short[] xCoords) {
-        this.xCoords = xCoords;
-    }
+	/**
+	 * Get a given y coordinate
+	 */
+	public short getYCoord(int pointIndex) {
+		return yCoords[pointIndex];
+	}
 
-    /**
-     * Get a given y coordinate
-     */
-    public short getYCoord(int pointIndex) {
-        return yCoords[pointIndex];
-    }
-
-    /**
-     * Set the x coordinates
-     */
-    protected void setYCoords(short[] yCoords) {
-        this.yCoords = yCoords;
-    }
+	/**
+	 * Set the x coordinates
+	 */
+	protected void setYCoords(short[] yCoords) {
+		this.yCoords = yCoords;
+	}
 }

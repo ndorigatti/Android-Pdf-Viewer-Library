@@ -22,122 +22,119 @@
 package com.sun.pdfview.font.ttf;
 
 import net.sf.andpdf.nio.ByteBuffer;
-
 import java.util.*;
 
 /**
- *
- * @author  jkaplan
+ * @author jkaplan
  */
 public class CMapFormat6 extends CMap {
-    /** First character code of subrange. */
-    private short firstCode;
-    /** Number of character codes in subrange. */
-    private short entryCount;
-    /** Array of glyph index values for character codes in the range. */
-    private short [] glyphIndexArray;
-    /** a reverse lookup from glyph id to index. */
-    private HashMap<Short,Short> glyphLookup = new HashMap<Short,Short>();
+	/** First character code of subrange. */
+	private short firstCode;
+	/** Number of character codes in subrange. */
+	private short entryCount;
+	/** Array of glyph index values for character codes in the range. */
+	private short[] glyphIndexArray;
+	/** a reverse lookup from glyph id to index. */
+	private HashMap<Short, Short> glyphLookup = new HashMap<Short, Short>();
 
-    /** Creates a new instance of CMapFormat0 */
-    protected CMapFormat6(short language) {
-        super((short) 6, language);
-    }
+	/** Creates a new instance of CMapFormat0 */
+	protected CMapFormat6(short language) {
+		super((short) 6, language);
+	}
 
-    /**
-     * Get the length of this table
-     */
-    @Override
+	/**
+	 * Get the length of this table
+	 */
+	@Override
 	public short getLength() {
-        // start with the size of the fixed header
-        short size = 5 * 2;
+		// start with the size of the fixed header
+		short size = 5 * 2;
 
-        // add the size of each segment header
-        size += entryCount * 2;
-        return size;
-    }
+		// add the size of each segment header
+		size += entryCount * 2;
+		return size;
+	}
 
-    /**
-     * Cannot map from a byte
-     */
-    @Override
+	/**
+	 * Cannot map from a byte
+	 */
+	@Override
 	public byte map(byte src) {
-        char c = map((char) src);
-        if ( c > Byte.MAX_VALUE) {
-            // out of range
-            return 0;
-        }
-        return (byte) c;
-    }
+		char c = map((char) src);
+        if (c < Byte.MIN_VALUE || c > Byte.MAX_VALUE) {
+			// out of range
+			return 0;
+		}
+		return (byte) c;
+	}
 
-    /**
-     * Map from char
-     */
-    @Override
+	/**
+	 * Map from char
+	 */
+	@Override
 	public char map(char src) {
 
-        // find first segment with endcode > src
-        if (src < firstCode || src > (firstCode + entryCount)) {
-            // Codes outside of the range are assumed to be missing and are
-            // mapped to the glyph with index 0
-            return '\000';
-        }
-        return (char) glyphIndexArray[src - firstCode];
-    }
+		// find first segment with endcode > src
+		if (src < firstCode || src > (firstCode + entryCount)) {
+			// Codes outside of the range are assumed to be missing and are
+			// mapped to the glyph with index 0
+			return '\000';
+		}
+		return (char) glyphIndexArray[src - firstCode];
+	}
 
-    /**
-     * Get the src code which maps to the given glyphID
-     */
-    @Override
+	/**
+	 * Get the src code which maps to the given glyphID
+	 */
+	@Override
 	public char reverseMap(short glyphID) {
-        Short result = glyphLookup.get(new Short(glyphID));
-        if (result == null) {
-            return '\000';
-        }
-        return (char) result.shortValue();
-    }
+		Short result = glyphLookup.get(new Short(glyphID));
+		if (result == null) {
+			return '\000';
+		}
+		return (char) result.shortValue();
+	}
 
-
-    /**
-     * Get the data in this map as a ByteBuffer
-     */
-    @Override
+	/**
+	 * Get the data in this map as a ByteBuffer
+	 */
+	@Override
 	public void setData(int length, ByteBuffer data) {
-        // read the table size values
-        firstCode = data.getShort();
-        entryCount = data.getShort();
+		// read the table size values
+		firstCode = data.getShort();
+		entryCount = data.getShort();
 
-        glyphIndexArray = new short [entryCount];
-        for (int i = 0; i < glyphIndexArray.length; i++) {
-            glyphIndexArray[i] = data.getShort();
+		glyphIndexArray = new short[entryCount];
+		for (int i = 0; i < glyphIndexArray.length; i++) {
+			glyphIndexArray[i] = data.getShort();
             glyphLookup.put(new Short(glyphIndexArray[i]),
                             new Short((short) (i + firstCode)));
-        }
-    }
+		}
+	}
 
-    /**
-     * Get the data in the map as a byte buffer
-     */
-    @Override
+	/**
+	 * Get the data in the map as a byte buffer
+	 */
+	@Override
 	public ByteBuffer getData() {
-        ByteBuffer buf = ByteBuffer.allocate(getLength());
+		ByteBuffer buf = ByteBuffer.allocate(getLength());
 
-        // write the header
-        buf.putShort(getFormat());
-        buf.putShort(getLength());
-        buf.putShort(getLanguage());
+		// write the header
+		buf.putShort(getFormat());
+        buf.putShort((short) getLength());
+		buf.putShort(getLanguage());
 
-        // write the various values
-        buf.putShort(firstCode);
-        buf.putShort(entryCount);
+		// write the various values
+		buf.putShort(firstCode);
+		buf.putShort(entryCount);
 
-        // write the endCodes
-        for (int i = 0; i < glyphIndexArray.length; i++) {
-            buf.putShort(glyphIndexArray[i]);
-        }
-        // reset the data pointer
-        buf.flip();
+		// write the endCodes
+		for (int i = 0; i < glyphIndexArray.length; i++) {
+			buf.putShort(glyphIndexArray[i]);
+		}
+		// reset the data pointer
+		buf.flip();
 
-        return buf;
-    }
+		return buf;
+	}
 }
