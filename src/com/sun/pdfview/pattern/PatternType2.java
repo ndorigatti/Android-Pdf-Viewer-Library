@@ -135,7 +135,8 @@ public class PatternType2 extends PDFPattern {
             //g.setPaint(getPaint());
             //g.fill(xformed);
             Paint tmp2 = getPaint();
-            Xfermode backupXfermode = tmp2.getXfermode();
+            @SuppressWarnings("unused")
+			Xfermode backupXfermode = tmp2.getXfermode();
             tmp2.setXfermode(pdxfer2);
             g.drawPath(xformed,tmp2);
             
