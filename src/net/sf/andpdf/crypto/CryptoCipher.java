@@ -5,7 +5,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -17,10 +16,10 @@ import javax.crypto.spec.SecretKeySpec;
 public class CryptoCipher extends Cipher {
 
 	javax.crypto.Cipher cipher;
-	
+
 	public CryptoCipher(String ciphername) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		this.cipher = javax.crypto.Cipher.getInstance(ciphername);
-		
+
 	}
 
 	@Override
@@ -40,52 +39,38 @@ public class CryptoCipher extends Cipher {
 
 	@Override
 	public void init(int mode, Key key) {
-		try
-		{
+		try {
 			cipher.init(mode, key);
-		}
-		catch ( InvalidKeyException e )
-		{
+		} catch (InvalidKeyException e) {
 			// no-op
 		}
 	}
 
 	@Override
 	public void init(int mode, SecretKey key) {
-		try
-		{
+		try {
 			cipher.init(mode, key);
-		}
-		catch ( InvalidKeyException e )
-		{
+		} catch (InvalidKeyException e) {
 			// no-op
 		}
 	}
 
 	@Override
 	public void init(int mode, SecretKeySpec keySpec) {
-		try
-		{
+		try {
 			cipher.init(mode, keySpec);
-		}
-		catch ( InvalidKeyException e )
-		{
+		} catch (InvalidKeyException e) {
 			// no-op
 		}
 	}
 
 	@Override
 	public void init(int mode, SecretKeySpec keySpec, IvParameterSpec Iv) {
-		try
-		{
+		try {
 			cipher.init(mode, keySpec, Iv);
-		}
-		catch ( InvalidKeyException e )
-		{
+		} catch (InvalidKeyException e) {
 			// no-op
-		}
-		catch ( InvalidAlgorithmParameterException e )
-		{
+		} catch (InvalidAlgorithmParameterException e) {
 			// no-op
 		}
 	}
