@@ -104,4 +104,11 @@ public class PDFPaint {
 	public Paint getPaint() {
 		return mainPaint;
 	}
+    
+    /**
+     * get the PDFPaint representing a generic paint
+     */
+    public static PDFPaint getPaint(Paint p) {
+        return new PDFPaint(p);
+    }
 }
