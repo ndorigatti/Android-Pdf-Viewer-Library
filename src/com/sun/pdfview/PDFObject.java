@@ -30,12 +30,9 @@ import java.util.Map;
 import java.util.Set;
 import net.sf.andpdf.nio.ByteBuffer;
 import net.sf.andpdf.refs.SoftReference;
-
-import java.util.*;
-
 import com.sun.pdfview.decode.PDFDecoder;
-import com.sun.pdfview.decrypt.PDFDecrypter;
 import com.sun.pdfview.decrypt.IdentityDecrypter;
+import com.sun.pdfview.decrypt.PDFDecrypter;
 
 /**
  * a class encapsulating all the possibilities of content for
@@ -582,9 +579,10 @@ public class PDFObject {
 
     public PDFDecrypter getDecrypter() {
         // PDFObjects without owners are always created as part of
-        // content instructions. Such objects will never have encryption
-        // applied to them, as the stream they're contained by is the
-        // unit of encryption. So, if someone asks for the decrypter for
+        // content instructions. Such an object will never have encryption
+        // applied to it, as the stream that contains it is the
+        // unit of encryption, with no further encryption being applied
+        // within. So if someone asks for the decrypter for
         // one of these in-stream objects, no decryption should
         // ever be applied. This can be seen with inline images.
         return owner != null ?
