@@ -378,6 +378,9 @@ public class PDFObject {
         if (type == INDIRECT) {
             return dereference().getIntValue();
         } else if (type == NUMBER) {
+        	if(value instanceof Integer){
+        		return (Integer)value;
+        	}
             return ((Double) value).intValue();
         }
 
